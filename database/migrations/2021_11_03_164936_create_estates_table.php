@@ -17,6 +17,7 @@ class CreateEstatesTable extends Migration
             $table->id();
             $table->unsignedBigInteger('city_id');
             $table->unsignedBigInteger('state_id');
+            $table->unsignedBigInteger('country_id');
             $table->unsignedBigInteger('bank_id');
             $table->string('estateCode', 20);
             $table->string('name', 100);
@@ -27,6 +28,7 @@ class CreateEstatesTable extends Migration
             $table->string('accountName', 100);
             $table->string('imageName', 100);
             $table->boolean('accountVerified')->default(false);
+            $table->string('alternativeContact', 100);
             $table->string('alternateEmail', 100);
             $table->string('alternatePhone', 17);
             $table->string('status')->default('pending')->comment('The options here
@@ -37,6 +39,7 @@ class CreateEstatesTable extends Migration
 
             $table->foreign('city_id')->references('id')->on('cities');
             $table->foreign('state_id')->references('id')->on('states');
+            $table->foreign('country_id')->references('id')->on('countries');
             $table->foreign('bank_id')->references('id')->on('banks');
             $table->foreign('created_by')->references('id')->on('users');
         });

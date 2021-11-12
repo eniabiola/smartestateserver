@@ -21,6 +21,8 @@ class CreateResidentsTable extends Migration
             $table->dateTime('dateMovedIn');
             $table->timestamps();
             $table->softDeletes();
+
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 
