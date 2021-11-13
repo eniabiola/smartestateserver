@@ -44,7 +44,7 @@ class VisitorPassAPIController extends AppBaseController
         );
         $visitorPasses = VisitorPass::query()
             ->where('estate_id', \request()->user()->estate_id)
-            ->when(Auth::user()->hasRoles('resident'), function($query){
+            ->when(Auth::user()->hasRole('resident'), function($query){
                 $query->where('user_id', Auth::user()->id);
             })
             ->get();

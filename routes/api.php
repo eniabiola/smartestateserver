@@ -22,7 +22,7 @@ Route::post('register', [AuthenticationController::class, 'residentRegister']);
 Route::post('forgot_password', [AuthenticationController::class, 'forgotPassword']);
 Route::post('user_reset_password', [AuthenticationController::class, 'UserResetPassword']);
 Route::post('residents', [\App\Http\Controllers\API\ResidentAPIController::class, 'store']);
-
+Route::post('visitor_pass_authentication', [\App\Http\Controllers\API\VisitorPassAPIController::class, 'passAuthentication']);
 
 Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('logout', [AuthenticationController::class, 'logout']);
