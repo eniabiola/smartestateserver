@@ -21,7 +21,7 @@ Route::post('register', [AuthenticationController::class, 'adminRegister']);
 Route::post('register', [AuthenticationController::class, 'residentRegister']);
 Route::post('forgot_password', [AuthenticationController::class, 'forgotPassword']);
 Route::post('user_reset_password', [AuthenticationController::class, 'UserResetPassword']);
-
+Route::post('residents', [\App\Http\Controllers\API\ResidentAPIController::class, 'store']);
 
 
 Route::group(['middleware' => ['jwt.verify']], function() {
@@ -35,7 +35,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::resource('cities', CityAPIController::class);
     Route::resource('banks', BankAPIController::class);
     Route::resource('roles', RoleAPIController::class);
-    Route::resource('residents', ResidentAPIController::class);
+    Route::resource('residents', ResidentAPIController::class)->except('store');
     Route::resource('module_accesses', ModuleAccessAPIController::class);
     Route::resource('role_module_access', RoleModuleAccessAPIController::class)->only('store');
     Route::resource('visitor_passes', VisitorPassAPIController::class);
