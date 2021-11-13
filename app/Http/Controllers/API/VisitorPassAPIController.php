@@ -4,12 +4,14 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateVisitorPassAPIRequest;
 use App\Http\Requests\API\UpdateVisitorPassAPIRequest;
+use App\Http\Resources\VisitorPassResource;
 use App\Models\VisitorPass;
 use App\Repositories\VisitorPassRepository;
 use App\Services\UtilityService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Response;
+use Auth;
 
 /**
  * Class VisitorPassController
@@ -40,8 +42,14 @@ class VisitorPassAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         );
+        $visitorPasses = VisitorPass::query()
+            ->where('estate_id', \request()->user()->estate_id)
+            ->when(Auth::user()->hasRoles('resident'), function($query){
+                $query->where('user_id', Auth::user()->id);
+            })
+            ->get();
 
-        return $this->sendResponse($visitorPasses->toArray(), 'Visitor Passes retrieved successfully');
+        return $this->sendResponse(VisitorPassResource::collection($visitorPasses), 'Visitor Passes retrieved successfully');
     }
 
     /**
@@ -54,13 +62,14 @@ class VisitorPassAPIController extends AppBaseController
      */
     public function store(CreateVisitorPassAPIRequest $request, UtilityService $utilityService)
     {
-        $request->merge(['generatedCode' => $utilityService->generateCode(6)]);
-        $request->merge(['generatedDate' => date('Y-m-d H:i:s')]);
+        $user = \request()->user();
+        $request->merge(['generatedCode' => $utilityService->generateCode(6),'generatedDate' => date('Y-m-d H:i:s')]);
+        $request->merge(['pass_status' => "inactive", "user_id" => $user->id, 'estate_id' => $user->estate_id ?? 1]);
         $input = $request->all();
 
         $visitorPass = $this->visitorPassRepository->create($input);
 
-        return $this->sendResponse($visitorPass->toArray(), 'Visitor Pass saved successfully');
+        return $this->sendResponse( new VisitorPassResource($visitorPass), 'Visitor Pass saved successfully');
     }
 
     /**
@@ -80,7 +89,7 @@ class VisitorPassAPIController extends AppBaseController
             return $this->sendError('Visitor Pass not found');
         }
 
-        return $this->sendResponse($visitorPass->toArray(), 'Visitor Pass retrieved successfully');
+        return $this->sendResponse(new VisitorPassResource($visitorPass), 'Visitor Pass retrieved successfully');
     }
 
     /**

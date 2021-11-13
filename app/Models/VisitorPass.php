@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $gender
  * @property string $pass_status
  * @property integer $user_id
+ * @property integer $estate_id
  * @property string|\Carbon\Carbon $visitationDate
  * @property string|\Carbon\Carbon $generatedDate
  * @property string $dateExpires
@@ -41,6 +42,7 @@ class VisitorPass extends Model
 
     public $fillable = [
         'visitor_pass_category_id',
+        'estate_id',
         'generatedCode',
         'guestName',
         'gender',
@@ -60,6 +62,7 @@ class VisitorPass extends Model
     protected $casts = [
         'id' => 'integer',
         'visitor_pass_category_id' => 'integer',
+        'estate_id' => 'integer',
         'generatedCode' => 'string',
         'guestName' => 'string',
         'gender' => 'string',
@@ -80,8 +83,6 @@ class VisitorPass extends Model
         'visitor_pass_category_id' => 'required',
         'guestName' => 'required|string|max:255',
         'gender' => 'required|string|max:255',
-        'pass_status' => 'required|string|max:255',
-        'user_id' => 'required',
         'visitationDate' => 'required',
         'dateExpires' => 'required',
         'isRecurrent' => 'required|boolean'
@@ -102,4 +103,14 @@ class VisitorPass extends Model
     {
         return $this->belongsTo(\App\Models\VisitorPassCategory::class, 'visitor_pass_category_id');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     **/
+    public function estate()
+    {
+        return $this->belongsTo(\App\Models\Estate::class, 'estate_id');
+    }
+
+
 }

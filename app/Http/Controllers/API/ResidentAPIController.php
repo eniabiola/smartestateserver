@@ -75,6 +75,8 @@ class ResidentAPIController extends AppBaseController
             return $this->sendResponse(new ResidentResource($resident), 'Resident saved successfully');
         } catch (\Exception $th)
         {
+            return $th;
+            \Log::debug($th);
             report($th->getMessage());
             return $this->sendError("Resident creation failed", 400);
         }

@@ -34,7 +34,8 @@ class Role extends Model
 
     public $fillable = [
         'name',
-        'guard_name'
+        'guard_name',
+        'slug',
     ];
 
     /**
@@ -45,6 +46,7 @@ class Role extends Model
     protected $casts = [
         'id' => 'integer',
         'name' => 'string',
+        'slug' => 'string',
         'guard_name' => 'string'
     ];
 
@@ -54,7 +56,8 @@ class Role extends Model
      * @var array
      */
     public static $rules = [
-        'name' => 'required|string|max:255,unique:roles,name'
+        'name' => 'required|string|max:255,unique:roles,name',
+        'slug' => 'required|string|max:255,unique:roles,slug'
     ];
 
     /**
