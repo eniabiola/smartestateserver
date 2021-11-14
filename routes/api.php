@@ -40,10 +40,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::resource('role_module_access', RoleModuleAccessAPIController::class)->only('store');
     Route::resource('visitor_passes', VisitorPassAPIController::class);
     Route::resource('visitor_pass_categories', VisitorPassCategoryAPIController::class);
+    Route::resource('billings', \BillingAPIController::class);
+
 });
-
-
-
-
-
 

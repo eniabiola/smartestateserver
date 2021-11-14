@@ -3,9 +3,11 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Billing;
 
-class RoleModuleAccessStoreRequest extends FormRequest
+class CreateBillingRequest extends FormRequest
 {
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -23,10 +25,6 @@ class RoleModuleAccessStoreRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'role' => 'required|integer|exists:roles,id',
-            'module_access' => 'required|array|min:1',
-            'module_access.*' => 'required|integer|exists:module_accesses,id'
-        ];
+        return Billing::$rules;
     }
 }

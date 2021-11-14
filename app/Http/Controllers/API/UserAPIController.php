@@ -106,7 +106,6 @@ class UserAPIController extends AppBaseController
      */
     public function update($id, UpdateUserAPIRequest $request)
     {
-        $request->merge('password', );
         $input = $request->all();
 
         /** @var User $user */

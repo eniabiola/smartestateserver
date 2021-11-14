@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateRoleAPIRequest;
 use App\Http\Requests\API\UpdateRoleAPIRequest;
+use App\Http\Resources\RoleResource;
 use App\Models\Role;
 use App\Repositories\RoleRepository;
 use Illuminate\Http\Request;
@@ -40,7 +41,7 @@ class RoleAPIController extends AppBaseController
             $request->get('limit')
         );
 
-        return $this->sendResponse($roles->toArray(), 'Roles retrieved successfully');
+        return $this->sendResponse(RoleResource::collection($roles), 'Roles retrieved successfully');
     }
 
     /**

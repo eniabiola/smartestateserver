@@ -5,7 +5,9 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\RoleModuleAccessStoreRequest;
 use App\Http\Resources\ModuleAccessIndex;
+use App\Http\Resources\RoleResource;
 use App\Models\ModuleAccess;
+use App\Models\Role;
 use Illuminate\Http\Request;
 
 class RoleModuleAccessAPIController extends AppBaseController
@@ -28,11 +30,11 @@ class RoleModuleAccessAPIController extends AppBaseController
      */
     public function store(RoleModuleAccessStoreRequest $request)
     {
-        $roles = $request->roles;
+        $module_access = $request->module_access;
 //        return $roles;
-        $moduleAccess = ModuleAccess::find($request->module_access);
-        $moduleAccess->roles()->sync($roles);
-        return $this->sendResponse(new ModuleAccessIndex($moduleAccess->toArray()), 'Module Access for various selected roles changed.');
+        $role = Role::find($request->role);
+        $role->moduleAccess()->sync($module_access);
+        return $this->sendResponse(new RoleResource($role), 'Module Accesses for the selected role changed.');
     }
 
     /**
