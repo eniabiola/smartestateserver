@@ -2,22 +2,26 @@
 
 namespace App\Repositories;
 
-use App\Models\State;
+use App\Models\WalletHistory;
 use App\Repositories\BaseRepository;
 
 /**
- * Class StateRepository
+ * Class WalletHistoryRepository
  * @package App\Repositories
- * @version November 15, 2021, 3:49 pm UTC
+ * @version November 14, 2021, 2:41 pm UTC
 */
 
-class StateRepository extends BaseRepository
+class WalletHistoryRepository extends BaseRepository
 {
     /**
      * @var array
      */
     protected $fieldSearchable = [
-        'name'
+        'prev_balance',
+        'amount',
+        'current_balance',
+        'transaction_type',
+        'description'
     ];
 
     /**
@@ -35,6 +39,6 @@ class StateRepository extends BaseRepository
      **/
     public function model()
     {
-        return State::class;
+        return WalletHistory::class;
     }
 }

@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 
 /**
  * Class State
  * @package App\Models
- * @version November 3, 2021, 6:34 pm UTC
+ * @version November 15, 2021, 3:49 pm UTC
  *
  * @property \Illuminate\Database\Eloquent\Collection $cities
  * @property \Illuminate\Database\Eloquent\Collection $estates
@@ -19,7 +19,6 @@ class State extends Model
 {
     use SoftDeletes;
 
-    use HasFactory;
 
     public $table = 'states';
     

@@ -2,22 +2,29 @@
 
 namespace App\Repositories;
 
-use App\Models\State;
+use App\Models\Transaction;
 use App\Repositories\BaseRepository;
 
 /**
- * Class StateRepository
+ * Class TransactionRepository
  * @package App\Repositories
- * @version November 15, 2021, 3:49 pm UTC
+ * @version November 14, 2021, 2:28 pm UTC
 */
 
-class StateRepository extends BaseRepository
+class TransactionRepository extends BaseRepository
 {
     /**
      * @var array
      */
     protected $fieldSearchable = [
-        'name'
+        'user_id',
+        'estate_id',
+        'description',
+        'amount',
+        'transaction_type',
+        'transaction_status',
+        'transaction_reference',
+        'date_initiated'
     ];
 
     /**
@@ -35,6 +42,6 @@ class StateRepository extends BaseRepository
      **/
     public function model()
     {
-        return State::class;
+        return Transaction::class;
     }
 }

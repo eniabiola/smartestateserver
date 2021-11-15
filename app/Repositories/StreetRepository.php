@@ -2,22 +2,23 @@
 
 namespace App\Repositories;
 
-use App\Models\State;
+use App\Models\Street;
 use App\Repositories\BaseRepository;
 
 /**
- * Class StateRepository
+ * Class StreetRepository
  * @package App\Repositories
- * @version November 15, 2021, 3:49 pm UTC
+ * @version November 15, 2021, 7:49 am UTC
 */
 
-class StateRepository extends BaseRepository
+class StreetRepository extends BaseRepository
 {
     /**
      * @var array
      */
     protected $fieldSearchable = [
-        'name'
+        'name',
+        'estate_id'
     ];
 
     /**
@@ -35,6 +36,6 @@ class StateRepository extends BaseRepository
      **/
     public function model()
     {
-        return State::class;
+        return Street::class;
     }
 }

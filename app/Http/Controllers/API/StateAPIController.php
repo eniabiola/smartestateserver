@@ -12,7 +12,7 @@ use Response;
 
 /**
  * Class StateController
- * @package App\Http\Controllers\API
+ * @package
  */
 
 class StateAPIController extends AppBaseController

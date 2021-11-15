@@ -83,7 +83,6 @@ class User extends Authenticatable implements JWTSubject
         'surname' => 'required|string|max:100',
         'othernames' => 'required|string|max:100',
         'phone' => 'required|string|max:14',
-        'gender' => 'required|string',
         'email' => 'required|string|max:255|unique:users,email',
         'remember_token' => 'nullable|string|max:100',
     ];

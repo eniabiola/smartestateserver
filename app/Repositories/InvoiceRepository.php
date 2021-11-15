@@ -2,22 +2,29 @@
 
 namespace App\Repositories;
 
-use App\Models\State;
+use App\Models\Invoice;
 use App\Repositories\BaseRepository;
 
 /**
- * Class StateRepository
+ * Class InvoiceRepository
  * @package App\Repositories
- * @version November 15, 2021, 3:49 pm UTC
+ * @version November 14, 2021, 2:25 pm UTC
 */
 
-class StateRepository extends BaseRepository
+class InvoiceRepository extends BaseRepository
 {
     /**
      * @var array
      */
     protected $fieldSearchable = [
-        'name'
+        'billing_id',
+        'user_id',
+        'estate_id',
+        'name',
+        'description',
+        'invoiceNo',
+        'amount',
+        'status'
     ];
 
     /**
@@ -35,6 +42,6 @@ class StateRepository extends BaseRepository
      **/
     public function model()
     {
-        return State::class;
+        return Invoice::class;
     }
 }

@@ -65,7 +65,7 @@ class Resident extends Model
     public static $rules = [
         'estateCode' => 'required|exists:estates,estateCode',
         'meterNo' => 'nullable|string|max:40',
-        'street' => 'required|string|max:40',
+        'street_id' => 'required|integer|exists:streets,id',
         'houseNo' => 'required|max:12',
         'dateMovedIn' => 'required|date',
     ];

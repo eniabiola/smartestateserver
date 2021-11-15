@@ -2,22 +2,26 @@
 
 namespace App\Repositories;
 
-use App\Models\State;
+use App\Models\Country;
 use App\Repositories\BaseRepository;
 
 /**
- * Class StateRepository
+ * Class CountryRepository
  * @package App\Repositories
  * @version November 15, 2021, 3:49 pm UTC
 */
 
-class StateRepository extends BaseRepository
+class CountryRepository extends BaseRepository
 {
     /**
      * @var array
      */
     protected $fieldSearchable = [
-        'name'
+        'name',
+        'iso_code_1',
+        'iso_code_2',
+        'status',
+        'phonecode'
     ];
 
     /**
@@ -35,6 +39,6 @@ class StateRepository extends BaseRepository
      **/
     public function model()
     {
-        return State::class;
+        return Country::class;
     }
 }

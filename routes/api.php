@@ -41,6 +41,15 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::resource('visitor_passes', VisitorPassAPIController::class);
     Route::resource('visitor_pass_categories', VisitorPassCategoryAPIController::class);
     Route::resource('billings', \BillingAPIController::class);
-
+    Route::resource('invoices', \InvoiceAPIController::class);
+    Route::resource('transactions', \TransactionAPIController::class);
+    Route::resource('wallet_histories', \WalletHistoryAPIController::class);
+    Route::resource('streets', \StreetAPIController::class);
 });
 
+
+
+
+
+
+Route::resource('countries', \CountryAPIController::class);
