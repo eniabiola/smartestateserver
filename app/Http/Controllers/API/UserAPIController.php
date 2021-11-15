@@ -57,19 +57,18 @@ class UserAPIController extends AppBaseController
      */
     public function store(CreateUserAPIRequest $request, UtilityService $utilityService)
     {
-        return $request;
         $request->merge(['password' => $utilityService->generateCode(10)]);
         $input = $request->all();
-        $user = $this->userRepository->create($input);
-        $user->assignRole($request->role_id);
 
         if ($request->has('estateCode'))
         {
             $estate_id = Estate::where('estateCode', $request->estateCode)->first()->id;
             $input['estate_id'] = $estate_id;
         }
-
-        $input['user_id'] = $user->id;
+        $user = $this->userRepository->create($input);
+        $user->assignRole($request->role_id);
+//
+//        $input['user_id'] = $user->id;
 
         //TODO: Send a queued mail to the user that they have been created on this platform
         return $this->sendResponse(new UserResource($user), 'User saved successfully');
