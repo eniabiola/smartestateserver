@@ -22,6 +22,7 @@ Route::post('register', [AuthenticationController::class, 'residentRegister']);
 Route::post('forgot_password', [AuthenticationController::class, 'forgotPassword']);
 Route::post('user_reset_password', [AuthenticationController::class, 'UserResetPassword']);
 Route::post('residents', [\App\Http\Controllers\API\ResidentAPIController::class, 'store']);
+Route::get('streets', [\App\Http\Controllers\API\StreetAPIController::class, 'index']);
 Route::post('visitor_pass_authentication', [\App\Http\Controllers\API\VisitorPassAPIController::class, 'passAuthentication']);
 
 Route::group(['middleware' => ['jwt.verify']], function() {
@@ -45,7 +46,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::resource('invoices', \InvoiceAPIController::class);
     Route::resource('transactions', \TransactionAPIController::class);
     Route::resource('wallet_histories', \WalletHistoryAPIController::class);
-    Route::resource('streets', \StreetAPIController::class);
+    Route::resource('streets', \StreetAPIController::class)->except('index');
 });
 
 
