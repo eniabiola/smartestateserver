@@ -61,6 +61,7 @@ class Estate extends Model
         'accountName',
         'imageName',
         'accountVerified',
+        'alternativeContact',
         'alternateEmail',
         'alternatePhone',
         'status',
