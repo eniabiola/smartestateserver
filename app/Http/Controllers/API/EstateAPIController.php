@@ -157,4 +157,16 @@ class EstateAPIController extends AppBaseController
 
         return $this->sendSuccess('Estate deleted successfully');
     }
+
+
+
+    public function validateEstateCode(Request $request)
+    {
+        $this->validate($request, [
+            'estate_code' => 'required|exists:estates,estateCode'
+        ]);
+        $estate = Estate::where('estateCode', $request->estate_code)->first();
+
+        return $this->sendResponse($estate->toArray(), 'Estate successfully retrieved');
+    }
 }
