@@ -57,7 +57,7 @@ class UserAPIController extends AppBaseController
      */
     public function store(CreateUserAPIRequest $request, UtilityService $utilityService)
     {
-        $request->merge(['password' => $utilityService->generateCode(10)]);
+        $request->merge(['password' => bcrypt($request->password)]);
         $input = $request->all();
 
         if ($request->has('estateCode'))
