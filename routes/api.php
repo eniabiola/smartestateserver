@@ -24,6 +24,7 @@ Route::post('user_reset_password', [AuthenticationController::class, 'UserResetP
 Route::post('residents', [\App\Http\Controllers\API\ResidentAPIController::class, 'store']);
 Route::get('streets', [\App\Http\Controllers\API\StreetAPIController::class, 'index']);
 Route::post('visitor_pass_authentication', [\App\Http\Controllers\API\VisitorPassAPIController::class, 'passAuthentication']);
+Route::post('estate_code_validation', [\App\Http\Controllers\API\EstateAPIController::class, 'validateEstateCode']);
 
 Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('logout', [AuthenticationController::class, 'logout']);
@@ -31,7 +32,6 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('get_authenticated_user', [AuthenticationController::class, 'get_user']);
     Route::post('reset_password', [AuthenticationController::class, 'resetPassword']);
     Route::resource('users', UserAPIController::class);
-    Route::post('estate_code_validation', [\App\Http\Controllers\API\EstateAPIController::class, 'validateEstateCode']);
     Route::resource('estates', EstateAPIController::class);
     Route::resource('states', StateAPIController::class);
     Route::resource('cities', CityAPIController::class);
