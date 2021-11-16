@@ -128,4 +128,15 @@ class CityAPIController extends AppBaseController
 
         return $this->sendSuccess('City deleted successfully');
     }
+
+    public function filterByState($state_id)
+    {
+        $cities = City::where('state_id', $state_id)->get();
+        if (count($cities))
+        {
+            return $this->sendError('City not found');
+        }
+        return $this->sendResponse($cities->toArray(), 'Cities by state retrieved retrieved successfully');
+
+    }
 }
