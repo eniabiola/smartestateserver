@@ -8,6 +8,7 @@ use App\Http\Resources\VisitorPassResource;
 use App\Models\VisitorPass;
 use App\Repositories\VisitorPassRepository;
 use App\Services\UtilityService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Response;
@@ -139,5 +140,20 @@ class VisitorPassAPIController extends AppBaseController
         $visitorPass->delete();
 
         return $this->sendSuccess('Visitor Pass deleted successfully');
+    }
+
+    public function passAuthentication(Request $request)
+    {
+        $visitorPass = VisitorPass::where('generatedCode', $request->invitation_code)
+                                    ->where('dateExpires' >= date("Y-m-d"))
+                                    ->first();
+        if (!$visitorPass)
+        {
+            return $this->sendError("This Pass code is invalid");
+        }
+
+        $visitorPass->pass_status = "active";
+        $visitorPass->save();
+        return $this->sendResponse($visitorPass->toArray(), "The pass code is valid");
     }
 }
