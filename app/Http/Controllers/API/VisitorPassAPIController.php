@@ -144,16 +144,29 @@ class VisitorPassAPIController extends AppBaseController
 
     public function passAuthentication(Request $request)
     {
-        $visitorPass = VisitorPass::where('generatedCode', $request->invitation_code)
-                                    ->where('dateExpires' >= date("Y-m-d"))
+        $invitation_code = $request->get('invitation_code');
+        $active = $request->get('active');
+        if ($invitation_code == null || $active == null) return $this->sendError("invalid URL");
+        $visitorPass = VisitorPass::query()
+                                    ->where('generatedCode', $request->invitation_code)
+//                                    ->where('dateExpires', '>=', date("Y-m-d"))
                                     ->first();
         if (!$visitorPass)
         {
             return $this->sendError("This Pass code is invalid");
         }
+        if ($active == "active" && $visitorPass->pass_status == "active") return $this->sendError("This Pass code is already in use.");
 
-        $visitorPass->pass_status = "active";
+        $visitorPass->pass_status = $active;
         $visitorPass->save();
-        return $this->sendResponse($visitorPass->toArray(), "The pass code is valid");
+        $visitor_pass = [
+            "guestName" => $visitorPass->guestName,
+            "gender" => $visitorPass->gender,
+            "visitationDate" => date('Y-m-d', strtotime($visitorPass->visitationDate)),
+            "dateExpires" => date('Y-m-d', strtotime($visitorPass->dateExpires)),
+            "estate" => $visitorPass->estate->name,
+            "user" => $visitorPass->user->surname,
+        ];
+        return $this->sendResponse($visitor_pass, "The pass code is valid");
     }
 }

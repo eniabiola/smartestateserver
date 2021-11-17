@@ -23,7 +23,7 @@ Route::post('forgot_password', [AuthenticationController::class, 'forgotPassword
 Route::post('user_reset_password', [AuthenticationController::class, 'UserResetPassword']);
 Route::post('residents', [\App\Http\Controllers\API\ResidentAPIController::class, 'store']);
 Route::get('streets', [\App\Http\Controllers\API\StreetAPIController::class, 'index']);
-Route::post('visitor_pass_authentication', [\App\Http\Controllers\API\VisitorPassAPIController::class, 'passAuthentication']);
+Route::get('visitor_pass_authentication', [\App\Http\Controllers\API\VisitorPassAPIController::class, 'passAuthentication']);
 Route::post('estate_code_validation', [\App\Http\Controllers\API\EstateAPIController::class, 'validateEstateCode']);
 Route::get('city_filter_by_state/{state_id}', [\App\Http\Controllers\API\CityAPIController::class, 'filterByState']);
 
