@@ -233,7 +233,7 @@ abstract class BaseRepository
     public function getDataTableSearchParams($search_request): array
     {
         $search = [];
-        if (!$search_request) {
+        if ($search_request != null && $search_request != "") {
             collect($this->getFieldsSearchable())->each(function ($field) use (&$search, $search_request) {
                 $search[$field] = $search_request;
             });
@@ -247,7 +247,7 @@ abstract class BaseRepository
         if (count($search)) {
             foreach($search as $key => $value) {
                 if (in_array($key, $this->getFieldsSearchable())) {
-                    $query->Where($key, $value);
+                    $query->orWhere($key, $value);
                 }
             }
         }

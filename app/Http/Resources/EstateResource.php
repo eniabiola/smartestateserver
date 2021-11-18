@@ -33,7 +33,9 @@ class EstateResource extends JsonResource
             "alternateEmail" => $this->alternateEmail,
             "alternatePhone" => $this->alternatePhone,
             "status" => $this->status,
-            "created_by" => $this->created_by
+            "is_active" => $this->isActive,
+            "created_by" => $this->created_by,
+            "created_by_user" => $this->createdBy->surname." ".$this->createdBy->othernames
         ];
     }
 }

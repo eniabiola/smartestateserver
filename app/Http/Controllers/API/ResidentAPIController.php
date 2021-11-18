@@ -49,9 +49,9 @@ class ResidentAPIController extends AppBaseController
 
         $residents = Resident::query()
             ->whereHas('user', function ($query) use ($estate_id){
-            $query->where('estate_id', $estate_id);
+            $query->where('users.estate_id', $estate_id);
         });
-        $residents = $this->residentRepository->searchFields($residents, $request->search ?? []);
+        $residents = $this->residentRepository->searchFields($residents, $request->search ?? null);
         return $this->sendResponse(ResidentResource::collection($residents->get()) , 'Residents retrieved successfully');
     }
 

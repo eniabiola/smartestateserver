@@ -39,7 +39,6 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::post('user_toggle_status', [\App\Http\Controllers\API\UserAPIController::class, 'toggleStatus']);
     Route::post('estate_toggle_status', [\App\Http\Controllers\API\EstateAPIController::class, 'toggleStatus']);
     Route::post('street_toggle_status', [\App\Http\Controllers\API\StreetAPIController::class, 'toggleStatus']);
-    Route::get('get_user', [UserController::class, 'get_user']);
     Route::get('get_authenticated_user', [AuthenticationController::class, 'get_user']);
     Route::post('reset_password', [AuthenticationController::class, 'resetPassword']);
     Route::resource('users', UserAPIController::class);

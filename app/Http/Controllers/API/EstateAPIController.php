@@ -175,6 +175,6 @@ class EstateAPIController extends AppBaseController
         $this->validate($request, [
             'id' => 'required|exists:users,id'
         ]);
-        return $this->sendResponse(new EstateResource($this->estateRepository->toggleStatus($request->id)), "User status successfully toggled.");
+        return $this->sendResponse(new EstateResource($this->estateRepository->toggleStatus($request->id)), "Estate status successfully toggled.");
     }
 }
