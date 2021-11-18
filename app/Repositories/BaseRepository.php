@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use Illuminate\Container\Container as Application;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 
@@ -107,6 +108,21 @@ abstract class BaseRepository
     }
 
     /**
+     * Toggle Status of a model
+     *
+     */
+    public function toggleStatus($id)
+    {
+        $query = $this->model->newQuery();
+
+        $query =  $query->find($id);
+        $query->isActive = !$query->isActive;
+        $query->save();
+
+        return $query;
+    }
+
+    /**
      * Retrieve all records with given filter criteria
      *
      * @param array $search
@@ -117,6 +133,24 @@ abstract class BaseRepository
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
      */
     public function all($search = [], $skip = null, $limit = null, $columns = ['*'])
+    {
+        $query = $this->allQuery($search, $skip, $limit);
+
+        return $query->get($columns);
+    }
+
+
+    /**
+     * Retrieve all records with given filter criteria
+     *
+     * @param array $search
+     * @param int|null $skip
+     * @param int|null $limit
+     * @param array $columns
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
+     */
+    public function allWithEstate($search = [], $skip = null, $limit = null, $columns = ['*'])
     {
         $query = $this->allQuery($search, $skip, $limit);
 
@@ -189,5 +223,34 @@ abstract class BaseRepository
         $model = $query->findOrFail($id);
 
         return $model->delete();
+    }
+
+    /**
+     * @param array $processedRequest
+     * @param $search_request
+     * @return array
+     */
+    public function getDataTableSearchParams($search_request): array
+    {
+        $search = [];
+        if (!$search_request) {
+            collect($this->getFieldsSearchable())->each(function ($field) use (&$search, $search_request) {
+                $search[$field] = $search_request;
+            });
+        }
+        return $search;
+    }
+
+    public function searchFields(Builder $query, $search_term)
+    {
+        $search = $this->getDataTableSearchParams($search_term);
+        if (count($search)) {
+            foreach($search as $key => $value) {
+                if (in_array($key, $this->getFieldsSearchable())) {
+                    $query->Where($key, $value);
+                }
+            }
+        }
+        return $query;
     }
 }

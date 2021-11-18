@@ -11,6 +11,7 @@ use App\Repositories\UserRepository;
 use App\Services\UtilityService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
+use Illuminate\Support\Facades\Auth;
 use Response;
 
 
@@ -38,13 +39,21 @@ class UserAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $users = $this->userRepository->all(
-            $request->except(['skip', 'limit']),
-            $request->get('skip'),
-            $request->get('limit')
-        );
 
-        return $this->sendResponse(UserResource::collection($users), 'Users retrieved successfully');
+        if (Auth::user()->hasrole('superadministrator'))
+        {
+            if ($request->get('estate_id') == null) return $this->sendError("What estate residents will you love to see");
+            $estate_id = $request->get('estate_id');
+        } else {
+            $estate_id = \request()->user()->estate_id;
+        }
+
+
+        $users = User::query()
+           ->where('estate_id', $estate_id);
+        $users = $this->userRepository->searchFields($users, $request->search);
+
+        return $this->sendResponse(UserResource::collection($users->get()), 'Users retrieved successfully');
     }
 
     /**
@@ -141,5 +150,14 @@ class UserAPIController extends AppBaseController
         $user->delete();
 
         return $this->sendSuccess('User deleted successfully');
+    }
+
+
+    public function toggleStatus(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'required|exists:users,id'
+        ]);
+         return $this->sendResponse(new UserResource($this->userRepository->toggleStatus($request->id)), "User status successfully toggled.");
     }
 }

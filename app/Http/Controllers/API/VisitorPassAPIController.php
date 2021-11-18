@@ -145,8 +145,11 @@ class VisitorPassAPIController extends AppBaseController
     public function passAuthentication(Request $request)
     {
         $invitation_code = $request->get('invitation_code');
-        $status = $request->get('active');
-        if ($invitation_code == null || $status == null) return $this->sendError("invalid URL");
+        $status = $request->get('status');
+        if ($invitation_code == null || $status == null){
+            return $this->sendError("invalid URL");
+        }
+
         $visitorPass = VisitorPass::query()
                                     ->where('generatedCode', $request->invitation_code)
 //                                    ->where('dateExpires', '>=', date("Y-m-d"))

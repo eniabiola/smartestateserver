@@ -11,6 +11,7 @@ use App\Repositories\ResidentRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Response;
 
@@ -38,20 +39,20 @@ class ResidentAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $residents = Resident::query()->whereHas('user', function ($query){
-            $query->where('estate_id', \request()->user()->estate_id);
-        })
-            ->get();
-        return $this->sendResponse(ResidentResource::collection($residents) , 'Residents retrieved successfully');
+        if (Auth::user()->hasrole('superadministrator'))
+        {
+            if ($request->get('estate_id') == null) return $this->sendError("What estate residents will you love to see");
+            $estate_id = $request->get('estate_id');
+        } else {
+            $estate_id = \request()->user()->estate_id;
+        }
 
-//        return $residents;
-        $residents = $this->residentRepository->allQuery(
-            $request->except(['skip', 'limit']),
-            $request->get('skip'),
-            $request->get('limit')
-        );
-
-        return $this->sendResponse(ResidentResource::collection($residents) , 'Residents retrieved successfully');
+        $residents = Resident::query()
+            ->whereHas('user', function ($query) use ($estate_id){
+            $query->where('estate_id', $estate_id);
+        });
+        $residents = $this->residentRepository->searchFields($residents, $request->search ?? []);
+        return $this->sendResponse(ResidentResource::collection($residents->get()) , 'Residents retrieved successfully');
     }
 
     /**
@@ -165,13 +166,4 @@ class ResidentAPIController extends AppBaseController
         return $this->sendSuccess('Resident deleted successfully');
     }
 
-    public function getResidentByEstateId($estate_id)
-    {
-        $residents = Resident::query()
-                            ->join('users', 'users.id', 'residents.user_id')
-                            ->where('users.estate_id', $estate_id)
-                            ->get();
-
-        return $this->sendResponse(ResidentResource::collection($residents), "List of residents by estate id.");
-    }
 }

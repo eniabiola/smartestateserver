@@ -72,7 +72,7 @@ class EstateAPIController extends AppBaseController
         $input = $request->all();
         $estate = $this->estateRepository->create($input);
 
-        return $this->sendResponse($estate->toArray(), 'Estate saved successfully');
+        return $this->sendResponse( new EstateResource($estate), 'Estate saved successfully');
     }
 
     /**
@@ -92,7 +92,7 @@ class EstateAPIController extends AppBaseController
             return $this->sendError('Estate not found');
         }
 
-        return $this->sendResponse($estate->toArray(), 'Estate retrieved successfully');
+        return $this->sendResponse(new EstateResource($estate), 'Estate retrieved successfully');
     }
 
     /**
@@ -168,5 +168,13 @@ class EstateAPIController extends AppBaseController
         $estate = Estate::where('estateCode', $request->estate_code)->first();
 
         return $this->sendResponse($estate->toArray(), 'Estate successfully retrieved');
+    }
+
+    public function toggleStatus(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'required|exists:users,id'
+        ]);
+        return $this->sendResponse(new EstateResource($this->estateRepository->toggleStatus($request->id)), "User status successfully toggled.");
     }
 }

@@ -48,6 +48,8 @@ class AuthenticationController extends BaseController
         }
 
         $user = User::query()->where('email', $request->email)->first();
+        if ($user->isActive == false) return $this->sendError('Your Account has been deactivated.', 'Your account has been deactivated.', 400);
+
         $userToken = ['token' => $token, 'expires_at' => 30*$myTTL];
         $data = [
             'user_token' => $userToken,
@@ -107,10 +109,12 @@ class AuthenticationController extends BaseController
             'name' => $user->firstname." ".$user->othernames,
             'email' => $user->email,
             'phone' => $user->phone,
+            'is_active' => $user->isActive,
             'role' => $role,
             'estate' => $user->estate_id == null ? null :[
+                'id' => $user->estate_id,
                 'name' => $user->estate->name,
-                'id' => $user->estate_id
+                'estate_code' => $user->estate->estateCode,
             ],
             ];
 

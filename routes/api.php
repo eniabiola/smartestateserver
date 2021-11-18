@@ -33,11 +33,12 @@ Route::get('city_filter_by_state/{state_id}', [\App\Http\Controllers\API\CityAPI
 - get invoices by residents id  or user id
 - get payments by user id
  */
-Route::get('residents/by_estate/{estate_id}', [\App\Http\Controllers\API\ResidentAPIController::class, 'getResidentByEstateId']);
-Route::get('visitor_passes/by_estate/{estate_id}', [\App\Http\Controllers\API\VisitorPassAPIController::class, 'getResidentByEstateId']);
 
 Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('logout', [AuthenticationController::class, 'logout']);
+    Route::post('user_toggle_status', [\App\Http\Controllers\API\UserAPIController::class, 'toggleStatus']);
+    Route::post('estate_toggle_status', [\App\Http\Controllers\API\EstateAPIController::class, 'toggleStatus']);
+    Route::post('street_toggle_status', [\App\Http\Controllers\API\StreetAPIController::class, 'toggleStatus']);
     Route::get('get_user', [UserController::class, 'get_user']);
     Route::get('get_authenticated_user', [AuthenticationController::class, 'get_user']);
     Route::post('reset_password', [AuthenticationController::class, 'resetPassword']);

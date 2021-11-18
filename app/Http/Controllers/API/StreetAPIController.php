@@ -130,4 +130,12 @@ class StreetAPIController extends AppBaseController
 
         return $this->sendSuccess('Street deleted successfully');
     }
+
+    public function toggleStatus(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'required|exists:users,id'
+        ]);
+        return $this->sendResponse($this->streetRepository->toggleStatus($request->id), "User status successfully toggled.");
+    }
 }
