@@ -34,6 +34,40 @@ class ResidentRepository extends BaseRepository
     }
 
     /**
+     * Build a query for retrieving all records.
+     *
+     * @param array $search
+     * @param int|null $skip
+     * @param int|null $limit
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function allQuery($search = [], $skip = null, $limit = null)
+    {
+        $query = $this->model->newQuery();
+
+        $query->whereHas('user', function ($query){
+           $query->where('estate_id', \request()->user()->estate_id);
+        });
+        if (count($search)) {
+            foreach($search as $key => $value) {
+                if (in_array($key, $this->getFieldsSearchable())) {
+                    $query->where($key, $value);
+                }
+            }
+        }
+
+        if (!is_null($skip)) {
+            $query->skip($skip);
+        }
+
+        if (!is_null($limit)) {
+            $query->limit($limit);
+        }
+
+        return $query;
+    }
+
+    /**
      * Configure the Model
      **/
     public function model()

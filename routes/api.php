@@ -26,6 +26,15 @@ Route::get('streets', [\App\Http\Controllers\API\StreetAPIController::class, 'in
 Route::get('visitor_pass_authentication', [\App\Http\Controllers\API\VisitorPassAPIController::class, 'passAuthentication']);
 Route::post('estate_code_validation', [\App\Http\Controllers\API\EstateAPIController::class, 'validateEstateCode']);
 Route::get('city_filter_by_state/{state_id}', [\App\Http\Controllers\API\CityAPIController::class, 'filterByState']);
+/**
+ * - get Residents by estate if Done
+- get visitor pass by resident  Id or user id Done
+- get complaints by residents Id or user id
+- get invoices by residents id  or user id
+- get payments by user id
+ */
+Route::get('residents/by_estate/{estate_id}', [\App\Http\Controllers\API\ResidentAPIController::class, 'getResidentByEstateId']);
+Route::get('visitor_passes/by_estate/{estate_id}', [\App\Http\Controllers\API\VisitorPassAPIController::class, 'getResidentByEstateId']);
 
 Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('logout', [AuthenticationController::class, 'logout']);

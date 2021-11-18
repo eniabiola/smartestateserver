@@ -38,7 +38,14 @@ class ResidentAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $residents = $this->residentRepository->all(
+        $residents = Resident::query()->whereHas('user', function ($query){
+            $query->where('estate_id', \request()->user()->estate_id);
+        })
+            ->get();
+        return $this->sendResponse(ResidentResource::collection($residents) , 'Residents retrieved successfully');
+
+//        return $residents;
+        $residents = $this->residentRepository->allQuery(
             $request->except(['skip', 'limit']),
             $request->get('skip'),
             $request->get('limit')
@@ -156,5 +163,15 @@ class ResidentAPIController extends AppBaseController
         $resident->delete();
 
         return $this->sendSuccess('Resident deleted successfully');
+    }
+
+    public function getResidentByEstateId($estate_id)
+    {
+        $residents = Resident::query()
+                            ->join('users', 'users.id', 'residents.user_id')
+                            ->where('users.estate_id', $estate_id)
+                            ->get();
+
+        return $this->sendResponse(ResidentResource::collection($residents), "List of residents by estate id.");
     }
 }
