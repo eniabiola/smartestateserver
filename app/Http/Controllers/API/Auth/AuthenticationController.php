@@ -10,6 +10,7 @@ use App\Models\PasswordReset;
 use App\Models\Resident;
 use App\Models\Role;
 use App\Models\User;
+use http\Url;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -184,7 +185,7 @@ class AuthenticationController extends BaseController
         //TODO: send message to user to reset email
 
         $message = "Dear {$user->first_name}, click on the link below to reset your password" . PHP_EOL;
-        $url = "password_reset_url" . "?token={$token}";
+        $url = url('/')."auth/reset_password" . "?token={$token}";
 
         $maildata = [
             'email' => $email,

@@ -26,6 +26,22 @@ Route::get('streets', [\App\Http\Controllers\API\StreetAPIController::class, 'in
 Route::get('visitor_pass_authentication', [\App\Http\Controllers\API\VisitorPassAPIController::class, 'passAuthentication']);
 Route::post('estate_code_validation', [\App\Http\Controllers\API\EstateAPIController::class, 'validateEstateCode']);
 Route::get('city_filter_by_state/{state_id}', [\App\Http\Controllers\API\CityAPIController::class, 'filterByState']);
+Route::get('storage/estateimages/{filename}', function ($filename)
+{
+
+    $path = storage_path('\app\estateImages\\' . $filename);
+    if (!File::exists($path)) {
+        abort(404);
+    }
+
+    $file = File::get($path);
+    $type = File::mimeType($path);
+
+    $response = Response::make($file, 200);
+    $response->header("Content-Type", $type);
+
+    return $response;
+})->name('estateImages');
 /**
  * - get Residents by estate if Done
 - get visitor pass by resident  Id or user id Done
