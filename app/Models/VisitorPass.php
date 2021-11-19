@@ -42,7 +42,6 @@ class VisitorPass extends Model
 
 
     public $fillable = [
-        'visitor_pass_category_id',
         'estate_id',
         'generatedCode',
         'guestName',
@@ -62,7 +61,6 @@ class VisitorPass extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'visitor_pass_category_id' => 'integer',
         'estate_id' => 'integer',
         'generatedCode' => 'string',
         'guestName' => 'string',
