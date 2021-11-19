@@ -81,6 +81,7 @@ class VisitorPass extends Model
      * @var array
      */
     public static $rules = [
+        'visitationDate' => 'required',
         'guestName' => 'required|string|max:255',
         'duration' => 'required|integer',
     ];

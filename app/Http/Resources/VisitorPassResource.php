@@ -16,8 +16,11 @@ class VisitorPassResource extends JsonResource
     {
         return [
             "guestName" => $this->guestName,
+            "pass_code" => $this->generatedCode,
             "visitationDate" => date('Y-m-d H:i:s', strtotime($this->visitationDate)),
+            "duration" => $this->duration,
             "dateExpires" => date('Y-m-d H:i:s', strtotime($this->dateExpires)),
+            "estate_id" => $this->estate_id,
             "estate" => $this->estate->name,
             "user" => $this->user->surname,
             "status" => $this->status,

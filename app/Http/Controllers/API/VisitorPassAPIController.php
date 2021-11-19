@@ -73,7 +73,7 @@ class VisitorPassAPIController extends AppBaseController
 
         $visitorPass = $this->visitorPassRepository->create($input);
 
-        return $this->sendResponse($visitorPass->toArray(), 'Visitor Pass saved successfully');
+        return $this->sendResponse(new VisitorPassResource( $visitorPass), 'Visitor Pass saved successfully');
     }
 
     /**
