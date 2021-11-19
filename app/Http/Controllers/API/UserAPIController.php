@@ -39,11 +39,13 @@ class UserAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-
         if (Auth::user()->hasrole('superadministrator'))
         {
-            if ($request->get('estate_id') == null) return $this->sendError("What estate residents will you love to see");
             $estate_id = $request->get('estate_id');
+            if ($request->get('estate_id') == null)
+            {
+                $estate_id = Estate::query()->distinct()->first()->id;
+            }
         } else {
             $estate_id = \request()->user()->estate_id;
         }
