@@ -9,21 +9,22 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * Class VisitorPass
  * @package App\Models
- * @version November 7, 2021, 9:50 pm UTC
+ * @version November 19, 2021, 4:40 pm UTC
  *
+ * @property \App\Models\Estate $estate
  * @property \App\Models\User $user
  * @property \App\Models\VisitorPassCategory $visitorPassCategory
  * @property integer $visitor_pass_category_id
+ * @property integer $estate_id
  * @property string $generatedCode
  * @property string $guestName
- * @property string $gender
  * @property string $pass_status
  * @property integer $user_id
- * @property integer $estate_id
  * @property string|\Carbon\Carbon $visitationDate
  * @property string|\Carbon\Carbon $generatedDate
- * @property string $dateExpires
- * @property boolean $isRecurrent
+ * @property string|\Carbon\Carbon $dateExpires
+ * @property integer $duration
+ * @property boolean $isActive
  */
 class VisitorPass extends Model
 {
@@ -45,13 +46,13 @@ class VisitorPass extends Model
         'estate_id',
         'generatedCode',
         'guestName',
-        'gender',
         'pass_status',
         'user_id',
         'visitationDate',
         'generatedDate',
         'dateExpires',
-        'isRecurrent'
+        'duration',
+        'isActive'
     ];
 
     /**
@@ -65,13 +66,13 @@ class VisitorPass extends Model
         'estate_id' => 'integer',
         'generatedCode' => 'string',
         'guestName' => 'string',
-        'gender' => 'string',
         'pass_status' => 'string',
         'user_id' => 'integer',
         'visitationDate' => 'datetime',
         'generatedDate' => 'datetime',
-        'dateExpires' => 'date',
-        'isRecurrent' => 'boolean'
+        'dateExpires' => 'datetime',
+        'duration' => 'integer',
+        'isActive' => 'boolean'
     ];
 
     /**
@@ -80,13 +81,17 @@ class VisitorPass extends Model
      * @var array
      */
     public static $rules = [
-        'visitor_pass_category_id' => 'required',
         'guestName' => 'required|string|max:255',
-        'gender' => 'required|string|max:255',
-        'visitationDate' => 'required',
-        'dateExpires' => 'required',
-        'isRecurrent' => 'required|boolean'
+        'duration' => 'required|integer',
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     **/
+    public function estate()
+    {
+        return $this->belongsTo(\App\Models\Estate::class, 'estate_id');
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -103,14 +108,4 @@ class VisitorPass extends Model
     {
         return $this->belongsTo(\App\Models\VisitorPassCategory::class, 'visitor_pass_category_id');
     }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
-    public function estate()
-    {
-        return $this->belongsTo(\App\Models\Estate::class, 'estate_id');
-    }
-
-
 }

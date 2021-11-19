@@ -8,10 +8,11 @@ use App\Http\Resources\VisitorPassResource;
 use App\Models\VisitorPass;
 use App\Repositories\VisitorPassRepository;
 use App\Services\UtilityService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Response;
-use Carbon\Carbon;
+use Auth;
 
 /**
  * Class VisitorPassController
@@ -62,17 +63,14 @@ class VisitorPassAPIController extends AppBaseController
      */
     public function store(CreateVisitorPassAPIRequest $request, UtilityService $utilityService)
     {
-        $date = date('Y-m-d H:i:s');
         $user = \request()->user();
-        $request->merge(['generatedCode' => $utilityService->generateCode(6),'generatedDate' => $date, 'visitationDate' => $date]);
+        $request->merge(['generatedCode' => $utilityService->generateCode(6),'generatedDate' => date('Y-m-d H:i:s')]);
         $request->merge(['pass_status' => "inactive", "user_id" => $user->id, 'estate_id' => $user->estate_id ?? 1]);
-        $request->merge(['dateExpires' => Carbon::parse($date)->addHours($request->duration)]);
-
         $input = $request->all();
 
         $visitorPass = $this->visitorPassRepository->create($input);
 
-        return $this->sendResponse($visitorPass->toArray(), 'Visitor Pass saved successfully');
+        return $this->sendResponse( new VisitorPassResource($visitorPass), 'Visitor Pass saved successfully');
     }
 
     /**
@@ -92,7 +90,7 @@ class VisitorPassAPIController extends AppBaseController
             return $this->sendError('Visitor Pass not found');
         }
 
-        return $this->sendResponse($visitorPass->toArray(), 'Visitor Pass retrieved successfully');
+        return $this->sendResponse(new VisitorPassResource($visitorPass), 'Visitor Pass retrieved successfully');
     }
 
     /**
@@ -142,5 +140,42 @@ class VisitorPassAPIController extends AppBaseController
         $visitorPass->delete();
 
         return $this->sendSuccess('Visitor Pass deleted successfully');
+    }
+
+    public function passAuthentication(Request $request)
+    {
+        $invitation_code = $request->get('invitation_code');
+        $status = $request->get('status');
+        if ($invitation_code == null || $status == null){
+            return $this->sendError("invalid URL");
+        }
+
+        $visitorPass = VisitorPass::query()
+                                    ->where('generatedCode', $request->invitation_code)
+//                                    ->where('dateExpires', '>=', date("Y-m-d"))
+                                    ->first();
+        if (!$visitorPass)
+        {
+            return $this->sendError("This Pass code is invalid");
+        }
+        if ($status == "active" && $visitorPass->pass_status == "active") return $this->sendError("This Pass code is already in use.");
+
+        if($status == "active")
+        {
+            $visitorPass->pass_status = $status;
+        } else {
+            $visitorPass->pass_status = "inactive";
+        }
+
+        $visitorPass->save();
+        $visitor_pass = [
+            "guestName" => $visitorPass->guestName,
+            "gender" => $visitorPass->gender,
+            "visitationDate" => date('Y-m-d', strtotime($visitorPass->visitationDate)),
+            "dateExpires" => date('Y-m-d', strtotime($visitorPass->dateExpires)),
+            "estate" => $visitorPass->estate->name,
+            "user" => $visitorPass->user->surname,
+        ];
+        return $this->sendResponse($visitor_pass, "The pass code is valid");
     }
 }

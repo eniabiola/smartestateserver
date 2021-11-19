@@ -1,19 +1,12 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>How to send mail using queue in Laravel 7/8 ?</title>
-</head>
-<body>
+@component('mail::message')
+    # Order Shipped
 
-<center>
-    <h2 style="padding: 23px;border: 6px red solid;">
-        <a href="https://websolutionstuff.com">Visit Our Website : websolutionstuff.com</a>
-    </h2>
-</center>
+    Your order has been shipped!
 
-<p>Hi,</p>
-<p>This is test mail. This mail send using queue listen in laravel 7/8.</p>
-<strong>Thanks & Regards.</strong>
+    @component('mail::button', ['url' => $url])
+        View Order
+    @endcomponent
 
-</body>
-</html>
+    Thanks,<br>
+    {{ config('app.name') }}
+@endcomponent

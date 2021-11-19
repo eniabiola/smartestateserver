@@ -24,6 +24,18 @@
         "inView": true
     },
     {
+        "name": "estate_id",
+        "dbType": "bigInteger,false,true",
+        "htmlType": null,
+        "validations": "required",
+        "searchable": true,
+        "fillable": true,
+        "primary": false,
+        "inForm": true,
+        "inIndex": true,
+        "inView": true
+    },
+    {
         "name": "generatedCode",
         "dbType": "string,15",
         "htmlType": "text",
@@ -37,18 +49,6 @@
     },
     {
         "name": "guestName",
-        "dbType": "string,255",
-        "htmlType": "text",
-        "validations": "required|string|max:255|string|max:255",
-        "searchable": true,
-        "fillable": true,
-        "primary": false,
-        "inForm": true,
-        "inIndex": true,
-        "inView": true
-    },
-    {
-        "name": "gender",
         "dbType": "string,255",
         "htmlType": "text",
         "validations": "required|string|max:255|string|max:255",
@@ -109,7 +109,7 @@
     },
     {
         "name": "dateExpires",
-        "dbType": "date",
+        "dbType": "datetime",
         "htmlType": "date",
         "validations": "required",
         "searchable": true,
@@ -120,7 +120,19 @@
         "inView": true
     },
     {
-        "name": "isRecurrent",
+        "name": "duration",
+        "dbType": "integer,false",
+        "htmlType": null,
+        "validations": "required|integer|integer",
+        "searchable": true,
+        "fillable": true,
+        "primary": false,
+        "inForm": true,
+        "inIndex": true,
+        "inView": true
+    },
+    {
+        "name": "isActive",
         "dbType": "boolean",
         "htmlType": "checkbox,1",
         "validations": "required|boolean|boolean",
@@ -166,6 +178,10 @@
         "inForm": false,
         "inIndex": false,
         "inView": false
+    },
+    {
+        "type": "relation",
+        "relation": "mt1,Estate,estate_id"
     },
     {
         "type": "relation",

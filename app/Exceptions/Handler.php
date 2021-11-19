@@ -59,6 +59,11 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
 
+        if ($exception instanceof \PDOException)
+        {
+            report($exception->getMessage());
+            return $this->failedResponse("Error performing operation.", 400);
+        }
         if ($exception instanceof ModelNotFoundException) {
             return $this->failedResponse("Error retrieving selection", 400);
         }

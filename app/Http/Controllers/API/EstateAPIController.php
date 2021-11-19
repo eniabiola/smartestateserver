@@ -5,12 +5,17 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateEstateAPIRequest;
 use App\Http\Requests\API\UpdateEstateAPIRequest;
 use App\Http\Resources\EstateResource;
+use App\Mail\UserWelcomeMail;
 use App\Models\Estate;
+use App\Models\User;
 use App\Repositories\EstateRepository;
+use App\Repositories\UserRepository;
 use App\Services\UploadService;
 use App\Services\UtilityService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Response;
 
 /**
@@ -70,7 +75,30 @@ class EstateAPIController extends AppBaseController
         }
         $request->merge(['imageName' => $filename, 'status' => 'active', 'estateCode' => $utilityService->generateCode(6)]);
         $input = $request->all();
+        DB::beginTransaction();
         $estate = $this->estateRepository->create($input);
+        $password = $utilityService->generateCode(6);
+        $user = User::firstOrCreate([
+            "surname" => $estate->name,
+            "othernames" => "",
+            "phone" =>$estate->phone,
+            "email" => $estate->email,
+            "password" =>  bcrypt($password),
+            "estate_id" => $estate->id,
+            "isActive" => true,
+        ]);
+        DB::commit();
+        $details = [
+          "name" => $request->name,
+          "email" => $request->email,
+          "message" => "An account has been created for you as the estate manager of $request->name estate",
+          "password" => $password,
+          "url"      => url('/')."/auth/login"
+        ];
+
+
+        Mail::to($request->email)
+            ->queue(new UserWelcomeMail($details));
 
         return $this->sendResponse( new EstateResource($estate), 'Estate saved successfully');
     }
@@ -104,7 +132,7 @@ class EstateAPIController extends AppBaseController
      *
      * @return Response
      */
-    public function update($id, UpdateEstateAPIRequest $request, UploadService $uploadService)
+    public function update($id, UpdateEstateAPIRequest $request, UploadService $uploadService, UserRepository $userRepository)
     {
 
         /** @var Estate $estate */
@@ -113,6 +141,8 @@ class EstateAPIController extends AppBaseController
         if (empty($estate)) {
             return $this->sendError('Estate not found');
         }
+
+
 
         if ($request->has('imageName')){
             $imageUploadAction = $uploadService->uploadImageBase64($request->imageName, "estateImages/");
@@ -130,7 +160,7 @@ class EstateAPIController extends AppBaseController
         $input = $request->all();
 
         $estate = $this->estateRepository->update($input, $id);
-
+        $user = $userRepository->create();
         return $this->sendResponse($estate->toArray(), 'Estate updated successfully');
     }
 

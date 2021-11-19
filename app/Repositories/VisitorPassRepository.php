@@ -8,7 +8,7 @@ use App\Repositories\BaseRepository;
 /**
  * Class VisitorPassRepository
  * @package App\Repositories
- * @version November 7, 2021, 9:50 pm UTC
+ * @version November 19, 2021, 4:40 pm UTC
 */
 
 class VisitorPassRepository extends BaseRepository
@@ -18,15 +18,16 @@ class VisitorPassRepository extends BaseRepository
      */
     protected $fieldSearchable = [
         'visitor_pass_category_id',
+        'estate_id',
         'generatedCode',
         'guestName',
-        'gender',
         'pass_status',
         'user_id',
         'visitationDate',
         'generatedDate',
         'dateExpires',
-        'isRecurrent'
+        'duration',
+        'isActive'
     ];
 
     /**
