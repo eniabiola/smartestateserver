@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Response;
 use Carbon\Carbon;
+use Auth;
 
 /**
  * Class VisitorPassController
@@ -64,9 +65,9 @@ class VisitorPassAPIController extends AppBaseController
     {
         $date = date('Y-m-d H:i:s');
         $user = \request()->user();
-        $request->merge(['generatedCode' => $utilityService->generateCode(6),'generatedDate' => $date, 'visitationDate' => $date]);
+        $request->merge(['generatedCode' => $utilityService->generateCode(6),'generatedDate' => $date, 'visitationDate' => $request->visitationDate]);
         $request->merge(['pass_status' => "inactive", "user_id" => $user->id, 'estate_id' => $user->estate_id ?? 1]);
-        $request->merge(['dateExpires' => Carbon::parse($date)->addHours($request->duration)]);
+        $request->merge(['dateExpires' => Carbon::parse($request->visitationDate)->addHours($request->duration)]);
 
         $input = $request->all();
 
