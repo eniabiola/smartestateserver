@@ -24,9 +24,8 @@ class UpdateStreetAPIRequest extends APIRequest
      */
     public function rules()
     {
-        return
-        [
-          'name' => 'required|string|max:255,unique:streets,name',$this->route('id')
+        return [
+            'name' => 'required|string|max:255,unique:streets,name,'.$this->route('id')
         ];
 
         $rules = Street::$rules;
