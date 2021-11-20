@@ -26,6 +26,7 @@ class CreateEstateAPIRequest extends APIRequest
     {
         $rules = Estate::$rules;
         $rules['name'] = 'required|string|max:100|unique:estates,name';
+        $rules['email'] = 'required|string|max:100|unique:users,email';
 
         return $rules;
 

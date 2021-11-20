@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Mail\PasswordResetEmail;
+use App\Mail\UserWelcomeMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -11,12 +11,11 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 
-class SendPasswordResetEmail implements ShouldQueue
+class sendUserwelcomeJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $maildata;
-
     /**
      * Create a new job instance.
      *
@@ -34,7 +33,7 @@ class SendPasswordResetEmail implements ShouldQueue
      */
     public function handle()
     {
-        $email = new PasswordResetEmail($this->maildata);
+        $email = new UserWelcomeMail($this->maildata);
         Mail::to($this->maildata['email'])->send($email);
     }
 }

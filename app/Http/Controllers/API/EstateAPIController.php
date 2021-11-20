@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateEstateAPIRequest;
 use App\Http\Requests\API\UpdateEstateAPIRequest;
 use App\Http\Resources\EstateResource;
+use App\Jobs\sendUserwelcomeJob;
 use App\Mail\UserWelcomeMail;
 use App\Models\Estate;
 use App\Models\User;
@@ -96,7 +97,7 @@ class EstateAPIController extends AppBaseController
           "url"      => url('/')."/auth/login"
         ];
 
-
+        sendUserwelcomeJob::dispatch($details);
         Mail::to($request->email)
             ->queue(new UserWelcomeMail($details));
 
