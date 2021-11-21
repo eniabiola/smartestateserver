@@ -133,7 +133,7 @@ class CityAPIController extends AppBaseController
     {
         $cities = City::where('state_id', $state_id)->get();
 
-        if (count($cities))
+        if (count($cities) == 0)
         {
             return $this->sendError('City not found');
         }
