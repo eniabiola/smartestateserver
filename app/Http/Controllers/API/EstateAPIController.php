@@ -63,7 +63,6 @@ class EstateAPIController extends AppBaseController
     public function store(CreateEstateAPIRequest $request, UploadService $uploadService, UtilityService $utilityService)
     {
         if ($request->has('imageName')){
-
             $imageUploadAction = $uploadService->uploadImageBase64($request->imageName, "estateImages/");
             if($imageUploadAction['status'] === false){
                 $message = "The file upload must be an image!";
