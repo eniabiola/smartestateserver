@@ -79,6 +79,7 @@ class ResidentAPIController extends AppBaseController
             $input['user_id'] = $user->id;
 
             $resident = $this->residentRepository->create($input);
+            //TODO: Queued mail to welcome the resident
             DB::commit();
             return $this->sendResponse(new ResidentResource($resident), 'Resident saved successfully');
         } catch (\Exception $th)

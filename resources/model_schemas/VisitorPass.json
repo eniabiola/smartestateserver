@@ -60,7 +60,7 @@
         "inView": true
     },
     {
-        "name": "pass_status",
+        "name": "status",
         "dbType": "string,255",
         "htmlType": "text",
         "validations": "required|string|max:255|string|max:255",

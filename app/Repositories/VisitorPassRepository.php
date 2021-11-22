@@ -21,7 +21,7 @@ class VisitorPassRepository extends BaseRepository
         'estate_id',
         'generatedCode',
         'guestName',
-        'pass_status',
+        'status',
         'user_id',
         'visitationDate',
         'generatedDate',

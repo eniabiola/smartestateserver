@@ -19,7 +19,7 @@ class CreateVisitorPassesTable extends Migration
             $table->string('generatedCode', 15);
             $table->string('guestName');
             $table->string('gender');
-            $table->string('pass_status');
+            $table->string('status');
             $table->unsignedBigInteger('user_id');
             $table->dateTime('visitationDate');
             $table->dateTime('generatedDate');

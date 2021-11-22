@@ -24,7 +24,7 @@ class VisitorPassResource extends JsonResource
             "estate_id" => $this->estate_id,
             "estate" => $this->estate->name,
             "user" => $this->user->surname,
-            "status" => $this->pass_status,
+            "status" => $this->status,
             "checked_in_time" => $this->checked_in_time,
             "checked_out_time" => $this->checked_out_time
             ];

@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property integer $estate_id
  * @property string $generatedCode
  * @property string $guestName
- * @property string $pass_status
+ * @property string $status
  * @property integer $user_id
  * @property string|\Carbon\Carbon $visitationDate
  * @property string|\Carbon\Carbon $generatedDate
@@ -45,7 +45,7 @@ class VisitorPass extends Model
         'estate_id',
         'generatedCode',
         'guestName',
-        'pass_status',
+        'status',
         'user_id',
         'visitationDate',
         'generatedDate',
@@ -64,7 +64,7 @@ class VisitorPass extends Model
         'estate_id' => 'integer',
         'generatedCode' => 'string',
         'guestName' => 'string',
-        'pass_status' => 'string',
+        'status' => 'string',
         'user_id' => 'integer',
         'visitationDate' => 'datetime',
         'generatedDate' => 'datetime',

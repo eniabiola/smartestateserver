@@ -30,6 +30,6 @@ class PerformBillingToInvoiceOperation implements ShouldQueue
      */
     public function handle()
     {
-        //TODO: CHECK THE FREQUENCY, AND THE PERSONS IT SHOULD BE ADDRESSED TO, TO CREATE THE BILLING
+        //TODO: CHECK THE FREQUENCY, AND THE PERSONS IT SHOULD BE ADDRESSED TO, TO CREATE THE INVOICE USING THE METHOD
     }
 }

@@ -66,7 +66,7 @@ class VisitorPassAPIController extends AppBaseController
         $date = date('Y-m-d H:i:s');
         $user = \request()->user();
         $request->merge(['generatedCode' => $utilityService->generateCode(6),'generatedDate' => $date, 'visitationDate' => $request->visitationDate]);
-        $request->merge(['pass_status' => "inactive", "user_id" => $user->id, 'estate_id' => $user->estate_id ?? 1]);
+        $request->merge(['status' => "inactive", "user_id" => $user->id, 'estate_id' => $user->estate_id ?? 1]);
         $request->merge(['dateExpires' => Carbon::parse($request->visitationDate)->addHours($request->duration)]);
 
         $input = $request->all();
@@ -159,9 +159,9 @@ class VisitorPassAPIController extends AppBaseController
         {
             return $this->sendError("This Pass code is invalid");
         }
-        if ($active == "active" && $visitorPass->pass_status == "active") return $this->sendError("This Pass code is already in use.");
+        if ($active == "active" && $visitorPass->status == "active") return $this->sendError("This Pass code is already in use.");
 
-        $visitorPass->pass_status = $active;
+        $visitorPass->status = $active;
         $visitorPass->save();
         $visitor_pass = [
             "guestName" => $visitorPass->guestName,
@@ -171,6 +171,7 @@ class VisitorPassAPIController extends AppBaseController
             "estate" => $visitorPass->estate->name,
             "user" => $visitorPass->user->surname,
         ];
+        //TODO: Queued Mail to inform the user of the activity of the guest whether in or out
         return $this->sendResponse($visitor_pass, "The pass code is valid");
     }
 }

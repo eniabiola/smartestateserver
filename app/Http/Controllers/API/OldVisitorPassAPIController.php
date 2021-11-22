@@ -65,7 +65,7 @@ class VisitorPassAPIController extends AppBaseController
     {
         $user = \request()->user();
         $request->merge(['generatedCode' => $utilityService->generateCode(6),'generatedDate' => date('Y-m-d H:i:s')]);
-        $request->merge(['pass_status' => "inactive", "user_id" => $user->id, 'estate_id' => $user->estate_id ?? 1]);
+        $request->merge(['status' => "inactive", "user_id" => $user->id, 'estate_id' => $user->estate_id ?? 1]);
         $input = $request->all();
 
         $visitorPass = $this->visitorPassRepository->create($input);
@@ -158,13 +158,13 @@ class VisitorPassAPIController extends AppBaseController
         {
             return $this->sendError("This Pass code is invalid");
         }
-        if ($status == "active" && $visitorPass->pass_status == "active") return $this->sendError("This Pass code is already in use.");
+        if ($status == "active" && $visitorPass->status == "active") return $this->sendError("This Pass code is already in use.");
 
         if($status == "active")
         {
-            $visitorPass->pass_status = $status;
+            $visitorPass->status = $status;
         } else {
-            $visitorPass->pass_status = "inactive";
+            $visitorPass->status = "inactive";
         }
 
         $visitorPass->save();
