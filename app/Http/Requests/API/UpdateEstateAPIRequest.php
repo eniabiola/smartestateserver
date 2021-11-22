@@ -27,8 +27,9 @@ class UpdateEstateAPIRequest extends APIRequest
     {
 
         $rules = Estate::$rules;
-        $rules['name'] = 'required|string|max:100|unique:estates,name,'.$this->route('id');
+        $custom_rules = ['name' => 'required','string','max:100',
+            Rule::unique('estates')->ignore($this->route('id'), 'name')];
 
-        return $rules;
+        return array_merge($rules, $custom_rules);
     }
 }

@@ -82,6 +82,8 @@ class UserAPIController extends AppBaseController
 //        $input['user_id'] = $user->id;
 
         //TODO: Send a queued mail to the user that they have been created on this platform
+        //TODO: CHECK IF THERE IS A BILLING FOR NEW USERS, AND CALL THE CREATE THE INVOICE METHOD
+
         return $this->sendResponse(new UserResource($user), 'User saved successfully');
     }
 

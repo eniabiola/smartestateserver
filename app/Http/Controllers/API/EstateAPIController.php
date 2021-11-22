@@ -62,7 +62,7 @@ class EstateAPIController extends AppBaseController
      */
     public function store(CreateEstateAPIRequest $request, UploadService $uploadService, UtilityService $utilityService)
     {
-        if ($request->has('imageName')){
+        if ($request->has('imageName') && $request->imageName != null){
             $imageUploadAction = $uploadService->uploadImageBase64($request->imageName, "estateImages/");
             if($imageUploadAction['status'] === false){
                 $message = "The file upload must be an image!";
@@ -79,7 +79,7 @@ class EstateAPIController extends AppBaseController
         $estate = $this->estateRepository->create($input);
         $password = $utilityService->generateCode(6);
         $user = User::firstOrCreate([
-            "surname" => $estate->name,
+            "surname" => $estate->contactPerson,
             "othernames" => "",
             "phone" =>$estate->phone,
             "email" => $estate->email,
@@ -89,7 +89,8 @@ class EstateAPIController extends AppBaseController
         ]);
         DB::commit();
         $details = [
-          "name" => $request->name,
+          "name" => $request->contactPerson,
+          "estate_name" => $request->name,
           "email" => $request->email,
           "message" => "An account has been created for you as the estate manager of $request->name estate",
           "password" => $password,
@@ -97,8 +98,8 @@ class EstateAPIController extends AppBaseController
         ];
 
         sendUserwelcomeJob::dispatch($details);
-        Mail::to($request->email)
-            ->queue(new UserWelcomeMail($details));
+//        Mail::to($request->email)
+//            ->queue(new UserWelcomeMail($details));
 
         return $this->sendResponse( new EstateResource($estate), 'Estate saved successfully');
     }
@@ -142,9 +143,7 @@ class EstateAPIController extends AppBaseController
             return $this->sendError('Estate not found');
         }
 
-
-
-        if ($request->has('imageName')){
+        if ($request->has('imageName') && $request->imageName != null){
             $imageUploadAction = $uploadService->uploadImageBase64($request->imageName, "estateImages/");
             if($imageUploadAction['status'] === false){
                 $message = "The file upload must be an image!";
@@ -152,15 +151,16 @@ class EstateAPIController extends AppBaseController
                 return $this->failedResponse($message, $statuscode);
             }
             $filename = $imageUploadAction['data'];
+//            return $filename;
             $uploadService->deleteImage($estate->imageName, "estateImages/");
         } else {
             $filename = $estate->imageName;
         }
-        $request->merge(['imageName', $filename]);
+        $request->merge(['imageName' => $filename]);
         $input = $request->all();
 
         $estate = $this->estateRepository->update($input, $id);
-        $user = $userRepository->create();
+//        $user = $userRepository->create();
         return $this->sendResponse($estate->toArray(), 'Estate updated successfully');
     }
 

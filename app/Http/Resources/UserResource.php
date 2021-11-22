@@ -22,6 +22,8 @@ class UserResource extends JsonResource
             "gender" => $this->gender,
             "email" => $this->email,
             "is_active" => $this->isActive,
+            "estate_id" => $this->estate_id,
+            "estate" => $this->estate()->exists() ? $this->estate->name : null,
             "role" => $this->roles()->exists() ? $this->roles[0]->name : null,
             $this->mergeWhen($this->roles()->exists() && $this->roles[0]->name == "resident",
                 ['resident' => [ $this->resident ]])

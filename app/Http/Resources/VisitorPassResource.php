@@ -15,6 +15,7 @@ class VisitorPassResource extends JsonResource
     public function toArray($request)
     {
         return [
+            "id" => $this->id,
             "guestName" => $this->guestName,
             "pass_code" => $this->generatedCode,
             "visitationDate" => date('Y-m-d H:i:s', strtotime($this->visitationDate)),

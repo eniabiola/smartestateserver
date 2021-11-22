@@ -24,13 +24,14 @@ class CreateEstatesTable extends Migration
             $table->string('email', 100);
             $table->string('phone', 17);
             $table->string('address');
+            $table->string('contactPerson');
             $table->string('accountNumber', 12);
             $table->string('accountName', 100);
             $table->string('imageName', 100);
             $table->boolean('accountVerified')->default(false);
-            $table->string('alternativeContact', 100);
-            $table->string('alternateEmail', 100);
-            $table->string('alternatePhone', 17);
+            $table->string('alternativeContact', 100)->nullable();
+            $table->string('alternateEmail', 100)->nullable();
+            $table->string('alternatePhone', 17)->nullable();
             $table->string('status')->default('pending')->comment('The options here
             are pending, active, inactive');
             $table->unsignedBigInteger('created_by');

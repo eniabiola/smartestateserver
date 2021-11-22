@@ -41,6 +41,7 @@ class BaseController extends Controller
 
     public function sendError($error, $message = "Error performing operation", $code = 400)
     {
+
         $args = func_get_args();
         if (count($args) == 1) {
             $message = $error;
