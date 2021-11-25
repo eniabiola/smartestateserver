@@ -63,9 +63,11 @@ class VisitorPassAPIController extends AppBaseController
      */
     public function store(CreateVisitorPassAPIRequest $request, UtilityService $utilityService)
     {
+        $code = mt_rand(100000, 999999);
+        $generatedCode = str_shuffle($code);
         $date = date('Y-m-d H:i:s');
         $user = \request()->user();
-        $request->merge(['generatedCode' => $utilityService->generateCode(6),'generatedDate' => $date, 'visitationDate' => $request->visitationDate]);
+        $request->merge(['generatedCode' => $generatedCode,'generatedDate' => $date, 'visitationDate' => $request->visitationDate]);
         $request->merge(['status' => "inactive", "user_id" => $user->id, 'estate_id' => $user->estate_id ?? 1]);
         $request->merge(['dateExpires' => Carbon::parse($request->visitationDate)->addHours($request->duration)]);
 
@@ -151,16 +153,21 @@ class VisitorPassAPIController extends AppBaseController
         $invitation_code = $request->get('invitation_code');
         $active = $request->get('status');
         if ($invitation_code == null || $active == null) return $this->sendError("invalid URL");
+
+
         $visitorPass = VisitorPass::query()
             ->where('generatedCode', $request->invitation_code)
-//                                    ->where('dateExpires', '>=', date("Y-m-d"))
             ->first();
-        if (!$visitorPass)
-        {
-            return $this->sendError("This Pass code is invalid");
-        }
+
+        if ($active == "active" && $visitorPass->visitationDate != Carbon::today())return $this->sendError("You are not scheduled for a visit today.");
+
         if ($active == "active" && $visitorPass->status == "active") return $this->sendError("This Pass code is already in use.");
 
+        if ($active == "active"){
+            $visitorPass->checked_in_time = date('Y-m-d h:i:s');
+        } else {
+            $visitorPass->checked_out_time = date('Y-m-d h:i:s');
+        }
         $visitorPass->status = $active;
         $visitorPass->save();
         $visitor_pass = [

@@ -66,12 +66,13 @@ class VisitorPass extends Model
         'guestName' => 'string',
         'status' => 'string',
         'user_id' => 'integer',
-        'visitationDate' => 'datetime',
-        'generatedDate' => 'datetime',
-        'dateExpires' => 'datetime',
+        'visitationDate' => 'date:Y-m-d H:i:s',
+        'generatedDate' => 'date:Y-m-d H:i:s',
+        'dateExpires' => 'date:Y-m-d H:i:s',
         'duration' => 'integer',
         'isActive' => 'boolean'
     ];
+
 
     /**
      * Validation rules
