@@ -26,6 +26,8 @@ Route::get('streets', [\App\Http\Controllers\API\StreetAPIController::class, 'in
 Route::get('visitor_pass_authentication', [\App\Http\Controllers\API\VisitorPassAPIController::class, 'passAuthentication']);
 Route::post('estate_code_validation', [\App\Http\Controllers\API\EstateAPIController::class, 'validateEstateCode']);
 Route::get('city_filter_by_state/{state_id}', [\App\Http\Controllers\API\CityAPIController::class, 'filterByState']);
+Route::get('billing_job_testing', [\App\Http\Controllers\API\TestingController::class, 'billingJobTesting']);
+
 Route::get('storage/estateimages/{filename}', function ($filename)
 {
 
@@ -73,6 +75,8 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::resource('transactions', \TransactionAPIController::class);
     Route::resource('wallet_histories', \WalletHistoryAPIController::class);
     Route::resource('streets', \StreetAPIController::class)->except('index');
+    Route::post('/pay', [\App\Http\Controllers\API\FlutterwaveController::class, 'initialize'])->name('pay');
+    Route::get('/flutterwave/callback', [\App\Http\Controllers\API\FlutterwaveController::class, 'callback'])->name('callback');
 });
 
 

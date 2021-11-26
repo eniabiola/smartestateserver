@@ -1,9 +1,10 @@
 <?php
 
-namespace ;
+namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateInvoiceAPIRequest;
 use App\Http\Requests\API\UpdateInvoiceAPIRequest;
+use App\Http\Resources\InvoiceResource;
 use App\Models\Invoice;
 use App\Repositories\InvoiceRepository;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ use Response;
 
 /**
  * Class InvoiceController
- * @package 
+ * @package
  */
 
 class InvoiceAPIController extends AppBaseController
@@ -40,7 +41,7 @@ class InvoiceAPIController extends AppBaseController
             $request->get('limit')
         );
 
-        return $this->sendResponse($invoices->toArray(), 'Invoices retrieved successfully');
+        return $this->sendResponse(InvoiceResource::collection($invoices), 'Invoices retrieved successfully');
     }
 
     /**

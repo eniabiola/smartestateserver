@@ -1,6 +1,6 @@
 <?php
 
-namespace ;
+namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateTransactionAPIRequest;
 use App\Http\Requests\API\UpdateTransactionAPIRequest;
@@ -12,7 +12,7 @@ use Response;
 
 /**
  * Class TransactionController
- * @package 
+ * @package
  */
 
 class TransactionAPIController extends AppBaseController

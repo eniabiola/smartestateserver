@@ -48,4 +48,23 @@ class BillingRepository extends BaseRepository
     {
         return Billing::class;
     }
+
+
+    /**
+     * @return mixed
+     */
+    public function BillingJob()
+    {
+        $billingsCount = Billing::query()
+            ->count();
+
+
+        if ($billingsCount == 0) return[];
+        $billings = Billing::query()
+            ->where(function ($query) {
+                $query->where('bill_target', 'current')
+                    ->orWhere('bill_target', 'both');
+            });
+        return $billings;
+    }
 }

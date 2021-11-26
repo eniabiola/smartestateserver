@@ -18,8 +18,8 @@ class CreateNotificationsSendingTable extends Migration
             $table->unsignedBigInteger('notification_id');
             $table->string('status', 20);
             $table->integer('numberOfTrials');
-            $table->dateTime('dateTimeToSend')->default();
-            $table->dateTime('dateTimeSent')->default();
+            $table->dateTime('dateTimeToSend')->nullable();
+            $table->dateTime('dateTimeSent')->nullable();
             $table->timestamps();
         });
     }

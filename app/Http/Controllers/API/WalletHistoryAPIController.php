@@ -1,6 +1,6 @@
 <?php
 
-namespace ;
+namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateWalletHistoryAPIRequest;
 use App\Http\Requests\API\UpdateWalletHistoryAPIRequest;
@@ -12,7 +12,7 @@ use Response;
 
 /**
  * Class WalletHistoryController
- * @package 
+ * @package
  */
 
 class WalletHistoryAPIController extends AppBaseController

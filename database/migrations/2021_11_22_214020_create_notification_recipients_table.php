@@ -17,7 +17,7 @@ class CreateNotificationRecipientsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('notification_id');
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->boolean('toAll')->default('false');
+            $table->boolean('toAll')->default(false);
 
             $table->foreign('notification_id')->on('notifications')->references('id');
             $table->foreign('user_id')->on('users')->references('id');
