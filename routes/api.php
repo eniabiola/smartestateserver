@@ -77,6 +77,9 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::resource('streets', \StreetAPIController::class)->except('index');
     Route::post('/pay', [\App\Http\Controllers\API\FlutterwaveController::class, 'initialize'])->name('pay');
     Route::get('/flutterwave/callback', [\App\Http\Controllers\API\FlutterwaveController::class, 'callback'])->name('callback');
+    Route::resource('complain_categories', \ComplainCategoryAPIController::class);
+    Route::resource('complains', \ComplainAPIController::class);
+    Route::resource('complain_responses', \ComplainResponseAPIController::class);
 });
 
 
@@ -85,3 +88,5 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 
 
 Route::resource('countries', \CountryAPIController::class);
+
+

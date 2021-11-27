@@ -88,10 +88,10 @@ class Billing extends Model
         'amount' => 'required|numeric',
         'bill_frequency' => 'required|string|max:50|in:yearly,monthly,daily,one-off',
         'bill_target' => 'required|string|max:50|in:current,new,both',
-        'invoice_day' => 'required',
-        'invoice_month' => 'nullable',
-        'due_day' => 'required',
-        'due_month' => 'nullable',
+        'invoice_day' => 'required|integer',
+        'invoice_month' => 'nullable|integer',
+        'due_day' => 'required|integer',
+        'due_month' => 'nullable|integer',
         'status' => 'required|string|max:10',
     ];
 

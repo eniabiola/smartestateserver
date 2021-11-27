@@ -19,3 +19,6 @@ Route::get('/', function () {
 
 
 Route::resource('billings', App\Http\Controllers\BillingController::class);
+
+
+Route::resource('complainCategories', App\Http\Controllers\ComplainCategoryController::class);
