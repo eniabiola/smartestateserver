@@ -56,7 +56,7 @@ class ComplainAPIController extends AppBaseController
     public function store(CreateComplainAPIRequest $request)
     {
         $user = Auth::user();
-        $ticket_id = Complain::query()->orderBy('created_at', 'DESC')->first() ?? 0;
+        $ticket_id = Complain::query()->orderBy('created_at', 'DESC')->first()->id ?? 0;
         $ticket_id = "".str_pad($ticket_id+1, 5, '0', STR_PAD_LEFT);
 
         $request->merge(['user_id' => $user->id, 'estate_id' => $user->estate_id,
