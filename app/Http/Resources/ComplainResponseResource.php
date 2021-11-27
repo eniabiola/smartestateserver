@@ -14,6 +14,15 @@ class ComplainResponseResource extends JsonResource
      */
     public function toArray($request)
     {
+        return [
+            "response" => $this->response,
+            "complain_id" => $this->complain_id,
+            "isOwner" =>  $this->isOwner,
+            "user" => $this->user->surname." ".$this->user->othernames,
+            "estate_id" => $this->estate_id,
+            "estate" => $this->estate->user,
+            "user_role" => $this->user_role,
+        ];
         return parent::toArray($request);
     }
 }

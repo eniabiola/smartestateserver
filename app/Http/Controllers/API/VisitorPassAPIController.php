@@ -154,12 +154,16 @@ class VisitorPassAPIController extends AppBaseController
         $active = $request->get('status');
         if ($invitation_code == null || $active == null) return $this->sendError("invalid URL");
 
-
+        $today_date = date('Y-m-d');
         $visitorPass = VisitorPass::query()
             ->where('generatedCode', $request->invitation_code)
+//            ->where(\DB::raw('CAST(visitationDate as date)'), '>=', "2021-11-23")
+            ->whereDate('visitationDate', date('Y-m-d'))
             ->first();
 
-        if ($active == "active" && $visitorPass->visitationDate != Carbon::today())return $this->sendError("You are not scheduled for a visit today.");
+        if (!$visitorPass) return $this->sendError("Pass is either invalid or you're not scheduled for today.");
+
+//        if ($active == "active" && (date("Y-m-d", strtotime($visitorPass->visitationDate)) != (date("Y-m-d"))))return $this->sendError("You are not scheduled for a visit today.");
 
         if ($active == "active" && $visitorPass->status == "active") return $this->sendError("This Pass code is already in use.");
 
