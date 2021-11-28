@@ -33,7 +33,7 @@ class Notification extends Model
 
 
     public $table = 'notifications';
-    
+
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
@@ -80,19 +80,14 @@ class Notification extends Model
      * @var array
      */
     public static $rules = [
-        'created_by' => 'nullable',
-        'estate_id' => 'nullable',
-        'receiver_id' => 'nullable',
-        'group_id' => 'nullable',
-        'street_id' => 'nullable',
+        'receiver_id' => 'required_if:recipient_type,==,user|integer|exists:users,id',
+        'group_id' => 'required_if:recipient_type,==,group|integer|exists:notification_groups,id',
+        'street_id' => 'required_if:recipient_type,==,street|integer|exists:streets,id',
         'name' => 'required|string|max:100',
         'title' => 'required|string|max:200',
         'message' => 'required|string',
         'file' => 'nullable|string|max:255',
-        'recipient_type' => 'nullable|string|max:20',
-        'created_at' => 'nullable',
-        'updated_at' => 'nullable',
-        'deleted_at' => 'nullable'
+        'recipient_type' => 'required|string|max:20|in:all,user,group,street',
     ];
 
     /**
@@ -125,6 +120,14 @@ class Notification extends Model
     public function receiver()
     {
         return $this->belongsTo(\App\Models\User::class, 'receiver_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     **/
+    public function street()
+    {
+        return $this->belongsTo(\App\Models\Street::class, 'street_id');
     }
 
     /**

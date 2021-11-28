@@ -4,8 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateNotificationAPIRequest;
 use App\Http\Requests\API\UpdateNotificationAPIRequest;
+use App\Http\Resources\NotificationResource;
 use App\Models\Notification;
 use App\Repositories\NotificationRepository;
+use App\Services\UploadService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Response;
@@ -40,7 +42,7 @@ class NotificationAPIController extends AppBaseController
             $request->get('limit')
         );
 
-        return $this->sendResponse($notifications->toArray(), 'Notifications retrieved successfully');
+        return $this->sendResponse(NotificationResource::collection($notifications), 'Notifications retrieved successfully');
     }
 
     /**
@@ -51,13 +53,27 @@ class NotificationAPIController extends AppBaseController
      *
      * @return Response
      */
-    public function store(CreateNotificationAPIRequest $request)
+    public function store(CreateNotificationAPIRequest $request, UploadService $uploadService)
     {
+        if ($request->has('file') && $request->file != null){
+            $imageUploadAction = $uploadService->uploadImageBase64($request->file, "notificationImages/");
+            if($imageUploadAction['status'] === false){
+                $message = "The file upload must be an image!";
+                $statuscode = 400;
+                return $this->failedResponse($message, $statuscode);
+            }
+            $filename = $imageUploadAction['data'];
+        } else {
+            $filename = "default.jpg";
+        }
+
+        $request->merge(['file' => $filename, 'created_by' => request()->user()->id, 'estate_id' => request()->user()->estate_id]);
+
         $input = $request->all();
 
         $notification = $this->notificationRepository->create($input);
 
-        return $this->sendResponse($notification->toArray(), 'Notification saved successfully');
+        return $this->sendResponse(new NotificationResource($notification), 'Notification saved successfully');
     }
 
     /**
@@ -77,7 +93,7 @@ class NotificationAPIController extends AppBaseController
             return $this->sendError('Notification not found');
         }
 
-        return $this->sendResponse($notification->toArray(), 'Notification retrieved successfully');
+        return $this->sendResponse(new NotificationResource($notification), 'Notification retrieved successfully');
     }
 
     /**
@@ -102,7 +118,7 @@ class NotificationAPIController extends AppBaseController
 
         $notification = $this->notificationRepository->update($input, $id);
 
-        return $this->sendResponse($notification->toArray(), 'Notification updated successfully');
+        return $this->sendResponse(new NotificationResource($notification), 'Notification updated successfully');
     }
 
     /**
