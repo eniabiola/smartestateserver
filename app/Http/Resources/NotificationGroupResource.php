@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ComplainResponseResource extends JsonResource
+class NotificationGroupResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,15 +15,10 @@ class ComplainResponseResource extends JsonResource
     public function toArray($request)
     {
         return [
-            "response" => $this->response,
-            "complain_id" => $this->complain_id,
-            "isOwner" =>  $this->isOwner,
-            "user" => $this->user->surname." ".$this->user->othernames,
+            "name" => $this->name,
             "estate_id" => $this->estate_id,
-            "estate" => $this->estate->name,
-            "user_role" => $this->user_role,
-            "created_at" => $this->created_at,
-            "complain" => $this->complain,
+            "estate" => $this->estate,
+            "users" => UserNotificationGroupResource::collection($this->users)
         ];
         return parent::toArray($request);
     }

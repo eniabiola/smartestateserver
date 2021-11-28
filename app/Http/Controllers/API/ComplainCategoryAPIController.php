@@ -4,7 +4,9 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateComplainCategoryAPIRequest;
 use App\Http\Requests\API\UpdateComplainCategoryAPIRequest;
+use App\Http\Resources\ComplainAPIResource;
 use App\Http\Resources\ComplainCategoryResource;
+use App\Http\Resources\ComplainCategoryWithComplainResource;
 use App\Models\ComplainCategory;
 use App\Repositories\ComplainCategoryRepository;
 use Illuminate\Http\Request;
@@ -133,5 +135,16 @@ class ComplainCategoryAPIController extends AppBaseController
         $complainCategory->delete();
 
         return $this->sendSuccess('Complain Category deleted successfully');
+    }
+
+    public function getComplainByCategoryId($id)
+    {
+        $complainCategory = $this->complainCategoryRepository->find($id);
+
+        if (empty($complainCategory)) {
+            return $this->sendError('Complain Category not found');
+        }
+
+        return $this->sendResponse(new ComplainCategoryWithComplainResource($complainCategory), 'Complain Category retrieved successfully');
     }
 }

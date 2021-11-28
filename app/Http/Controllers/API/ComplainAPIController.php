@@ -163,4 +163,19 @@ class ComplainAPIController extends AppBaseController
 
         return $this->sendSuccess('Complain deleted successfully');
     }
+
+    public function closeComplain(Request $request, $id)
+    {
+        /** @var Complain $complain */
+        $complain = $this->complainRepository->find($id);
+
+        if (empty($complain)) {
+            return $this->sendError('Complain not found');
+        }
+
+        $complain->status = "closed";
+        $complain->save();
+        return $this->sendResponse(new ComplainAPIResource($complain), 'Complain closed successfully');
+
+    }
 }

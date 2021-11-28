@@ -114,4 +114,8 @@ class Complain extends Model
     {
         return $this->hasMany(\App\Models\ComplainResponse::class, 'complain_id');
     }
+
+    protected $hidden = [
+        "updated_at","deleted_at"
+    ];
 }

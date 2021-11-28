@@ -38,8 +38,6 @@ class User extends Authenticatable implements JWTSubject
 
     protected $dates = ['deleted_at'];
 
-
-
     public $fillable = [
         'estate_id',
         'surname',
@@ -88,7 +86,7 @@ class User extends Authenticatable implements JWTSubject
     ];
 
     protected $hidden = [
-        'password', 'updated_at', 'deleted_at', 'email_verified_at', 'remember_token'
+        'password', 'updated_at', 'deleted_at', 'email_verified_at', 'remember_token', 'pivot'
     ];
 
 

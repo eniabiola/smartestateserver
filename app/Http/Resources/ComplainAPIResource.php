@@ -27,8 +27,9 @@ class ComplainAPIResource extends JsonResource
             "priority" => $this->priority,
             "file" => $this->file ?? null,
             "description" => $this->description,
-            "status" => $this->status
+            "status" => $this->status,
+            $this->mergeWhen($this->complainResponses()->exists(),
+                ['complain_responses' => $this->complainResponses])
         ];
-        return parent::toArray($request);
     }
 }

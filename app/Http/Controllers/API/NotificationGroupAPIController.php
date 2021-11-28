@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateNotificationGroupAPIRequest;
 use App\Http\Requests\API\UpdateNotificationGroupAPIRequest;
+use App\Http\Resources\NotificationGroupResource;
 use App\Models\NotificationGroup;
 use App\Repositories\NotificationGroupRepository;
 use Illuminate\Http\Request;
@@ -41,7 +42,7 @@ class NotificationGroupAPIController extends AppBaseController
             $request->get('limit')
         );
 
-        return $this->sendResponse($notificationGroups->toArray(), 'Notification Groups retrieved successfully');
+        return $this->sendResponse(NotificationGroupResource::collection($notificationGroups), 'Notification Groups retrieved successfully');
     }
 
     /**
@@ -60,7 +61,7 @@ class NotificationGroupAPIController extends AppBaseController
         $notificationGroup = $this->notificationGroupRepository->create($input);
         $notificationGroup->users()->sync($request->users);
 
-        return $this->sendResponse($notificationGroup->toArray(), 'Notification Group saved successfully');
+        return $this->sendResponse(new NotificationGroupResource($notificationGroup), 'Notification Group saved successfully');
     }
 
     /**
@@ -80,7 +81,7 @@ class NotificationGroupAPIController extends AppBaseController
             return $this->sendError('Notification Group not found');
         }
 
-        return $this->sendResponse($notificationGroup->toArray(), 'Notification Group retrieved successfully');
+        return $this->sendResponse(new NotificationGroupResource($notificationGroup), 'Notification Group retrieved successfully');
     }
 
     /**
@@ -104,8 +105,9 @@ class NotificationGroupAPIController extends AppBaseController
         }
 
         $notificationGroup = $this->notificationGroupRepository->update($input, $id);
+        $notificationGroup->users()->sync($request->users);
 
-        return $this->sendResponse($notificationGroup->toArray(), 'NotificationGroup updated successfully');
+        return $this->sendResponse(new NotificationGroupResource($notificationGroup), 'NotificationGroup updated successfully');
     }
 
     /**

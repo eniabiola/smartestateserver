@@ -1,6 +1,6 @@
 <?php
 
-namespace ;
+namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateNotificationAPIRequest;
 use App\Http\Requests\API\UpdateNotificationAPIRequest;
@@ -12,7 +12,7 @@ use Response;
 
 /**
  * Class NotificationController
- * @package 
+ * @package
  */
 
 class NotificationAPIController extends AppBaseController

@@ -4,7 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserResource extends JsonResource
+class UserNotificationGroupResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,14 +19,10 @@ class UserResource extends JsonResource
             "surname" => $this->surname,
             "othernames" => $this->othernames,
             "phone" => $this->phone,
-            "gender" => $this->gender,
             "email" => $this->email,
             "is_active" => $this->isActive,
             "estate_id" => $this->estate_id,
             "estate" => $this->estate()->exists() ? $this->estate->name : null,
-            "role" => $this->roles()->exists() ? $this->roles[0]->name : null,
-            $this->mergeWhen($this->roles()->exists() && $this->roles[0]->name == "resident",
-                ['resident' => $this->resident])
         ];
     }
 }
