@@ -90,3 +90,9 @@ Route::group(['middleware' => ['jwt.verify']], function() {
 Route::resource('countries', \CountryAPIController::class);
 
 
+
+
+Route::resource('notifications', \NotificationAPIController::class);
+
+
+Route::resource('notification_groups', \NotificationGroupAPIController::class);

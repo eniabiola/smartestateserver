@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests\API;
 
-use App\Models\Complain;
+use App\Models\NotificationGroup;
 use InfyOm\Generator\Request\APIRequest;
 
-class UpdateComplainAPIRequest extends APIRequest
+class UpdateNotificationGroupAPIRequest extends APIRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,8 +24,8 @@ class UpdateComplainAPIRequest extends APIRequest
      */
     public function rules()
     {
-        $rules = Complain::$rules;
-
+        $rules = NotificationGroup::$rules;
+        
         return $rules;
     }
 }

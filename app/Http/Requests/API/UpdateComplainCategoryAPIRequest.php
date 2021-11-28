@@ -26,7 +26,11 @@ class UpdateComplainCategoryAPIRequest extends APIRequest
     public function rules()
     {
         return
-        ['name' => 'required','string','max:20',
-            Rule::unique('complain_categories')->ignore($this->route('id'), 'name')];;
+            ['name' => 'required','string','max:255',
+                Rule::unique('complain_categories')->ignoreModel($this->complainCategory)];;
+/*            ['name' => 'required','string','max:255',
+                Rule::unique('complain_categories', 'name')->ignore($this->route('id'), 'id')
+            ];*/
+
     }
 }

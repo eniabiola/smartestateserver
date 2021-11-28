@@ -13,9 +13,9 @@
     },
     {
         "name": "name",
-        "dbType": "string,50",
+        "dbType": "string,30",
         "htmlType": "text",
-        "validations": "required|string|max:50|string|max:50",
+        "validations": "required|string|max:30|string|max:30",
         "searchable": true,
         "fillable": true,
         "primary": false,
@@ -24,10 +24,10 @@
         "inView": true
     },
     {
-        "name": "status",
-        "dbType": "string,20",
-        "htmlType": "text",
-        "validations": "required|string|max:20|string|max:20",
+        "name": "user_id",
+        "dbType": "bigInteger,false,true",
+        "htmlType": null,
+        "validations": "required",
         "searchable": true,
         "fillable": true,
         "primary": false,
@@ -89,6 +89,10 @@
     },
     {
         "type": "relation",
-        "relation": "1tm,Complain,complain_category_id"
+        "relation": "mt1,User,user_id"
+    },
+    {
+        "type": "relation",
+        "relation": "1tm,Notification,group_id"
     }
 ]

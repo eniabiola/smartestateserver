@@ -38,7 +38,7 @@ class AuthenticationController extends BaseController
         //Request is validated
         //Create token
         try {
-            $myTTL = 120; //minutes
+            $myTTL = 1200; //minutes
 
             JWTAuth::factory()->setTTL($myTTL);
             if (! $token = JWTAuth::attempt($credentials)) {

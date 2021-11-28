@@ -7,6 +7,7 @@ use App\Http\Requests\API\UpdateComplainAPIRequest;
 use App\Http\Resources\ComplainAPIResource;
 use App\Models\Complain;
 use App\Repositories\ComplainRepository;
+use App\Services\UploadService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Support\Facades\Auth;
@@ -53,14 +54,26 @@ class ComplainAPIController extends AppBaseController
      *
      * @return Response
      */
-    public function store(CreateComplainAPIRequest $request)
+    public function store(CreateComplainAPIRequest $request, UploadService $uploadService)
     {
         $user = Auth::user();
         $ticket_id = Complain::query()->orderBy('created_at', 'DESC')->first()->id ?? 0;
         $ticket_id = "".str_pad($ticket_id+1, 5, '0', STR_PAD_LEFT);
 
+        if ($request->has('file') && $request->file != null){
+            $imageUploadAction = $uploadService->uploadImageBase64($request->file, "complainImages/");
+            if($imageUploadAction['status'] === false){
+                $message = "The file upload must be an image!";
+                $statuscode = 400;
+                return $this->failedResponse($message, $statuscode);
+            }
+            $filename = $imageUploadAction['data'];
+        } else {
+            $filename = "default.jpg";
+        }
         $request->merge(['user_id' => $user->id, 'estate_id' => $user->estate_id,
-                         'ticket_no' => $ticket_id, 'status' => "active"]);
+                         'ticket_no' => $ticket_id, 'status' => "active",
+                         'file' => $filename]);
         $input = $request->all();
 
         $complain = $this->complainRepository->create($input);
@@ -97,10 +110,8 @@ class ComplainAPIController extends AppBaseController
      *
      * @return Response
      */
-    public function update($id, UpdateComplainAPIRequest $request)
+    public function update($id, UpdateComplainAPIRequest $request, UploadService $uploadService)
     {
-        $input = $request->all();
-
         /** @var Complain $complain */
         $complain = $this->complainRepository->find($id);
 
@@ -108,6 +119,22 @@ class ComplainAPIController extends AppBaseController
             return $this->sendError('Complain not found');
         }
 
+        if ($request->has('file') && $request->file != null){
+            $imageUploadAction = $uploadService->uploadImageBase64($request->file, "estateImages/");
+            if($imageUploadAction['status'] === false){
+                $message = "The file upload must be an image!";
+                $statuscode = 400;
+                return $this->failedResponse($message, $statuscode);
+            }
+            $filename = $imageUploadAction['data'];
+//            return $filename;
+            $uploadService->deleteImage($complain->imageName, "complainImages/");
+        } else {
+            $filename = $complain->imageName;
+        }
+        $request->merge(['file' => $filename]);
+
+        $input = $request->all();
         $complain = $this->complainRepository->update($input, $id);
 
         return $this->sendResponse(new ComplainAPIResource($complain), 'Complain updated successfully');

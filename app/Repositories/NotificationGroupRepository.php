@@ -2,23 +2,23 @@
 
 namespace App\Repositories;
 
-use App\Models\ComplainCategory;
+use App\Models\NotificationGroup;
 use App\Repositories\BaseRepository;
 
 /**
- * Class ComplainCategoryRepository
+ * Class NotificationGroupRepository
  * @package App\Repositories
- * @version November 27, 2021, 10:16 pm UTC
+ * @version November 27, 2021, 10:18 pm UTC
 */
 
-class ComplainCategoryRepository extends BaseRepository
+class NotificationGroupRepository extends BaseRepository
 {
     /**
      * @var array
      */
     protected $fieldSearchable = [
         'name',
-        'status',
+        'user_id',
         'estate_id'
     ];
 
@@ -37,6 +37,6 @@ class ComplainCategoryRepository extends BaseRepository
      **/
     public function model()
     {
-        return ComplainCategory::class;
+        return NotificationGroup::class;
     }
 }

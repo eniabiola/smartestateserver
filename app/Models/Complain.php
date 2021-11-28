@@ -79,7 +79,7 @@ class Complain extends Model
         'complain_category_id' => 'required|integer|exists:complain_categories,id',
         'subject' => 'required|string|max:20',
         'priority' => 'required|string|max:20',
-        'file' => 'nullable|string|max:255',
+        'file' => 'nullable|string',
         'description' => 'required|string',
     ];
 

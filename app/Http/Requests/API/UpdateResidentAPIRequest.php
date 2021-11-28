@@ -29,7 +29,7 @@ class UpdateResidentAPIRequest extends APIRequest
 //        $user_rules = User::$rules;
         $resident_rules = Resident::$rules;
         $custom_rules = ['email' => 'required','string','max:255',
-            Rule::unique('users')->ignore($this->route('id'), 'id')];
+            Rule::unique('users')->ignore($this->route('id'), 'email')];
 
 
         return array_merge(/*$user_rules, */$resident_rules, $custom_rules);

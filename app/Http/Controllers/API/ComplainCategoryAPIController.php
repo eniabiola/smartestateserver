@@ -9,6 +9,7 @@ use App\Models\ComplainCategory;
 use App\Repositories\ComplainCategoryRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
+use Illuminate\Support\Facades\Auth;
 use Response;
 
 /**
@@ -41,7 +42,7 @@ class ComplainCategoryAPIController extends AppBaseController
             $request->get('limit')
         );
 
-        return $this->sendResponse( ComplainCategoryResource::collection($complainCategories), 'Complain Categories retrieved successfully');
+        return $this->sendResponse(ComplainCategoryResource::collection($complainCategories), 'Complain Categories retrieved successfully');
     }
 
     /**
@@ -54,12 +55,12 @@ class ComplainCategoryAPIController extends AppBaseController
      */
     public function store(CreateComplainCategoryAPIRequest $request)
     {
-        $request->merge(['status' => 'active']);
+        $request->merge(['estate_id' => Auth::user()->estate_id, 'status' => 'active']);
         $input = $request->all();
 
         $complainCategory = $this->complainCategoryRepository->create($input);
 
-        return $this->sendResponse( new ComplainCategoryResource($complainCategory), 'Complain Category saved successfully');
+        return $this->sendResponse(new ComplainCategoryResource($complainCategory), 'Complain Category saved successfully');
     }
 
     /**
@@ -91,8 +92,11 @@ class ComplainCategoryAPIController extends AppBaseController
      *
      * @return Response
      */
-    public function update($id, UpdateComplainCategoryAPIRequest $request)
+    public function update($id, Request $request)
     {
+        $this->validate($request, [
+            'name' => 'required|string|unique:complain_categories,name,'.$id
+        ]);
         $input = $request->all();
 
         /** @var ComplainCategory $complainCategory */
