@@ -80,6 +80,8 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::resource('complain_categories', \ComplainCategoryAPIController::class);
     Route::resource('complains', \ComplainAPIController::class);
     Route::resource('complain_responses', \ComplainResponseAPIController::class);
+    Route::resource('notifications', \NotificationAPIController::class);
+    Route::resource('notification_groups', \NotificationGroupAPIController::class);
 });
 
 
@@ -92,7 +94,3 @@ Route::resource('countries', \CountryAPIController::class);
 
 
 
-Route::resource('notifications', \NotificationAPIController::class);
-
-
-Route::resource('notification_groups', \NotificationGroupAPIController::class);

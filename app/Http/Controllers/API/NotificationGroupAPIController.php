@@ -1,6 +1,6 @@
 <?php
 
-namespace ;
+namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateNotificationGroupAPIRequest;
 use App\Http\Requests\API\UpdateNotificationGroupAPIRequest;
@@ -8,11 +8,12 @@ use App\Models\NotificationGroup;
 use App\Repositories\NotificationGroupRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
+use Illuminate\Support\Facades\Auth;
 use Response;
 
 /**
  * Class NotificationGroupController
- * @package 
+ * @package
  */
 
 class NotificationGroupAPIController extends AppBaseController
@@ -53,9 +54,11 @@ class NotificationGroupAPIController extends AppBaseController
      */
     public function store(CreateNotificationGroupAPIRequest $request)
     {
+        $request->merge(['estate_id' => request()->user()->estate_id]);
         $input = $request->all();
 
         $notificationGroup = $this->notificationGroupRepository->create($input);
+        $notificationGroup->users()->sync($request->users);
 
         return $this->sendResponse($notificationGroup->toArray(), 'Notification Group saved successfully');
     }

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @version November 27, 2021, 10:18 pm UTC
  *
  * @property \App\Models\Estate $estate
- * @property \App\Models\User $user
+ * @property \App\Models\User $users
  * @property \Illuminate\Database\Eloquent\Collection $notifications
  * @property string $name
  * @property integer $user_id
@@ -24,7 +24,7 @@ class NotificationGroup extends Model
 
 
     public $table = 'notification_groups';
-    
+
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
@@ -58,11 +58,8 @@ class NotificationGroup extends Model
      */
     public static $rules = [
         'name' => 'required|string|max:30',
-        'user_id' => 'required',
-        'estate_id' => 'required',
-        'created_at' => 'nullable',
-        'updated_at' => 'nullable',
-        'deleted_at' => 'nullable'
+        'users' => 'required|array|min:1',
+        'users.*' => 'integer|exists:users,id'
     ];
 
     /**
@@ -74,11 +71,12 @@ class NotificationGroup extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      **/
-    public function user()
+    public function users()
     {
-        return $this->belongsTo(\App\Models\User::class, 'user_id');
+        return $this->belongsToMany(\App\Models\User::class, 'user_notificationgroup',
+        'notification_group_id', 'user_id');
     }
 
     /**
