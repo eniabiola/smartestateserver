@@ -2,9 +2,11 @@
 
 namespace App\Repositories;
 
+use App\Models\Estate;
 use Illuminate\Container\Container as Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 
 abstract class BaseRepository
@@ -73,6 +75,29 @@ abstract class BaseRepository
     {
         $query = $this->allQuery();
 
+        return $query->paginate($perPage, $columns);
+    }
+
+    public function paginateViewBasedOnRole($perPage, $columns = ['*'], $search, $estate_id)
+    {
+        $query = $this->model->newQuery();
+
+        if (Auth::user()->hasrole('superadministrator'))
+        {
+            if ($estate_id == null)
+            {
+                $estate_id = Estate::query()->distinct()->first()->id;
+            }
+        } else {
+            $estate_id = \request()->user()->estate_id;
+        }
+
+        $query->where(function($quer) use($estate_id){
+           $quer->where('estate_id', $estate_id);
+        })
+            ->orderBy('created_at', 'DESC');
+
+//        $query = $this->searchFields($query, $search);
         return $query->paginate($perPage, $columns);
     }
 
@@ -246,11 +271,14 @@ abstract class BaseRepository
         $search = $this->getDataTableSearchParams($search_term);
         if (count($search)) {
             foreach($search as $key => $value) {
+                \Log::debug($key." ! ".$value);
                 if (in_array($key, $this->getFieldsSearchable())) {
-                    $query->orWhere($key, $value);
+                    $query->orWhere("name", 'LIKE', '%'.$value.'%');
                 }
             }
         }
+
+        \Log::debug(print_r($query->toSql(), true));
         return $query;
     }
 }

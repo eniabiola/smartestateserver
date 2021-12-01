@@ -4,7 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
 use App\Models\Transaction;
-use App\Models\WalletHistory;
+use App\Models\OldWallet;
+use App\Models\WalletFundingTransactionLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -57,6 +58,8 @@ class FlutterwaveController extends AppBaseController
         $transaction->estate_id = Auth::user()->estate_id;
         $transaction->description = "wallet Funding ".date("Y-m-d H:i:s");
         $transaction->amount = $request->amount;
+        $transaction->gateway_commission = 0.00;
+        $transaction->total_amount = $request->amount;
         $transaction->transaction_type = "debit";
         $transaction->transaction_status = "initiated";
         $transaction->transaction_reference = $reference;
@@ -75,9 +78,24 @@ class FlutterwaveController extends AppBaseController
     {
         $status = request()->status;
         $reference = $request->tx_ref;
+        $transactionID = $request->transaction_id;
         $transaction = Transaction::where('transaction_reference', $reference)->first();
         if (!$transaction) return $this->sendError("Unknown Transaction.");
+
+        $checkTransaction = WalletFundingTransactionLog::query()
+            ->where('transaction_id', $transactionID)
+            ->where('status', $status)
+            ->first();
+        if ($checkTransaction) return $this->sendError("This transaction has been processed", 400);
+
         //if payment is successful
+        WalletFundingTransactionLog::create([
+            'transaction_id' => $transactionID,
+            'transaction_reference' => $reference,
+            'status' => $status,
+            'response' => ""
+        ]);
+//        'transaction_id', 'transaction_reference', 'status', 'reference'
         if ($status ==  'successful') {
             $transactionID = $request->transaction_id;
 //            $data = Flutterwave::verifyTransaction($transactionID);
@@ -102,11 +120,44 @@ class FlutterwaveController extends AppBaseController
             $response = curl_exec($curl);
 
             curl_close($curl);
+
+            $checkTransaction = WalletFundingTransactionLog::query()
+                ->where('transaction_id', $transactionID)
+                ->where('status', $status)
+                ->first();
+            if ($checkTransaction) return $this->sendError("This transaction has been processed", 400);
+
+            WalletFundingTransactionLog::create([
+                'transaction_id' => $transactionID,
+                'transaction_reference' => $reference,
+                'status' => $status,
+                'response' => $response
+            ]);
             $decoded_data = json_decode($response, true);
 
+            $transaction->amount = $decoded_data['data']['amount_settled'];
+            $transaction->gateway_commission = $decoded_data['data']['app_fee'];
+            $transaction->total_amount = $decoded_data['data']['charged_amount'];
             $transaction->transaction_status = "successful";
             $message = "Wallet Successfully Funded.";
-            $status = false;
+            $status = true;
+
+
+            $wallet = OldWallet::query()->where('user_id', request()->user()->id)->first();
+
+            if($wallet)
+            {
+                $walletPrev_balance = $wallet->prev_balance;
+            } else {
+                $wallet = new OldWallet();
+                $walletPrev_balance = 0.00;
+            }
+            $wallet->user_id = request()->user()->id;
+            $wallet->prev_balance = $walletPrev_balance;
+            $wallet->amount = $decoded_data['data']['amount_settled'];
+            $wallet->current_balance = $walletPrev_balance + $decoded_data['data']['amount_settled'];
+            $wallet->transaction_type = 'credit';
+            $wallet->save();
         }
         elseif ($status ==  'cancelled'){
             $transaction->transaction_status = "cancelled";
@@ -120,17 +171,11 @@ class FlutterwaveController extends AppBaseController
         }
         $transaction->save();
 
-        $walletHistory = new WalletHistory();
-
-        $walletHistory->save();
-        // Get the transaction from your DB using the transaction reference (txref)
-        // Check if you have previously given value for the transaction. If you have, redirect to your successpage else, continue
-        // Confirm that the currency on your db transaction is equal to the returned currency
-        // Confirm that the db transaction amount is equal to the returned amount
-        // Update the db transaction record (including parameters that didn't exist before the transaction is completed. for audit purpose)
-        // Give value for the transaction
-        // Update the transaction to note that you have given value for the transaction
-        // You can also redirect to your success page from here
+        if ($status === false)
+        {
+            return $this->sendError($message);
+        }
+        return $this->sendSuccess($message);
 
     }
 

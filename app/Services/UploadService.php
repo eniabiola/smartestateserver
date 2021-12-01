@@ -32,7 +32,7 @@ class UploadService {
         $destinationPath = public_path('/'.$folder);
         $oldImage = $destinationPath."/".$deleteImage;
         if (file_exists($oldImage)) {
-            unlink($oldImage);
+            Storage::delete($oldImage);
         }
     }
 }

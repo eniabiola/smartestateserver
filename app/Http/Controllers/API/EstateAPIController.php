@@ -13,10 +13,12 @@ use App\Repositories\EstateRepository;
 use App\Repositories\UserRepository;
 use App\Services\UploadService;
 use App\Services\UtilityService;
+use http\Url;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Response;
 
 /**
@@ -48,7 +50,6 @@ class EstateAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         );
-
         return $this->sendResponse(EstateResource::collection($estates), 'Estates retrieved successfully');
     }
 
@@ -98,8 +99,6 @@ class EstateAPIController extends AppBaseController
         ];
 
         sendUserwelcomeJob::dispatch($details);
-//        Mail::to($request->email)
-//            ->queue(new UserWelcomeMail($details));
 
         return $this->sendResponse( new EstateResource($estate), 'Estate saved successfully');
     }

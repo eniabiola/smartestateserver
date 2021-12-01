@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateComplainCategoryAPIRequest;
 use App\Http\Requests\API\UpdateComplainCategoryAPIRequest;
 use App\Http\Resources\ComplainAPIResource;
+use App\Http\Resources\ComplainCategoryCollection;
 use App\Http\Resources\ComplainCategoryResource;
 use App\Http\Resources\ComplainCategoryWithComplainResource;
 use App\Models\ComplainCategory;
@@ -38,13 +39,11 @@ class ComplainCategoryAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $complainCategories = $this->complainCategoryRepository->all(
-            $request->except(['skip', 'limit']),
-            $request->get('skip'),
-            $request->get('limit')
-        );
+        $search = $request->get('search');
+        $estate_id = $request->get('estate_id');
+        $complainCategories = $this->complainCategoryRepository->paginateViewBasedOnRole('20', ['*'], $search, $estate_id);
 
-        return $this->sendResponse(ComplainCategoryResource::collection($complainCategories), 'Complain Categories retrieved successfully');
+        return $this->sendResponse(new ComplainCategoryCollection($complainCategories), 'Complain Categories retrieved successfully');
     }
 
     /**

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateNotificationAPIRequest;
 use App\Http\Requests\API\UpdateNotificationAPIRequest;
+use App\Http\Resources\NotificationCollection;
 use App\Http\Resources\NotificationResource;
+use App\Http\Resources\UserCollection;
 use App\Models\Notification;
 use App\Repositories\NotificationRepository;
 use App\Services\UploadService;
@@ -36,13 +38,12 @@ class NotificationAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $notifications = $this->notificationRepository->all(
-            $request->except(['skip', 'limit']),
-            $request->get('skip'),
-            $request->get('limit')
-        );
+        $search = $request->get('search');
+        $estate_id = $request->get('estate_id');
+        $notifications = $this->notificationRepository->paginateViewBasedOnRole('20', ['*'], $search, $estate_id);
 
-        return $this->sendResponse(NotificationResource::collection($notifications), 'Notifications retrieved successfully');
+
+        return $this->sendResponse(NotificationResource::collection($notifications)->response()->getData(true), 'Notifications retrieved successfully');
     }
 
     /**
@@ -64,7 +65,7 @@ class NotificationAPIController extends AppBaseController
             }
             $filename = $imageUploadAction['data'];
         } else {
-            $filename = "default.jpg";
+            $filename = null;
         }
 
         $request->merge(['file' => $filename, 'created_by' => request()->user()->id, 'estate_id' => request()->user()->estate_id]);
@@ -105,12 +106,28 @@ class NotificationAPIController extends AppBaseController
      *
      * @return Response
      */
-    public function update($id, UpdateNotificationAPIRequest $request)
+    public function update($id, UpdateNotificationAPIRequest $request, UploadService $uploadService)
     {
-        $input = $request->all();
 
         /** @var Notification $notification */
         $notification = $this->notificationRepository->find($id);
+
+
+        if ($request->has('file') && $request->file != null){
+            $imageUploadAction = $uploadService->uploadImageBase64($request->file, "notificationImages/");
+            if($imageUploadAction['status'] === false){
+                $message = "The file upload must be an image!";
+                $statuscode = 400;
+                return $this->failedResponse($message, $statuscode);
+            }
+            $filename = $imageUploadAction['data'];
+//            return $filename;
+            $uploadService->deleteImage($notification->file, "notificationImages/");
+        } else {
+            $filename = $notification->imageName;
+        }
+        $request->merge(['file' => $filename]);
+        $input = $request->all();
 
         if (empty($notification)) {
             return $this->sendError('Notification not found');

@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class EstateResource extends JsonResource
 {
@@ -14,6 +15,9 @@ class EstateResource extends JsonResource
      */
     public function toArray($request)
     {
+
+        $string =   Storage::url('estateimages/2c1ce651a4254b0983513f824e60cf26.jpeg');
+//        return \url('/api/').$string;
         return [
             "id" => $this->id,
             "city_id" => $this->city_id,
@@ -30,7 +34,7 @@ class EstateResource extends JsonResource
             "contactPerson" => $this->contactPerson,
             "accountNumber" => $this->accountNumber,
             "accountName" => $this->accountName,
-            "imageName" => $this->imageName != "default.jpg" ? url('storage/estateimages/'.$this->imageName) : "default.jpg",
+            "imageName" => $this->imageName != "default.jpg" ? \url('/api/').Storage::url('estateimages/'.$this->imageName) : \url('/api/')."default.jpg",
             "accountVerified" => $this->accountVerified,
             "alternativeContact" => $this->alternativeContact,
             "alternateEmail" => $this->alternateEmail,

@@ -28,10 +28,11 @@ Route::post('estate_code_validation', [\App\Http\Controllers\API\EstateAPIContro
 Route::get('city_filter_by_state/{state_id}', [\App\Http\Controllers\API\CityAPIController::class, 'filterByState']);
 Route::get('billing_job_testing', [\App\Http\Controllers\API\TestingController::class, 'billingJobTesting']);
 
-Route::get('storage/estateimages/{filename}', function ($filename)
+Route::get('storage/{foldername}/{filename}', function ($foldername, $filename)
 {
-
-    $path = storage_path('\app\estateImages\\' . $filename);
+//    return "hello";
+    $path = storage_path('app\\' .$foldername.'\\'. $filename);
+//    return $path;
     if (!File::exists($path)) {
         abort(404);
     }
@@ -43,7 +44,7 @@ Route::get('storage/estateimages/{filename}', function ($filename)
     $response->header("Content-Type", $type);
 
     return $response;
-})->name('estateImages');
+})->name('getImages');
 /**
  * - get Residents by estate if Done
 - get visitor pass by resident  Id or user id Done
@@ -84,15 +85,8 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::resource('complain_responses', \ComplainResponseAPIController::class);
     Route::resource('notifications', \NotificationAPIController::class);
     Route::resource('notification_groups', \NotificationGroupAPIController::class);
+    Route::resource('wallets', \WalletAPIController::class)->only('index');
 });
 
-
-
-
-
-
 Route::resource('countries', \CountryAPIController::class);
-
-
-
 

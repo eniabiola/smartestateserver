@@ -4,10 +4,12 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateWalletHistoryAPIRequest;
 use App\Http\Requests\API\UpdateWalletHistoryAPIRequest;
+use App\Models\Transaction;
 use App\Models\WalletHistory;
 use App\Repositories\WalletHistoryRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
+use Illuminate\Support\Facades\Auth;
 use Response;
 
 /**
@@ -34,11 +36,22 @@ class WalletHistoryAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $walletHistories = $this->walletHistoryRepository->all(
-            $request->except(['skip', 'limit']),
-            $request->get('skip'),
-            $request->get('limit')
-        );
+        $walletHistories = Transaction::query()
+            ->when(Auth::user()->hasrole('resident'), function ($query){
+                $query->where('user_id', request()->user()->id);
+            })
+            ->when(Auth::user()->hasrole('administrator'), function ($query){
+                $query->whereHas('user', function($query){
+                    $query->where('estate_id',request()->user()->estate_id);
+                });
+            })
+            ->when(Auth::user()->hasrole('superadministrator'), function ($query){
+                $query->whereHas('user', function($query){
+                    $query->where('estate_id',request()->user()->estate_id);
+                });
+            })
+            ->orderBy('created_at', 'DESC')
+            ->get();
 
         return $this->sendResponse($walletHistories->toArray(), 'Wallet Histories retrieved successfully');
     }

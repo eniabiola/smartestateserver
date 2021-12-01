@@ -35,13 +35,11 @@ class InvoiceAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $invoices = $this->invoiceRepository->all(
-            $request->except(['skip', 'limit']),
-            $request->get('skip'),
-            $request->get('limit')
-        );
+        $search = $request->get('search');
+        $estate_id = $request->get('estate_id');
+        $invoices = $this->invoiceRepository->paginateViewBasedOnRole('20', ['*'], $search, $estate_id);
 
-        return $this->sendResponse(InvoiceResource::collection($invoices), 'Invoices retrieved successfully');
+        return $this->sendResponse(InvoiceResource::collection($invoices)->response()->getData(true), 'Invoices retrieved successfully');
     }
 
     /**

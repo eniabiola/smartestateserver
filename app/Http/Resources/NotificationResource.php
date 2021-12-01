@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class NotificationResource extends JsonResource
 {
@@ -14,12 +15,14 @@ class NotificationResource extends JsonResource
      */
     public function toArray($request)
     {
+        return parent::toArray($request);
+
         return [
             'id' => $this->id,
             'name' => $this->name,
             'title' => $this->title,
             'message' => $this->message,
-            'file'  => $this->file,
+            "file" => $this->imageName != null ? \url('/api/').Storage::url('notificationimages/'.$this->file) : null,
             'recipient_type' => $this->recipient_type,
             'created_by' => $this->created_by,
             'created_by_user' => $this->createdBy->surname." ".$this->createdBy->othernames,
@@ -38,6 +41,5 @@ class NotificationResource extends JsonResource
             $this->mergeWhen($this->street()->exists(),
                 ['street' => $this->street])
         ];
-        return parent::toArray($request);
     }
 }

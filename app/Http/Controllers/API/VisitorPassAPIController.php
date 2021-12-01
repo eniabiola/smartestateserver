@@ -38,19 +38,13 @@ class VisitorPassAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $visitorPasses = $this->visitorPassRepository->all(
-            $request->except(['skip', 'limit']),
-            $request->get('skip'),
-            $request->get('limit')
-        );
-        $visitorPasses = VisitorPass::query()
-            ->where('estate_id', \request()->user()->estate_id)
-            ->when(Auth::user()->hasRole('resident'), function($query){
-                $query->where('user_id', Auth::user()->id);
-            })
-            ->get();
 
-        return $this->sendResponse(VisitorPassResource::collection($visitorPasses), 'Visitor Passes retrieved successfully');
+        $search = $request->get('search');
+        $estate_id = $request->get('estate_id');
+        $visitorPasses = $this->visitorPassRepository->paginateViewBasedOnRole('20', ['*'], $search, $estate_id);
+
+
+        return $this->sendResponse(VisitorPassResource::collection($visitorPasses)->response()->getData(true), 'Visitor Passes retrieved successfully');
     }
 
     /**

@@ -37,13 +37,12 @@ class ComplainResponseAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $complainResponses = $this->complainResponseRepository->all(
-            $request->except(['skip', 'limit']),
-            $request->get('skip'),
-            $request->get('limit')
-        );
 
-        return $this->sendResponse(ComplainResponseResource::collection($complainResponses), 'Complain Responses retrieved successfully');
+        $search = $request->get('search');
+        $estate_id = $request->get('estate_id');
+        $complainResponses = $this->complainResponseRepository->paginateViewBasedOnRole('20', ['*'], $search, $estate_id);
+
+        return $this->sendResponse(ComplainResponseResource::collection($complainResponses)->response()->getData(true), 'Complain Responses retrieved successfully');
     }
 
     /**

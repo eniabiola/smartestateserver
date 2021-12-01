@@ -5,10 +5,15 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateResidentAPIRequest;
 use App\Http\Requests\API\UpdateResidentAPIRequest;
 use App\Http\Resources\ResidentResource;
+use App\Jobs\createNewResidentInvoice;
+use App\Jobs\sendResidentWelcomeMail;
+use App\Models\Billing;
 use App\Models\Estate;
 use App\Models\Resident;
+use App\Models\Wallet;
 use App\Repositories\ResidentRepository;
 use App\Repositories\UserRepository;
+use App\Services\UtilityService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Support\Facades\Auth;
@@ -70,16 +75,32 @@ class ResidentAPIController extends AppBaseController
             $userInput = $request->safe()->only(['surname', 'othernames', 'phone', 'gender', 'email', 'password']);
             $userInput['password'] = bcrypt($request->password);
             $input = $request->safe()->only(['meterNo', 'dateMovedIn', 'houseNo', 'street']);
-            $estate_id = Estate::where('estateCode', $request->estateCode)->first()->id;
-            $userInput['estate_id'] = $estate_id;
+            $estate = Estate::where('estateCode', $request->estateCode)->first();
+            $userInput['estate_id'] = $estate->id;
 
             $user = $userRepository->create($userInput);
             $user->assignRole('resident');
 
             $input['user_id'] = $user->id;
-
+            $details = [
+              "email" => $user->email,
+              "estate" =>  $estate->name,
+              "surname" => $user->surname,
+              "othernames" => $user->othernames,
+            ];
             $resident = $this->residentRepository->create($input);
             //TODO: Queued mail to welcome the resident
+            sendResidentWelcomeMail::dispatch($details);
+            //TODO: Job to create Invoice for the new user
+            createNewResidentInvoice::dispatch($user);
+
+            $wallet = new Wallet();
+            $wallet->prev_balance = 0.00;
+            $wallet->amount = 0.00;
+            $wallet->current_balance = 0.00;
+            $wallet->transaction_type = "opening";
+            $wallet->user_id = $user->id;
+            $wallet->save();
             DB::commit();
             return $this->sendResponse(new ResidentResource($resident), 'Resident saved successfully');
         } catch (\Exception $th)
@@ -166,5 +187,6 @@ class ResidentAPIController extends AppBaseController
 
         return $this->sendSuccess('Resident deleted successfully');
     }
+
 
 }

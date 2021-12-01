@@ -5,6 +5,8 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateComplainAPIRequest;
 use App\Http\Requests\API\UpdateComplainAPIRequest;
 use App\Http\Resources\ComplainAPIResource;
+use App\Http\Resources\ComplainCollection;
+use App\Http\Resources\ComplainNotification;
 use App\Models\Complain;
 use App\Repositories\ComplainRepository;
 use App\Services\UploadService;
@@ -42,8 +44,11 @@ class ComplainAPIController extends AppBaseController
             $request->get('skip'),
             $request->get('limit')
         );
+        $search = $request->get('search');
+        $estate_id = $request->get('estate_id');
+        $complains = $this->complainRepository->paginateViewBasedOnRole('20', ['*'], $search, $estate_id);
 
-        return $this->sendResponse(ComplainAPIResource::collection($complains), 'Complains retrieved successfully');
+        return $this->sendResponse(ComplainAPIResource::collection($complains)->response()->getData(true), 'Complains retrieved successfully');
     }
 
     /**

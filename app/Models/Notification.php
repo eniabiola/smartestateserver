@@ -80,13 +80,13 @@ class Notification extends Model
      * @var array
      */
     public static $rules = [
-        'receiver_id' => 'required_if:recipient_type,==,user|integer|exists:users,id',
-        'group_id' => 'required_if:recipient_type,==,group|integer|exists:notification_groups,id',
-        'street_id' => 'required_if:recipient_type,==,street|integer|exists:streets,id',
+        'receiver_id' => 'nullable|required_if:recipient_type,==,user|integer|exists:users,id',
+        'group_id' => 'nullable|required_if:recipient_type,==,group|integer|exists:notification_groups,id',
+        'street_id' => 'nullable|required_if:recipient_type,==,street|integer|exists:streets,id',
         'name' => 'required|string|max:100',
         'title' => 'required|string|max:200',
         'message' => 'required|string',
-        'file' => 'nullable|string|max:255',
+        'file' => 'nullable|string',
         'recipient_type' => 'required|string|max:20|in:all,user,group,street',
     ];
 
