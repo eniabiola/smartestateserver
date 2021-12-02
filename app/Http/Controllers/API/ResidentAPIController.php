@@ -7,6 +7,7 @@ use App\Http\Requests\API\UpdateResidentAPIRequest;
 use App\Http\Resources\ResidentResource;
 use App\Jobs\createNewResidentInvoice;
 use App\Jobs\sendResidentWelcomeMail;
+use App\Mail\sendResidentWelcomeMail as ResidentMail;
 use App\Models\Billing;
 use App\Models\Estate;
 use App\Models\Resident;
@@ -18,6 +19,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Response;
 
 /**
@@ -90,7 +92,11 @@ class ResidentAPIController extends AppBaseController
             ];
             $resident = $this->residentRepository->create($input);
             //TODO: Queued mail to welcome the resident
-            sendResidentWelcomeMail::dispatch($details);
+//            sendResidentWelcomeMail::dispatch($details);
+
+            $email = new ResidentMail($details);
+            Mail::to($details['email'])->queue($email);
+//                ->send($email);
             //TODO: Job to create Invoice for the new user
             createNewResidentInvoice::dispatch($user);
 

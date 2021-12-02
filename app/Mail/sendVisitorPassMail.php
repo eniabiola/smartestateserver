@@ -7,11 +7,12 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class sendResidentWelcomeMail extends Mailable
+class sendVisitorPassMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $maildata;
+
     /**
      * Create a new message instance.
      *
@@ -29,8 +30,8 @@ class sendResidentWelcomeMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Welcome to '.$this->maildata['estate'])
-            ->markdown('emails.sendResidentWelcomeMail')
+        return $this->subject('Visitor Pass Access')
+            ->markdown('emails.visitor_pass_mail')
             ->with('maildata', $this->maildata);
     }
 }

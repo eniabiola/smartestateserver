@@ -4,7 +4,7 @@ Dear {{ $maildata['name'] }}
 {!! $maildata['message'] !!}
 
 @component('mail::panel')
-    Your logging details below:
+    Your log in details below:
     Email: {{ $maildata['email'] }}
     Password: {{ $maildata['password'] }}
 @endcomponent

@@ -163,7 +163,7 @@ class AuthenticationController extends BaseController
 
     public function forgotPassword(Request $request)
     {
-        $respMessage = "You would  get a mail in the inbox of {$request->email} if it exists on our system";
+        $respMessage = "Invalid Email";
         \request()->validate([
             "email" => "required|email|exists:users,email"
         ], [
@@ -184,10 +184,11 @@ class AuthenticationController extends BaseController
 
         //TODO: send message to user to reset email
 
-        $message = "Dear {$user->first_name}, click on the link below to reset your password" . PHP_EOL;
-        $url = url('/')."auth/reset_password" . "?token={$token}";
+        $message = "Dear {$user->surname} {$user->othernames}, click on the link below to reset your password" . PHP_EOL;
+        $url = url('/')."/auth/reset_password" . "?token={$token}";
 
         $maildata = [
+            'name' => $user->surname. " ".$user->othernames,
             'email' => $email,
             'message' => $message,
             'url' => $url
@@ -196,7 +197,7 @@ class AuthenticationController extends BaseController
         SendPasswordResetEmail::dispatch($maildata);
         return $this->sendSuccess(
             [],
-            "$respMessage"
+            "A password reset email has been sent"
         );
 
 

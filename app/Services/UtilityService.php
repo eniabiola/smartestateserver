@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Invoice;
 use Illuminate\Support\Facades\Storage;
 
 class UtilityService {
@@ -19,7 +20,7 @@ class UtilityService {
     public function CreateInvoice($billings, $user): bool
     {
         foreach ($billings as $billing) {
-            $invoice = new Invoice;
+            $invoice = new Invoice();
             $invoice->billing_id = $billing->id;
             $invoice->user_id = $user->id;
             $invoice->estate_id = $user->estate_id;

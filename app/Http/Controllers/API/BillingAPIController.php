@@ -56,8 +56,16 @@ class BillingAPIController extends AppBaseController
     public function store(CreateBillingAPIRequest $request)
     {
         $user = \request()->user();
-        $request->merge(['created_by' => $user->id, 'estate_id' => $user->estate_id]);
+
+        $request->merge(['created_by' => $user->id, 'estate_id' => $user->estate_id,
+            'due_day' => !is_null($request->due_day) && !empty($request->due_day) ? intval($request->due_day) : null,
+            'due_month' => !is_null($request->due_month) && !empty($request->due_month) ? intval($request->due_month) : null,
+            'invoice_day' => !is_null($request->invoice_day) && !empty($request->invoice_day) ? intval($request->invoice_day) : null,
+            'invoice_month' => !is_null($request->invoice_month) && !empty($request->invoice_month) ? intval($request->invoice_month) : null,
+            ]);
+
         $input = $request->all();
+//        return $request;
 
         $billing = $this->billingRepository->create($input);
 

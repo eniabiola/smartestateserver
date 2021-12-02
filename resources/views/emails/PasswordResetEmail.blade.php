@@ -1,5 +1,5 @@
 @component('mail::message')
-# Introduction
+Dear {{ $maildata['name'] }}
 
 {!! $maildata['message'] !!}
 

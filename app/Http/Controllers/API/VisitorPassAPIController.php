@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateVisitorPassAPIRequest;
 use App\Http\Requests\API\UpdateVisitorPassAPIRequest;
 use App\Http\Resources\VisitorPassResource;
+use App\Mail\sendVisitorPassMail;
 use App\Models\VisitorPass;
 use App\Repositories\VisitorPassRepository;
 use App\Services\UtilityService;
@@ -149,22 +150,23 @@ class VisitorPassAPIController extends AppBaseController
         if ($invitation_code == null || $active == null) return $this->sendError("invalid URL");
 
         $today_date = date('Y-m-d');
+//        return $today_date;
         $visitorPass = VisitorPass::query()
             ->where('generatedCode', $request->invitation_code)
 //            ->where(\DB::raw('CAST(visitationDate as date)'), '>=', "2021-11-23")
             ->whereDate('visitationDate', date('Y-m-d'))
             ->first();
-
+        return $visitorPass;
         if (!$visitorPass) return $this->sendError("Pass is either invalid or you're not scheduled for today.");
 
-//        if ($active == "active" && (date("Y-m-d", strtotime($visitorPass->visitationDate)) != (date("Y-m-d"))))return $this->sendError("You are not scheduled for a visit today.");
-
         if ($active == "active" && $visitorPass->status == "active") return $this->sendError("This Pass code is already in use.");
-
+        $user = $visitorPass->user->surname." ".$visitorPass->user->surname;
         if ($active == "active"){
             $visitorPass->checked_in_time = date('Y-m-d h:i:s');
+            $message = "Your guest {$visitorPass->guestname} has just been allowed into the estate at {$visitorPass->checked_in_time}";
         } else {
             $visitorPass->checked_out_time = date('Y-m-d h:i:s');
+            $message = "Your guest {$visitorPass->guestname} has just been checkout of the estate at {$visitorPass->checked_out_time}";
         }
         $visitorPass->status = $active;
         $visitorPass->save();
@@ -177,6 +179,12 @@ class VisitorPassAPIController extends AppBaseController
             "user" => $visitorPass->user->surname,
         ];
         //TODO: Queued Mail to inform the user of the activity of the guest whether in or out
+        $maildata = [
+          $message => $message,
+          $user => $user,
+        ];
+        $email = new sendVisitorPassMail($maildata);
+        Mail::to($this->maildata['email'])->send($email);
         return $this->sendResponse($visitor_pass, "The pass code is valid");
     }
 }
