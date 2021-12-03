@@ -20,10 +20,10 @@ class CreateBillingsTable extends Migration
             $table->decimal('amount', 15,2);
             $table->string('bill_frequency', 50);
             $table->string('bill_target', 50);
-            $table->date('invoice_day')->comment("The day the invoice will be sent.");
-            $table->date('invoice_month')->nullable()->comment("if yearly, the month the invoice will be sent.");
-            $table->date('due_day')->comment("The day the billing is due.");
-            $table->date('due_month') ->nullable()->comment("if yearly, the month the billing is due.");
+            $table->integer('invoice_day')->comment("The day the invoice will be sent.");
+            $table->integer('invoice_month')->nullable()->comment("if yearly, the month the invoice will be sent.");
+            $table->integer('due_day')->comment("The day the billing is due.");
+            $table->integer('due_month') ->nullable()->comment("if yearly, the month the billing is due.");
             $table->string('status', 10)->default('active');
             $table->unsignedBigInteger('estate_id');
             $table->unsignedBigInteger('created_by');

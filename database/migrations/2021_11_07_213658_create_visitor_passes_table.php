@@ -22,10 +22,9 @@ class CreateVisitorPassesTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->dateTime('visitationDate');
             $table->dateTime('generatedDate');
-            $table->date('dateExpires');
-            $table->dateTime('dateExpires')->change();
-            $table->integer('duration')->after('dateExpires')->default(2);
-            $table->boolean('isActive')->default(true)->after('duration');
+            $table->dateTime('dateExpires');
+            $table->integer('duration')->default(2);
+            $table->boolean('isActive')->default(true);
             $table->timestamps();
             $table->softDeletes();
 
