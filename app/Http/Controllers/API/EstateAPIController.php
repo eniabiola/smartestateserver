@@ -115,7 +115,8 @@ class EstateAPIController extends AppBaseController
           "url"      => url('/')."/auth/login"
         ];
 
-        sendUserwelcomeJob::dispatch($details);
+        $email = new UserWelcomeMail($details);
+        Mail::to($details['email'])->queue($email);
 
         return $this->sendResponse( new EstateResource($estate), 'Estate saved successfully');
     }

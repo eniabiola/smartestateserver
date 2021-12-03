@@ -194,7 +194,8 @@ class AuthenticationController extends BaseController
             'url' => $url
         ];
 
-        SendPasswordResetEmail::dispatch($maildata);
+        $email = new PasswordResetEmail($maildata);
+        Mail::to($maildata['email'])->queue($email);
         return $this->sendSuccess(
             [],
             "A password reset email has been sent"

@@ -59,7 +59,6 @@ class ResidentAPIController extends AppBaseController
             $query->where('users.estate_id', $estate_id);
         });
 
-
         $residents = $this->residentRepository->searchFields($residents, $request->search ?? null);
         return $this->sendResponse(ResidentResource::collection($residents->paginate(20))->response()->getData(true), 'Residents retrieved successfully');
     }
@@ -93,12 +92,9 @@ class ResidentAPIController extends AppBaseController
               "othernames" => $user->othernames,
             ];
             $resident = $this->residentRepository->create($input);
-            //TODO: Queued mail to welcome the resident
-//            sendResidentWelcomeMail::dispatch($details);
 
             $email = new ResidentMail($details);
             Mail::to($details['email'])->queue($email);
-//                ->send($email);
             //TODO: Job to create Invoice for the new user
             createNewResidentInvoice::dispatch($user);
 
