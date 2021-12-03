@@ -18,18 +18,18 @@ class CreateVisitorPassesTable extends Migration
             $table->unsignedBigInteger('visitor_pass_category_id');
             $table->string('generatedCode', 15);
             $table->string('guestName');
-            $table->string('gender');
             $table->string('status');
             $table->unsignedBigInteger('user_id');
             $table->dateTime('visitationDate');
             $table->dateTime('generatedDate');
             $table->date('dateExpires');
-            $table->boolean('isRecurrent')->default(false);
+            $table->dateTime('dateExpires')->change();
+            $table->integer('duration')->after('dateExpires')->default(2);
+            $table->boolean('isActive')->default(true)->after('duration');
             $table->timestamps();
             $table->softDeletes();
 
             $table->foreign('user_id')->on('users')->references('id');
-            $table->foreign('visitor_pass_category_id')->on('visitor_pass_categories')->references('id');
         });
     }
 
