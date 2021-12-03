@@ -13,7 +13,7 @@ pipelines:
           - php -v
           - apt-get update
           - apt-get install -y unzip git
-          - git push https://heroku:c136d546-a957-4268-a303-b91b0974c83b@git.heroku.com/smartestateapp.git HEAD
+          - git push https://heroku:c136d546-a957-4268-a303-b91b0974c83b@git.heroku.com/smartestateserver.git HEAD
           - export CACHE_DRIVER=redis
           - export SESSION_DRIVER=redis
           - export DB_CONNECTION=mysql
