@@ -52,6 +52,23 @@ class EstateAPIController extends AppBaseController
         );
         return $this->sendResponse(EstateResource::collection($estates), 'Estates retrieved successfully');
     }
+    /**
+     * Display a listing of the Estate.
+     * GET|HEAD /estates
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function indexPaginate(Request $request)
+    {
+        $estates = $this->estateRepository->all(
+            $request->except(['skip', 'limit']),
+            $request->get('skip'),
+            $request->get('limit')
+        );
+        $estates = Estate::query()->orderBy('name', 'ASC');
+        return $this->sendResponse(EstateResource::collection($estates->paginate(20))->response()->getData(true), 'Estates retrieved successfully');
+    }
 
     /**
      * Store a newly created Estate in storage.

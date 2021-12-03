@@ -56,6 +56,7 @@ Route::get('storage/{foldername}/{filename}', function ($foldername, $filename)
 Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('logout', [AuthenticationController::class, 'logout']);
     Route::post('user_toggle_status', [\App\Http\Controllers\API\UserAPIController::class, 'toggleStatus']);
+    Route::get('estate-index-paginate', [\App\Http\Controllers\API\EstateAPIController::class, 'indexPaginate']);
     Route::post('estate_toggle_status', [\App\Http\Controllers\API\EstateAPIController::class, 'toggleStatus']);
     Route::post('street_toggle_status', [\App\Http\Controllers\API\StreetAPIController::class, 'toggleStatus']);
     Route::get('get_authenticated_user', [AuthenticationController::class, 'get_user']);

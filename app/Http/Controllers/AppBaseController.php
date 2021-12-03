@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-//use InfyOm\Generator\Utils\ResponseUtil;
+use InfyOm\Generator\Utils\ResponseUtil;
 use Response;
 
 /**
@@ -20,12 +20,12 @@ class AppBaseController extends Controller
 {
     public function sendResponse($result, $message)
     {
-        return Response::json(self::makeResponse($message, $result));
+        return Response::json(ResponseUtil::makeResponse($message, $result));
     }
 
     public function sendError($error, $code = 404)
     {
-        return Response::json(self::makeError($error), $code);
+        return Response::json(ResponseUtil::makeError($error), $code);
     }
 
     public function sendSuccess($message)
@@ -35,40 +35,4 @@ class AppBaseController extends Controller
             'message' => $message
         ], 200);
     }
-
-    /**
-     * @param string $message
-     * @param mixed  $data
-     *
-     * @return array
-     */
-    public static function makeResponse($message, $data)
-    {
-        return [
-            'success' => true,
-            'data'    => $data,
-            'message' => $message,
-        ];
-    }
-
-    /**
-     * @param string $message
-     * @param array  $data
-     *
-     * @return array
-     */
-    public static function makeError($message, array $data = [])
-    {
-        $res = [
-            'success' => false,
-            'message' => $message,
-        ];
-
-        if (!empty($data)) {
-            $res['data'] = $data;
-        }
-
-        return $res;
-    }
-
 }
