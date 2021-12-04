@@ -118,7 +118,7 @@ class EstateAPIController extends AppBaseController
         ];
 
         $email = new UserWelcomeMail($details);
-//        Mail::to($details['email'])->queue($email);
+        Mail::to($details['email'])->queue($email);
 
         return $this->sendResponse( new EstateResource($estate), 'Estate saved successfully');
     }
