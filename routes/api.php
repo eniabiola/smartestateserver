@@ -19,7 +19,7 @@ use App\Http\Controllers\API\Auth\AuthenticationController;
 Route::get('testing', function ()
 {
     return "This endpoint is reachable and the URL is valid";
-})->name('getImages');
+});
 Route::post('login', [AuthenticationController::class, 'authenticate']);
 Route::post('register', [AuthenticationController::class, 'adminRegister']);
 Route::post('register', [AuthenticationController::class, 'residentRegister']);
