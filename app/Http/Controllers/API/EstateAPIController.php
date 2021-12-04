@@ -91,8 +91,10 @@ class EstateAPIController extends AppBaseController
         } else {
             $filename = "default.jpg";
         }
-        $request->merge(['imageName' => $filename, 'status' => 'active', 'estateCode' => $utilityService->generateCode(6)]);
+        $request->merge(['imageName' => $filename, 'status' => 'active',
+            'estateCode' => $utilityService->generateCode(6), 'country_id' => 156]);
         $input = $request->all();
+//        return $input;
         DB::beginTransaction();
         $estate = $this->estateRepository->create($input);
         $password = $utilityService->generateCode(6);
@@ -116,7 +118,7 @@ class EstateAPIController extends AppBaseController
         ];
 
         $email = new UserWelcomeMail($details);
-        Mail::to($details['email'])->queue($email);
+//        Mail::to($details['email'])->queue($email);
 
         return $this->sendResponse( new EstateResource($estate), 'Estate saved successfully');
     }

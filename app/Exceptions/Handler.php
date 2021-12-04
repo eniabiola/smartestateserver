@@ -77,9 +77,9 @@ class Handler extends ExceptionHandler
             return $this->failedResponse("Error retrieving selection", 400);
         }
 
-        if ($exception instanceof NotFoundHttpException) {
+/*        if ($exception instanceof NotFoundHttpException) {
             return $this->failedResponse("Resource not available, please, check the endpoint", 400);
-        }
+        }*/
 
         if ($exception instanceof ValidationException) {
             foreach ($exception->errors() as $key => $value) {

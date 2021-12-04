@@ -32,7 +32,7 @@ Route::post('estate_code_validation', [\App\Http\Controllers\API\EstateAPIContro
 Route::get('city_filter_by_state/{state_id}', [\App\Http\Controllers\API\CityAPIController::class, 'filterByState']);
 Route::get('billing_job_testing', [\App\Http\Controllers\API\TestingController::class, 'billingJobTesting']);
 
-Route::get('storage/{foldername}/{filename}', function ($foldername, $filename)
+/*Route::get('storage/{foldername}/{filename}', function ($foldername, $filename)
 {
 //    return "hello";
     $path = storage_path('app\\' .$foldername.'\\'. $filename);
@@ -48,7 +48,7 @@ Route::get('storage/{foldername}/{filename}', function ($foldername, $filename)
     $response->header("Content-Type", $type);
 
     return $response;
-})->name('getImages');
+})->name('getImages');*/
 /**
  * - get Residents by estate if Done
 - get visitor pass by resident  Id or user id Done

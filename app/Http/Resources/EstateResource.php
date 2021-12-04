@@ -34,7 +34,7 @@ class EstateResource extends JsonResource
             "contactPerson" => $this->contactPerson,
             "accountNumber" => $this->accountNumber,
             "accountName" => $this->accountName,
-            "imageName" => $this->imageName != "default.jpg" ? \url('/api/').Storage::url('estateimages/'.$this->imageName) : \url('/')."/default.jpg",
+            "imageName" => $this->imageName != "default.jpg" ? Storage::url('estateImages/' .$this->imageName) : \url('/')."/default.jpg",
             "accountVerified" => $this->accountVerified,
             "alternativeContact" => $this->alternativeContact,
             "alternateEmail" => $this->alternateEmail,
