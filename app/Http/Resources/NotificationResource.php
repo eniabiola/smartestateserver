@@ -15,7 +15,7 @@ class NotificationResource extends JsonResource
      */
     public function toArray($request)
     {
-        return parent::toArray($request);
+//        return parent::toArray($request);
 
         return [
             'id' => $this->id,
@@ -39,7 +39,8 @@ class NotificationResource extends JsonResource
             $this->mergeWhen($this->street_id != null,
                 ['street_id' => $this->street_id]),
             $this->mergeWhen($this->street()->exists(),
-                ['street' => $this->street])
+                ['street' => $this->street]),
+            "created_at" => date("Y-m-d h:i:s a", strtotime($this->created_at))
         ];
     }
 }

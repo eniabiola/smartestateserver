@@ -5,13 +5,16 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateUserAPIRequest;
 use App\Http\Requests\API\UpdateUserAPIRequest;
 use App\Http\Resources\UserResource;
+use App\Mail\UserWelcomeMail;
 use App\Models\Estate;
+use App\Models\Role;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use App\Services\UtilityService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Response;
 
 
@@ -74,15 +77,28 @@ class UserAPIController extends AppBaseController
 
         if ($request->has('estateCode'))
         {
-            $estate_id = Estate::where('estateCode', $request->estateCode)->first()->id;
-            $input['estate_id'] = $estate_id;
+            $estate = Estate::where('estateCode', $request->estateCode)->first();
+            $input['estate_id'] = $estate->id;
         }
         $user = $this->userRepository->create($input);
         $user->assignRole($request->role_id);
+        $role = Role::query()->find($request->role_id);
 //
 //        $input['user_id'] = $user->id;
 
         //TODO: Send a queued mail to the user that they have been created on this platform
+
+        $details = [
+            "name" => $request->surname. " ".$request->othernames,
+            "estate_name" => $estate->name,
+            "email" => $request->email,
+            "message" => "An account has been created for you as the $role->name of $request->name estate",
+            "password" => $request->password,
+            "url"      => url('/')."/auth/login"
+        ];
+
+        $email = new UserWelcomeMail($details);
+        Mail::to($details['email'])->queue($email);
 
         return $this->sendResponse(new UserResource($user), 'User saved successfully');
     }

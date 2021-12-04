@@ -42,7 +42,6 @@ class NotificationAPIController extends AppBaseController
         $estate_id = $request->get('estate_id');
         $notifications = $this->notificationRepository->paginateViewBasedOnRole('20', ['*'], $search, $estate_id);
 
-
         return $this->sendResponse(NotificationResource::collection($notifications)->response()->getData(true), 'Notifications retrieved successfully');
     }
 

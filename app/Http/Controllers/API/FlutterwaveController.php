@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
+use App\Mail\GeneralMail;
+use App\Mail\UserWelcomeMail;
 use App\Models\Transaction;
 use App\Models\OldWallet;
 use App\Models\WalletFundingTransactionLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use KingFlamez\Rave\Facades\Rave as Flutterwave;
 
 class FlutterwaveController extends AppBaseController
@@ -88,17 +91,8 @@ class FlutterwaveController extends AppBaseController
             ->first();
         if ($checkTransaction) return $this->sendError("This transaction has been processed", 400);
 
-        //if payment is successful
-        WalletFundingTransactionLog::create([
-            'transaction_id' => $transactionID,
-            'transaction_reference' => $reference,
-            'status' => $status,
-            'response' => ""
-        ]);
-//        'transaction_id', 'transaction_reference', 'status', 'reference'
         if ($status ==  'successful') {
             $transactionID = $request->transaction_id;
-//            $data = Flutterwave::verifyTransaction($transactionID);
             $secret_key = config('flutterwave.secretKey');
             $curl = curl_init();
 
@@ -175,8 +169,17 @@ class FlutterwaveController extends AppBaseController
         {
             return $this->sendError($message);
         }
-        return $this->sendSuccess($message);
 
+        $details = [
+            "subject" => "Wallet Funding",
+            "name" => Auth::user()->surname. " ".Auth::user()->othernames,
+            "message" => "Your wallet has been funded with {$wallet->amount} <br> and your new wallet balance is {$wallet->current_balance}",
+        ];
+
+        $email = new GeneralMail($details);
+        Mail::to(Auth::user()->email)->queue($email);
+
+        return $this->sendSuccess($message);
     }
 
 
