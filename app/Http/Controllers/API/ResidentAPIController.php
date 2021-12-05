@@ -79,12 +79,15 @@ class ResidentAPIController extends AppBaseController
             $userInput['password'] = bcrypt($request->password);
             $input = $request->safe()->only(['meterNo', 'dateMovedIn', 'houseNo', 'street']);
             $estate = Estate::where('estateCode', $request->estateCode)->first();
+//            return $estate;
             $userInput['estate_id'] = $estate->id;
-
+//return $userInput;
             $user = $userRepository->create($userInput);
             $user->assignRole('resident');
 
             $input['user_id'] = $user->id;
+            $input['estate_id'] = $estate->id;
+//            return $input;
             $details = [
               "email" => $user->email,
               "estate" =>  $estate->name,

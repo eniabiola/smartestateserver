@@ -32,31 +32,6 @@ Route::post('estate_code_validation', [\App\Http\Controllers\API\EstateAPIContro
 Route::get('city_filter_by_state/{state_id}', [\App\Http\Controllers\API\CityAPIController::class, 'filterByState']);
 Route::get('billing_job_testing', [\App\Http\Controllers\API\TestingController::class, 'billingJobTesting']);
 
-/*Route::get('storage/{foldername}/{filename}', function ($foldername, $filename)
-{
-//    return "hello";
-    $path = storage_path('app\\' .$foldername.'\\'. $filename);
-//    return $path;
-    if (!File::exists($path)) {
-        abort(404);
-    }
-
-    $file = File::get($path);
-    $type = File::mimeType($path);
-
-    $response = Response::make($file, 200);
-    $response->header("Content-Type", $type);
-
-    return $response;
-})->name('getImages');*/
-/**
- * - get Residents by estate if Done
-- get visitor pass by resident  Id or user id Done
-- get complaints by residents Id or user id
-- get invoices by residents id  or user id
-- get payments by user id
- */
-
 Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('logout', [AuthenticationController::class, 'logout']);
     Route::post('user_toggle_status', [\App\Http\Controllers\API\UserAPIController::class, 'toggleStatus']);
@@ -77,6 +52,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::resource('visitor_passes', VisitorPassAPIController::class);
     Route::resource('visitor_pass_categories', VisitorPassCategoryAPIController::class);
     Route::resource('billings', \BillingAPIController::class);
+    Route::post('pay-invoice', [\App\Http\Controllers\API\InvoiceAPIController::class, 'payInvoice']);
     Route::resource('invoices', \InvoiceAPIController::class);
     Route::resource('transactions', \TransactionAPIController::class);
     Route::resource('wallet_histories', \WalletHistoryAPIController::class);

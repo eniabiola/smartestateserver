@@ -5,10 +5,16 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateInvoiceAPIRequest;
 use App\Http\Requests\API\UpdateInvoiceAPIRequest;
 use App\Http\Resources\InvoiceResource;
+use App\Mail\GeneralMail;
 use App\Models\Invoice;
+use App\Models\Transaction;
+use App\Models\Wallet;
 use App\Repositories\InvoiceRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Response;
 
 /**
@@ -127,4 +133,89 @@ class InvoiceAPIController extends AppBaseController
 
         return $this->sendSuccess('Invoice deleted successfully');
     }
+
+
+    /**
+     * Update the specified Invoice in storage.
+     * PUT/PATCH /invoices/{id}
+     *
+     * @param
+     * @param Request $request
+     *
+     * @return Response
+     */
+    public function payInvoice(Request $request)
+    {
+//        return Auth::id();
+        $this->validate($request, [
+            'invoice_ids' => 'required|array|min:1',
+            'invoice_ids.*' => 'required|integer|exists:invoices,id',
+        ]);
+        $input = $request->all();
+
+        /** @var Invoice $invoice */
+        $invoice = Invoice::query()
+                    ->findMany($request->invoice_ids)
+                    ->sum('amount');
+        $wallet = Wallet::query()
+                    ->where('user_id', Auth::id())
+                    ->first();
+        if ($invoice > $wallet->current_balance) return $this->sendError("You do not have sufficient money in your wallet, either fund or reduce number of invoices to pay", 400);
+
+        $invoices = Invoice::query()
+            ->findMany($request->invoice_ids);
+//        return $invoices;
+        try {
+            $paid = 0;
+            foreach ($invoices as $payable_invoice)
+            {
+                if ($payable_invoice->status == "Paid")
+                {
+                    continue;
+                }
+                DB::beginTransaction();
+                $paid += $payable_invoice->amount;
+                $payable_invoice->status = "Paid";
+                $payable_invoice->save();
+
+                $wallet =  Wallet::where('user_id', Auth::id())->first();
+                $current_balance = $wallet->current_balance;
+                $wallet->prev_balance = $current_balance;
+                $wallet->amount = $payable_invoice->amount;
+                $wallet->current_balance = $current_balance - $payable_invoice->amount;
+                $wallet->transaction_type = "debit";
+                $wallet->save();
+
+                $transaction = new Transaction();
+                $transaction->user_id = Auth::id();
+                $transaction->estate_id = Auth::user()->estate_id;
+                $transaction->description = $payable_invoice->description.date("Y-m-d");
+                $transaction->amount = $payable_invoice->amount;
+                $transaction->gateway_commission = 0;
+                $transaction->total_amount = $payable_invoice->amount;
+                $transaction->transaction_type = 'debit';
+                $transaction->transaction_status = 'completed';
+                $transaction->transaction_reference = $payable_invoice->invoiceNo;
+                $transaction->date_initiated = date("Y-m-d H:i:s");
+                $transaction->save();
+
+                DB::commit();
+
+            }
+
+            $details = [
+                "subject" => "Invoice Payment",
+                "name" => Auth::user()->surname. " ".Auth::user()->othernames,
+                "message" => "You have successfully paid your invoice(s) worth NGN{$paid} <br> and your new wallet balance is NGN{$wallet->current_balance}",
+            ];
+
+            $email = new GeneralMail($details);
+            Mail::to(Auth::user()->email)->queue($email);
+            return $this->sendSuccess("Invoice(s) successfully paid");
+        } catch (\Exception $th)
+        {
+            return $this->sendError("Unable to pay invoice, contact administrator", 400);
+        }
+    }
+
 }

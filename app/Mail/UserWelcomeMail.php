@@ -30,7 +30,7 @@ class UserWelcomeMail extends Mailable
      */
     public function build()
     {
-        return $this->markdown('email.adminCreatedUserWelcomeEmail')
+        return $this->markdown('emails.adminCreatedUserWelcomeEmail')
             ->with('maildata', $this->maildata);
     }
 }
