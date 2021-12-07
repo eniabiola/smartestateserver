@@ -55,9 +55,10 @@ class RoleAPIController extends AppBaseController
     {
         $roles = Role::query()
                 ->where('name', '!=', 'resident')
+                ->select('id', 'name')
                 ->get();
 
-        return $this->sendResponse(RoleResource::collection($roles), 'Roles retrieved successfully');
+        return $this->sendResponse($roles, 'Roles retrieved successfully');
     }
     /**
      * Store a newly created Role in storage.
