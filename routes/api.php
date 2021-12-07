@@ -34,6 +34,7 @@ Route::get('visitor_pass_authentication', [\App\Http\Controllers\API\VisitorPass
 Route::post('estate_code_validation', [\App\Http\Controllers\API\EstateAPIController::class, 'validateEstateCode']);
 Route::get('city_filter_by_state/{state_id}', [\App\Http\Controllers\API\CityAPIController::class, 'filterByState']);
 Route::get('billing_job_testing', [\App\Http\Controllers\API\TestingController::class, 'billingJobTesting']);
+Route::get('roles-for-user-creations', [\App\Http\Controllers\API\RoleAPIController::class, 'userCreationIndex']);
 
 Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('logout', [AuthenticationController::class, 'logout']);

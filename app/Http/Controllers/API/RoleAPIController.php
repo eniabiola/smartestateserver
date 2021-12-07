@@ -45,6 +45,21 @@ class RoleAPIController extends AppBaseController
     }
 
     /**
+     * Display a listing of the Role.
+     * GET|HEAD /roles
+     *
+     * @param Request $request
+     * @return Response
+     */
+    public function userCreationIndex(Request $request)
+    {
+        $roles = Role::query()
+                ->where('name', '!=', 'resident')
+                ->get();
+
+        return $this->sendResponse(RoleResource::collection($roles), 'Roles retrieved successfully');
+    }
+    /**
      * Store a newly created Role in storage.
      * POST /roles
      *
