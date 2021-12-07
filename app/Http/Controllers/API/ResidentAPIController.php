@@ -199,7 +199,7 @@ class ResidentAPIController extends AppBaseController
      *
      * @return Response
      */
-    public function destroy($id, )
+    public function destroy($id)
     {
         /** @var Resident $resident */
         $resident = $this->residentRepository->find($id);
