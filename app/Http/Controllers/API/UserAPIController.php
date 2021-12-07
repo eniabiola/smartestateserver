@@ -10,6 +10,7 @@ use App\Models\Estate;
 use App\Models\Role;
 use App\Models\User;
 use App\Repositories\UserRepository;
+use App\Services\UploadService;
 use App\Services\UtilityService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -70,7 +71,7 @@ class UserAPIController extends AppBaseController
      *
      * @return Response
      */
-    public function store(CreateUserAPIRequest $request, UtilityService $utilityService)
+    public function store(CreateUserAPIRequest $request, UtilityService $utilityService, UploadService $uploadService)
     {
         $request->merge(['password' => bcrypt($request->password)]);
         $input = $request->all();
@@ -80,13 +81,23 @@ class UserAPIController extends AppBaseController
             $estate = Estate::where('estateCode', $request->estateCode)->first();
             $input['estate_id'] = $estate->id;
         }
+
+        if ($request->has('imageName') && $request->imageName != null){
+            $imageUploadAction = $uploadService->uploadImageBase64($request->imageName, "userImages/");
+            if($imageUploadAction['status'] === false){
+                $message = "The file upload must be an image!";
+                $statuscode = 400;
+                return $this->failedResponse($message, $statuscode);
+            }
+            $filename = $imageUploadAction['data'];
+        } else {
+            $filename = "default.jpg";
+        }
+        $request->merge(['imageName' => $filename]);
+
         $user = $this->userRepository->create($input);
         $user->assignRole($request->role_id);
         $role = Role::query()->find($request->role_id);
-//
-//        $input['user_id'] = $user->id;
-
-        //TODO: Send a queued mail to the user that they have been created on this platform
 
         $details = [
             "name" => $request->surname. " ".$request->othernames,

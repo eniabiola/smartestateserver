@@ -81,6 +81,24 @@ class ResidentAPIController extends AppBaseController
             $estate = Estate::where('estateCode', $request->estateCode)->first();
 //            return $estate;
             $userInput['estate_id'] = $estate->id;
+
+
+
+            if ($request->has('imageName') && $request->imageName != null){
+                $imageUploadAction = $uploadService->uploadImageBase64($request->imageName, "userImages/");
+                if($imageUploadAction['status'] === false){
+                    $message = "The file upload must be an image!";
+                    $statuscode = 400;
+                    return $this->failedResponse($message, $statuscode);
+                }
+                $filename = $imageUploadAction['data'];
+            } else {
+                $filename = "default.jpg";
+            }
+            $userInput['imageName'] = $filename;
+//            $request->merge(['imageName' => $filename]);
+
+
 //return $userInput;
             $user = $userRepository->create($userInput);
             $user->assignRole('resident');
@@ -181,7 +199,7 @@ class ResidentAPIController extends AppBaseController
      *
      * @return Response
      */
-    public function destroy($id)
+    public function destroy($id, )
     {
         /** @var Resident $resident */
         $resident = $this->residentRepository->find($id);

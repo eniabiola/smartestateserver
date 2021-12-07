@@ -22,7 +22,7 @@ class NotificationResource extends JsonResource
             'name' => $this->name,
             'title' => $this->title,
             'message' => $this->message,
-            "file" => $this->imageName != null ? \url('/api/').Storage::url('notificationimages/'.$this->file) : null,
+            'file' => $this->file != null ? Storage::url('notificationImages/' .$this->file) : null,
             'recipient_type' => $this->recipient_type,
             'created_by' => $this->created_by,
             'created_by_user' => $this->createdBy->surname." ".$this->createdBy->othernames,
