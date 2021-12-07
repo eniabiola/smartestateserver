@@ -74,13 +74,6 @@ class UserAPIController extends AppBaseController
     public function store(CreateUserAPIRequest $request, UtilityService $utilityService, UploadService $uploadService)
     {
         $request->merge(['password' => bcrypt($request->password)]);
-        $input = $request->all();
-
-        if ($request->has('estateCode'))
-        {
-            $estate = Estate::where('estateCode', $request->estateCode)->first();
-            $input['estate_id'] = $estate->id;
-        }
 
         if ($request->has('imageName') && $request->imageName != null){
             $imageUploadAction = $uploadService->uploadImageBase64($request->imageName, "userImages/");
@@ -93,7 +86,14 @@ class UserAPIController extends AppBaseController
         } else {
             $filename = "default.jpg";
         }
+
+        if ($request->has('estateCode'))
+        {
+            $estate = Estate::where('estateCode', $request->estateCode)->first();
+            $request->merge(['estate_id' => $estate->id]);
+        }
         $request->merge(['imageName' => $filename]);
+        $input = $request->all();
 
         $user = $this->userRepository->create($input);
         $user->assignRole($request->role_id);
@@ -131,7 +131,7 @@ class UserAPIController extends AppBaseController
             return $this->sendError('User not found');
         }
 
-        return $this->sendResponse($user->toArray(), 'User retrieved successfully');
+        return $this->sendResponse(new UserResource($user), 'User retrieved successfully');
     }
 
     /**
@@ -143,9 +143,8 @@ class UserAPIController extends AppBaseController
      *
      * @return Response
      */
-    public function update($id, UpdateUserAPIRequest $request)
+    public function update($id, UpdateUserAPIRequest $request, UploadService $uploadService)
     {
-        $input = $request->all();
 
         /** @var User $user */
         $user = $this->userRepository->find($id);
@@ -154,9 +153,26 @@ class UserAPIController extends AppBaseController
             return $this->sendError('User not found');
         }
 
+        if ($request->has('imageName') && $request->imageName != null){
+            $imageUploadAction = $uploadService->uploadImageBase64($request->imageName, "estateImages/");
+            if($imageUploadAction['status'] === false){
+                $message = "The file upload must be an image!";
+                $statuscode = 400;
+                return $this->failedResponse($message, $statuscode);
+            }
+            $filename = $imageUploadAction['data'];
+            $uploadService->deleteImage($user->imageName, "estateImages/");
+        } else {
+            $filename = $user->imageName;
+        }
+        $request->merge(['imageName' => $filename]);
+
+        $input = $request->all();
+
+
         $user = $this->userRepository->update($input, $id);
 
-        return $this->sendResponse($user->toArray(), 'User updated successfully');
+        return $this->sendResponse(new UserResource($user), 'User updated successfully');
     }
 
     /**

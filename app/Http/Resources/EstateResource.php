@@ -16,8 +16,6 @@ class EstateResource extends JsonResource
     public function toArray($request)
     {
 
-        $string =   Storage::url('estateimages/2c1ce651a4254b0983513f824e60cf26.jpeg');
-//        return \url('/api/').$string;
         return [
             "id" => $this->id,
             "city_id" => $this->city_id,

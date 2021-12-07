@@ -14,6 +14,7 @@ use App\Models\Resident;
 use App\Models\Wallet;
 use App\Repositories\ResidentRepository;
 use App\Repositories\UserRepository;
+use App\Services\UploadService;
 use App\Services\UtilityService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -72,17 +73,16 @@ class ResidentAPIController extends AppBaseController
      *
      * @return Response
      */
-    public function store(CreateResidentAPIRequest $request, UserRepository $userRepository)
+    public function store(CreateResidentAPIRequest $request, UserRepository $userRepository, UploadService $uploadService)
     {
         try {
             DB::beginTransaction();
             $userInput = $request->safe()->only(['surname', 'othernames', 'phone', 'gender', 'email', 'password']);
             $userInput['password'] = bcrypt($request->password);
-            $input = $request->safe()->only(['meterNo', 'dateMovedIn', 'houseNo', 'street']);
+            $input = $request->safe()->only(['meterNo', 'dateMovedIn', 'houseNo', 'street_id']);
             $estate = Estate::where('estateCode', $request->estateCode)->first();
 //            return $estate;
             $userInput['estate_id'] = $estate->id;
-
 
 
             if ($request->has('imageName') && $request->imageName != null){
@@ -97,16 +97,14 @@ class ResidentAPIController extends AppBaseController
                 $filename = "default.jpg";
             }
             $userInput['imageName'] = $filename;
-//            $request->merge(['imageName' => $filename]);
-
-
-//return $userInput;
+//            return $userInput;
             $user = $userRepository->create($userInput);
+//            return $user;
             $user->assignRole('resident');
 
             $input['user_id'] = $user->id;
             $input['estate_id'] = $estate->id;
-//            return $input;
+            $input['estate_id'] = $estate->id;
             $details = [
               "email" => $user->email,
               "estate" =>  $estate->name,
@@ -180,10 +178,8 @@ class ResidentAPIController extends AppBaseController
 
         $userInput = $request->safe()->only(['surname', 'othernames', 'phone', 'gender', 'email']);
 
-        $input = $request->safe()->only(['meterNo', 'dateMovedIn', 'houseNo', 'street']);
-        $estate_id = Estate::where('estateCode', $request->estateCode)->first()->id;
+        $input = $request->safe()->only(['meterNo', 'dateMovedIn', 'houseNo', 'street_id']);
         $user = $userRepository->update($userInput, $id);
-        $input['estate_id'] = $estate_id;
         $resident = Resident::where('user_id', $id)->first();
         $resident = $this->residentRepository->update($input, $resident->id);
 

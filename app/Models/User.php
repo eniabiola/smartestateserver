@@ -20,6 +20,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property string $phone
  * @property string $gender
  * @property string $email
+ * @property string $imageName
  * @property string|\Carbon\Carbon $email_verified_at
  * @property string $password
  * @property string $remember_token
@@ -44,6 +45,7 @@ class User extends Authenticatable implements JWTSubject
         'othernames',
         'phone',
         'gender',
+        'imageName',
         'email',
         'email_verified_at',
         'password',
@@ -63,10 +65,10 @@ class User extends Authenticatable implements JWTSubject
         'phone' => 'string',
         'gender' => 'string',
         'email' => 'string',
+        'imageName' => 'string',
         'email_verified_at' => 'datetime',
         'password' => 'string',
         'remember_token' => 'string',
-        'email_verified_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
