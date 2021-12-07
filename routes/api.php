@@ -20,6 +20,9 @@ Route::get('testing', function ()
 {
     return "This endpoint is reachable and the URL is valid";
 });
+Route::get('/check', function () {
+    Artisan::call('queue:work');
+});
 Route::post('login', [AuthenticationController::class, 'authenticate']);
 Route::post('register', [AuthenticationController::class, 'adminRegister']);
 Route::post('register', [AuthenticationController::class, 'residentRegister']);
