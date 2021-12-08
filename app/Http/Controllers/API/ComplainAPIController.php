@@ -83,7 +83,7 @@ class ComplainAPIController extends AppBaseController
 
         $complain = $this->complainRepository->create($input);
 
-        return $this->sendResponse(new ComplainAPIResource($complain), 'Complain saved successfully');
+        return $this->sendResponse(new ComplainAPIResource($complain), 'Complain sent successfully');
     }
 
     /**
