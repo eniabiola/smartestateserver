@@ -24,8 +24,6 @@ class BillingRepository extends BaseRepository
         'bill_target',
         'invoice_day',
         'invoice_month',
-        'due_day',
-        'due_month',
         'status',
         'estate_id',
         'created_by'

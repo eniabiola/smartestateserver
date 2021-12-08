@@ -103,7 +103,7 @@ class UserAPIController extends AppBaseController
             "name" => $request->surname. " ".$request->othernames,
             "estate_name" => $estate->name,
             "email" => $request->email,
-            "message" => "An account has been created for you as the $role->name of $request->name estate",
+            "message" => "An account has been created for you as a $role->name of $request->name estate",
             "password" => $request->password,
             "url"      => url('/')."/auth/login"
         ];

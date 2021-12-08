@@ -23,8 +23,6 @@ class BillingResource extends JsonResource
             "bill_target" => $this->bill_target,
             "invoice_day" => $this->invoice_day,
             "invoice_month" => $this->invoice_month,
-            "due_day" => $this->due_day,
-            "due_month" => $this->due_month,
             "status" => $this->status,
             "estate_id" => $this->estate_id,
             "estate" => $this->estate->name,

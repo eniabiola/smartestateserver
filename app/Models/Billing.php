@@ -20,8 +20,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $bill_target
  * @property string $invoice_day
  * @property string $invoice_month
- * @property string $due_day
- * @property string $due_month
  * @property string $status
  * @property integer $estate_id
  * @property integer $created_by
@@ -36,9 +34,7 @@ class Billing extends Model
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
-
     protected $dates = ['deleted_at'];
-
 
 
     public $fillable = [

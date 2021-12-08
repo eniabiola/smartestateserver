@@ -117,6 +117,7 @@ class AuthenticationController extends BaseController
                 'name' => $user->estate->name,
                 'estate_code' => $user->estate->estateCode,
             ],
+            'resident' => $user->resident()->exists() ? $user->resident : null,
             ];
 
         if ($user->hasRole('resident'))

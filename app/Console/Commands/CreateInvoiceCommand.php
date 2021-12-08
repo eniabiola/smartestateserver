@@ -16,14 +16,14 @@ class CreateInvoiceCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'create:invoice';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Create Invoice as at when due';
 
     /**
      * Create a new command instance.
@@ -49,22 +49,41 @@ class CreateInvoiceCommand extends Command
          * What is the Frequency
          * Get the date, check if the date is today, then create the invoices
          */
+        $users = User::all();
+
         $billingsCount = Billing::query()->count();
+        if (count($billingsCount) == 0) die();
 
         $billings = Billing::query()
+            ->where('bill_frequency', 'daily')
             ->where(function ($query){
                 $query->where('bill_target', 'current')
                     ->orWhere('bill_target', 'both');
             })
             ->get();
-        if (count($billingsCount) == 0) die();
-        $users = User::all();
-        // if the frequency is daily
-        return $this->CreateInvoice($billings, $users);
 
-        //if the freequency is monthly
+        foreach ($billings as $billing)
+        {
+            $day = date('j');
+            $month = date('n');
+            switch ($billing->bill_frequency) {
+                case "daily":
+                    $this->CreateInvoice($billing, $users);
+                break;
+                case "monthly":
+                    if ($day == $billing->invoice_day) $this->CreateInvoice($billing, $users);
+                break;
+                case "yearly":
+                    if ($month == $billing->invoice_month && $day == $billing->invoice_day)
+                    {
+                        $this->CreateInvoice($billing, $users);
+                    }
+                break;
+                default:
+                    //nothing happens here;
+            }
 
-        //if the frequency is yearly
+        }
 
         return Command::SUCCESS;
     }
@@ -75,9 +94,8 @@ class CreateInvoiceCommand extends Command
      * @param $users
      * @return bool
      */
-    protected function CreateInvoice($billings, $users): bool
+    protected function CreateInvoice($billing, $users): bool
     {
-        foreach ($billings as $billing) {
             foreach ($users as $user) {
                 $invoice = new Invoice;
                 $invoice->billing_id = $billing->id;
@@ -90,18 +108,17 @@ class CreateInvoiceCommand extends Command
                 $invoice->status = "Not Paid";
                 $invoice->save();
 
-                $month   = \DateTime::createFromFormat('!n', $billing->due_month)->format('F');
-                $day   = \DateTime::createFromFormat('!j', $billing->due_day)->format('S');
+                $month   = \DateTime::createFromFormat('!n', $billing->invoice_month)->format('F');
+                $day   = \DateTime::createFromFormat('!j', $billing->invoice_day)->format('S');
                 $details = [
                     "subject" => "Invoice Payment",
                     "name" => $user->surname. " ".$user->othernames,
                     "message" => "This is to notify you that you have an invoice of {$billing->amount} for {$billing->description} to pay.
-                    <br> This invoice is due {$day} {$month}",
+                    <br>  Amount Due: {$billing->amount}",
                 ];
 
                 $email = new GeneralMail($details);
                 Mail::to(Auth::user()->email)->queue($email);
-            }
         }
         return true;
     }
