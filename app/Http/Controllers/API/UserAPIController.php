@@ -57,7 +57,10 @@ class UserAPIController extends AppBaseController
 
 
         $users = User::query()
-           ->where('estate_id', $estate_id);
+            ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
+            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->where('roles.name', '!=', 'resident')
+           ->where('users.estate_id', $estate_id);
         $users = $this->userRepository->searchFields($users, $request->search);
 
         return $this->sendResponse(UserResource::collection($users->get()), 'Users retrieved successfully');
