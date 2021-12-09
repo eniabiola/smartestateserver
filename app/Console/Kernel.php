@@ -27,6 +27,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('queue:work --tries=3')
             ->cron('*/5 * * * *')
             ->withoutOverlapping();
+        $schedule->command('create:invoice')->daily();
         // $schedule->command('inspire')->hourly();
     }
 
