@@ -60,7 +60,7 @@ class UserAPIController extends AppBaseController
             ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
             ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
             ->where('roles.name', '!=', 'resident')
-           ->where('user.estate_id', $estate_id);
+           ->where('users.estate_id', $estate_id);
         $users = $this->userRepository->searchFields($users, $request->search);
 //        return $this->sendResponse(UserResource::collection($users->paginate(20))->response()->getData(true), 'Users retrieved successfully');
 
