@@ -7,7 +7,7 @@ use Illuminate\Container\Container as Application;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\Schema;
 
 abstract class BaseRepository
 {
@@ -81,7 +81,8 @@ abstract class BaseRepository
     public function paginateViewBasedOnRole($perPage, $columns = ['*'], $search, $estate_id)
     {
         $query = $this->model->newQuery();
-
+        $table = $this->model->getTable();
+        $isColExist = Schema::hasColumn($table,'user_id');
         if (Auth::user()->hasrole('superadministrator'))
         {
             if ($estate_id == null)
@@ -95,6 +96,11 @@ abstract class BaseRepository
         $query->where(function($quer) use($estate_id){
            $quer->where('estate_id', $estate_id);
         })
+            ->when(Auth::user()->hasRole('resident'), function ($query) use($isColExist){
+                $query->when($isColExist, function ($query){
+                   $query->where('user_id', Auth::id());
+                });
+            })
             ->orderBy('created_at', 'DESC');
 
 //        $query = $this->searchFields($query, $search);
