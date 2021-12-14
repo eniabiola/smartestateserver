@@ -29,6 +29,13 @@ class GeneralMail extends Mailable
      */
     public function build()
     {
+        if (array_key_exists('attachment', $this->maildata) && $this->maildata['attachment'] != "" && $this->maildata['attachment'] != null)
+        {
+            return $this->subject($this->maildata['subject'])
+                ->markdown('emails.general_mail')
+                ->attach($this->maildata['attachment'])
+                ->with('maildata', $this->maildata);
+        }
         return $this->subject($this->maildata['subject'])
             ->markdown('emails.general_mail')
             ->with('maildata', $this->maildata);

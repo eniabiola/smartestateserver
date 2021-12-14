@@ -58,9 +58,9 @@ class ResidentAPIController extends AppBaseController
 
         $residents = Resident::query()
             ->whereHas('user', function ($query) use ($estate_id){
-            $query->where('users.estate_id', $estate_id);
-        })
-        ->orderBy('created_at', 'DESC');
+                $query->where('users.estate_id', $estate_id);
+            })
+            ->orderBy('created_at', 'DESC');
 
         $residents = $this->residentRepository->searchFields($residents, $request->search ?? null);
         return $this->sendResponse(ResidentResource::collection($residents->paginate(20))->response()->getData(true), 'Residents retrieved successfully');
@@ -108,10 +108,10 @@ class ResidentAPIController extends AppBaseController
             $input['estate_id'] = $estate->id;
             $input['estate_id'] = $estate->id;
             $details = [
-              "email" => $user->email,
-              "estate" =>  $estate->name,
-              "surname" => $user->surname,
-              "othernames" => $user->othernames,
+                "email" => $user->email,
+                "estate" =>  $estate->name,
+                "surname" => $user->surname,
+                "othernames" => $user->othernames,
             ];
             $resident = $this->residentRepository->create($input);
 
@@ -164,22 +164,37 @@ class ResidentAPIController extends AppBaseController
      *
      * @return Response
      */
-    public function update($id, UpdateResidentAPIRequest $request, UserRepository $userRepository)
+    public function update($id, UpdateResidentAPIRequest $request, UserRepository $userRepository, UploadService $uploadService)
     {
         $input = $request->all();
 
         /** @var Resident $resident */
-        $resident = $userRepository->find($id);
+        $resident = $this->residentRepository->find($id);
 
+        $resident = Resident::find($id);
+        $user = $userRepository->find($resident->user_id);
         if (empty($resident)) {
             return $this->sendError('Resident not found');
         }
-
+        if ($request->has('imageName') && $request->imageName != null){
+            $imageUploadAction = $uploadService->uploadImageBase64($request->imageName, "userImages/");
+            if($imageUploadAction['status'] === false){
+                $message = "The file upload must be an image!";
+                $statuscode = 400;
+                return $this->failedResponse($message, $statuscode);
+            }
+            $filename = $imageUploadAction['data'];
+//            return $filename;
+            $uploadService->deleteImage($user->imageName, "userImages/");
+        } else {
+            $filename = $user->imageName;
+        }
         $userInput = $request->safe()->only(['surname', 'othernames', 'phone', 'gender', 'email']);
-
+        $userInput['imageName'] = $filename;
         $input = $request->safe()->only(['meterNo', 'dateMovedIn', 'houseNo', 'street_id']);
-        $user = $userRepository->update($userInput, $id);
-        $resident = Resident::where('user_id', $id)->first();
+
+        $resident = Resident::find($id);
+        $user = $userRepository->update($userInput, $resident->user_id);
         $resident = $this->residentRepository->update($input, $resident->id);
 
         return $this->sendResponse(new ResidentResource($resident), 'Resident updated successfully');
@@ -212,13 +227,13 @@ class ResidentAPIController extends AppBaseController
     public function changeUserStatus(Request $request, UserAPIController $userAPIController)
     {
         $this->validate($request, [
-           'id' => 'required|integer|exists:residents,id',
+            'id' => 'required|integer|exists:residents,id',
         ]);
 
         $user = Resident::query()
-                    ->join('users', 'users.id', 'residents.user_id')
-                    ->where('residents.id', '=', $request->id)
-                    ->first();
+            ->join('users', 'users.id', 'residents.user_id')
+            ->where('residents.id', '=', $request->id)
+            ->first();
 
         return $userAPIController->toggleStatus($request);
     }

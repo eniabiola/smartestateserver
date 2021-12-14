@@ -40,6 +40,7 @@ class sendNotificationMessages implements ShouldQueue
     {
         $notification = Notification::query()
                         ->find($this->notification_id);
+        $details['attachment'] = "";
         $details['subject'] = $notification->title;
         $details['message'] = $notification->message;
         switch ($notification->recipient_type)

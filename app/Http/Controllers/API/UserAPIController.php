@@ -9,6 +9,7 @@ use App\Mail\UserWelcomeMail;
 use App\Models\Estate;
 use App\Models\Role;
 use App\Models\User;
+use App\Repositories\ResidentRepository;
 use App\Repositories\UserRepository;
 use App\Services\UploadService;
 use App\Services\UtilityService;
@@ -147,7 +148,7 @@ class UserAPIController extends AppBaseController
      *
      * @return Response
      */
-    public function update($id, UpdateUserAPIRequest $request, UploadService $uploadService)
+    public function update($id, UpdateUserAPIRequest $request, ResidentRepository $residentRepository, UploadService $uploadService)
     {
 
         /** @var User $user */
@@ -175,7 +176,11 @@ class UserAPIController extends AppBaseController
 
 
         $user = $this->userRepository->update($input, $id);
-
+        if (Auth::user()->hasRole('resident')){
+            $resident = $residentRepository->find($user->id);
+            $updateResident = $request->safe()->only(['meterNo', 'dateMovedIn', 'houseNo', 'street_id']);
+            $residentRepository->update($updateResident, $resident->id);
+        }
         return $this->sendResponse(new UserResource($user), 'User updated successfully');
     }
 
