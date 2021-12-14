@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
@@ -110,6 +111,7 @@ class AuthenticationController extends BaseController
             'name' => $user->firstname." ".$user->othernames,
             'email' => $user->email,
             'phone' => $user->phone,
+            "imageName" => $this->imageName != "default.jpg" ? Storage::url('userImages/' .$this->imageName) : \url('/')."/default.jpg",
             'is_active' => $user->isActive,
             'role' => $role,
             'estate' => $user->estate_id == null ? null :[
