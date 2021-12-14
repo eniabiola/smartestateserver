@@ -22,6 +22,7 @@ class ResidentResource extends JsonResource
             "gender" => $this->user->gender,
             "othernames" => $this->user->othernames,
             "phone" => $this->user->phone,
+            "status" => $this->user->isActive,
             "email" => $this->user->email,
             "imageName" => $this->user->imageName != "default.jpg" ? Storage::url('userImages/' .$this->user->imageName) : \url('/')."/default.jpg",
             "estate_id" => $this->user->estate_id,
