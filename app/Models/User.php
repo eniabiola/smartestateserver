@@ -20,6 +20,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
  * @property string $phone
  * @property string $gender
  * @property string $email
+ * @property boolean $isActive
  * @property string $imageName
  * @property string|\Carbon\Carbon $email_verified_at
  * @property string $password
@@ -47,6 +48,7 @@ class User extends Authenticatable implements JWTSubject
         'gender',
         'imageName',
         'email',
+        'isActive',
         'email_verified_at',
         'password',
         'remember_token'
@@ -119,4 +121,5 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(Resident::class);
     }
+
 }

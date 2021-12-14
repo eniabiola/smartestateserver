@@ -277,14 +277,12 @@ abstract class BaseRepository
         $search = $this->getDataTableSearchParams($search_term);
         if (count($search)) {
             foreach($search as $key => $value) {
-                \Log::debug($key." ! ".$value);
+//                \Log::debug($key." ! ".$value);
                 if (in_array($key, $this->getFieldsSearchable())) {
                     $query->orWhere("name", 'LIKE', '%'.$value.'%');
                 }
             }
         }
-
-        \Log::debug(print_r($query->toSql(), true));
         return $query;
     }
 }

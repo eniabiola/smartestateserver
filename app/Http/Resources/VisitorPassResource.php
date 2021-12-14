@@ -18,15 +18,15 @@ class VisitorPassResource extends JsonResource
             "id" => $this->id,
             "guestName" => $this->guestName,
             "pass_code" => $this->generatedCode,
-            "visitationDate" => date('Y-m-d H:i:s', strtotime($this->visitationDate)),
+            "visitationDate" => date('d/m/y H:i:s', strtotime($this->visitationDate)),
             "duration" => $this->duration,
-            "dateExpires" => date('Y-m-d H:i:s', strtotime($this->dateExpires)),
+            "dateExpires" => date('d/m/y H:i:s', strtotime($this->dateExpires)),
             "estate_id" => $this->estate_id,
             "estate" => $this->estate->name,
             "user" => $this->user->surname,
             "status" => $this->status,
-            "checked_in_time" => $this->checked_in_time,
-            "checked_out_time" => $this->checked_out_time
+            "checked_in_time" => date('d/m/y H:i:s', strtotime($this->checked_in_time)),
+            "checked_out_time" => date('d/m/y H:i:s', strtotime($this->checked_out_time))
             ];
     }
 }

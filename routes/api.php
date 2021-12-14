@@ -39,6 +39,7 @@ Route::get('roles-for-user-creations', [\App\Http\Controllers\API\RoleAPIControl
 Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('logout', [AuthenticationController::class, 'logout']);
     Route::post('user_toggle_status', [\App\Http\Controllers\API\UserAPIController::class, 'toggleStatus']);
+    Route::post('resident-activate-deactivate', [\App\Http\Controllers\API\ResidentAPIController::class, 'changeUserStatus']);
     Route::get('estate-index-paginate', [\App\Http\Controllers\API\EstateAPIController::class, 'indexPaginate']);
     Route::post('estate_toggle_status', [\App\Http\Controllers\API\EstateAPIController::class, 'toggleStatus']);
     Route::post('street_toggle_status', [\App\Http\Controllers\API\StreetAPIController::class, 'toggleStatus']);

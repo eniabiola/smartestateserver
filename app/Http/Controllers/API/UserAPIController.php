@@ -206,9 +206,15 @@ class UserAPIController extends AppBaseController
 
     public function toggleStatus(Request $request)
     {
-        $this->validate($request, [
-            'id' => 'required|exists:users,id'
-        ]);
-         return $this->sendResponse(new UserResource($this->userRepository->toggleStatus($request->id)), "User status successfully toggled.");
+        $user = User::find($request->id);
+        $adminUser = Auth::user();
+        if ($adminUser->hasRole('resident') && $adminUser->estate_id == $user->estate_id)
+        {
+            $this->validate($request, [
+                'id' => 'required|exists:users,id'
+            ]);
+            return $this->sendResponse(new UserResource($this->userRepository->toggleStatus($request->id)), "User status successfully toggled.");
+        }
+        return $this->sendError("You are unable to perform this operation", 401);
     }
 }

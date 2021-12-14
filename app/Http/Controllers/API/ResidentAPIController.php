@@ -11,6 +11,7 @@ use App\Mail\sendResidentWelcomeMail as ResidentMail;
 use App\Models\Billing;
 use App\Models\Estate;
 use App\Models\Resident;
+use App\Models\User;
 use App\Models\Wallet;
 use App\Repositories\ResidentRepository;
 use App\Repositories\UserRepository;
@@ -97,6 +98,7 @@ class ResidentAPIController extends AppBaseController
                 $filename = "default.jpg";
             }
             $userInput['imageName'] = $filename;
+            $userInput['isActive'] = false;
 //            return $userInput;
             $user = $userRepository->create($userInput);
 //            return $user;
@@ -115,7 +117,6 @@ class ResidentAPIController extends AppBaseController
 
             $email = new ResidentMail($details);
             Mail::to($details['email'])->queue($email);
-            //TODO: Job to create Invoice for the new user
             createNewResidentInvoice::dispatch($user);
 
             $wallet = new Wallet();
@@ -129,8 +130,6 @@ class ResidentAPIController extends AppBaseController
             return $this->sendResponse(new ResidentResource($resident), 'Resident saved successfully');
         } catch (\Exception $th)
         {
-            return $th;
-            \Log::debug($th);
             report($th->getMessage());
             return $this->sendError("Resident creation failed", 400);
         }
@@ -208,6 +207,20 @@ class ResidentAPIController extends AppBaseController
         $resident->delete();
 
         return $this->sendSuccess('Resident deleted successfully');
+    }
+
+    public function changeUserStatus(Request $request, UserAPIController $userAPIController)
+    {
+        $this->validate($request, [
+           'id' => 'required|integer|exists:residents,id',
+        ]);
+
+        $user = Resident::query()
+                    ->join('users', 'users.id', 'residents.user_id')
+                    ->where('residents.id', '=', $request->id)
+                    ->first();
+
+        return $userAPIController->toggleStatus($request);
     }
 
 

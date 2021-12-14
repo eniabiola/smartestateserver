@@ -52,7 +52,7 @@ class CreateInvoiceCommand extends Command
         $users = User::all();
 
         $billingsCount = Billing::query()->count();
-        if (count($billingsCount) == 0) die();
+        if ($billingsCount == 0) die();
 
         $billings = Billing::query()
             ->where('bill_frequency', 'daily')

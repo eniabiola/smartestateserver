@@ -7,6 +7,7 @@ use App\Http\Requests\API\UpdateNotificationAPIRequest;
 use App\Http\Resources\NotificationCollection;
 use App\Http\Resources\NotificationResource;
 use App\Http\Resources\UserCollection;
+use App\Jobs\sendNotificationMessages;
 use App\Models\Notification;
 use App\Repositories\NotificationRepository;
 use App\Services\UploadService;
@@ -159,5 +160,15 @@ class NotificationAPIController extends AppBaseController
         $notification->delete();
 
         return $this->sendSuccess('Notification deleted successfully');
+    }
+
+    public function sendNotificationMessages(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'required|integer|exists:notifications,id'
+        ]);
+
+        sendNotificationMessages::dispatch($request->id);
+
     }
 }

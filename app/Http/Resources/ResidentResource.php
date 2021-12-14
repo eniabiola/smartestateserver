@@ -27,7 +27,8 @@ class ResidentResource extends JsonResource
             "estate" => $this->user->estate->name ?? null,
             "meterNo" => $this->meterNo,
             "houseNo" => $this->houseNo,
-            "street" => $this->street,
+            "street_id" => $this->street_id,
+            "street" => $this->street()->exists() ? $this->street->name : null,
             "dateMovedIn" => date("Y-m-d", strtotime($this->dateMovedIn))
         ];
     }

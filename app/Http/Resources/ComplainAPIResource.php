@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class ComplainAPIResource extends JsonResource
 {
@@ -25,7 +26,7 @@ class ComplainAPIResource extends JsonResource
             "ticket_no" => $this->ticket_no,
             "subject" => $this->subject,
             "priority" => $this->priority,
-            "file" => $this->file ?? null,
+            "file" => $this->file != null ? Storage::url('complainImages/' .$this->file) : null,
             "description" => $this->description,
             "status" => $this->status,
             $this->mergeWhen($this->complainResponses()->exists(),

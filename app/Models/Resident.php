@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property integer $user_id
  * @property integer $estate_id
  * @property string $meterNo
- * @property string $street
+ * @property string $street_id
  * @property string $houseNo
  * @property string|\Carbon\Carbon $dateMovedIn
  */
@@ -37,7 +37,7 @@ class Resident extends Model
     public $fillable = [
         'user_id',
         'houseNo',
-        'street',
+        'street_id',
         'meterNo',
         'dateMovedIn'
     ];
@@ -53,7 +53,7 @@ class Resident extends Model
         'estate_id' => 'integer',
         'meterNo' => 'string',
         'houseNo' => 'string',
-        'street' => 'string',
+        'street_id' => 'integer',
         'dateMovedIn' => 'datetime'
     ];
 
@@ -77,6 +77,15 @@ class Resident extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function street()
+    {
+        return $this->belongsTo(Street::class);
     }
 
     protected $hidden = [

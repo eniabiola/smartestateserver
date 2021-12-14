@@ -86,8 +86,6 @@ class Billing extends Model
         'bill_target' => 'required|string|max:50|in:current,new,both',
         'invoice_day' => 'required|integer',
         'invoice_month' => 'nullable|integer',
-        'due_day' => 'required|integer',
-        'due_month' => 'nullable|integer',
         'status' => 'required|string|max:10',
     ];
 
