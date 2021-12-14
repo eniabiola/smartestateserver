@@ -161,14 +161,14 @@ class UserAPIController extends AppBaseController
         }
 
         if ($request->has('imageName') && $request->imageName != null){
-            $imageUploadAction = $uploadService->uploadImageBase64($request->imageName, "estateImages/");
+            $imageUploadAction = $uploadService->uploadImageBase64($request->imageName, "userImages/");
             if($imageUploadAction['status'] === false){
                 $message = "The file upload must be an image!";
                 $statuscode = 400;
                 return $this->failedResponse($message, $statuscode);
             }
             $filename = $imageUploadAction['data'];
-            $uploadService->deleteImage($user->imageName, "estateImages/");
+            $uploadService->deleteImage($user->imageName, "userImages/");
         } else {
             $filename = $user->imageName;
         }
