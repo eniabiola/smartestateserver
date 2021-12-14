@@ -7,6 +7,7 @@ use App\Http\Requests\API\UpdateUserAPIRequest;
 use App\Http\Resources\UserResource;
 use App\Mail\UserWelcomeMail;
 use App\Models\Estate;
+use App\Models\Resident;
 use App\Models\Role;
 use App\Models\User;
 use App\Repositories\ResidentRepository;
@@ -150,6 +151,7 @@ class UserAPIController extends AppBaseController
      */
     public function update($id, UpdateUserAPIRequest $request, ResidentRepository $residentRepository, UploadService $uploadService)
     {
+//        return $request->all();
 
         /** @var User $user */
         $user = $this->userRepository->find($id);
@@ -176,9 +178,10 @@ class UserAPIController extends AppBaseController
 
 
         $user = $this->userRepository->update($input, $id);
-        if (Auth::user()->hasRole('resident')){
-            $resident = $residentRepository->find($user->id);
-            $updateResident = $request->safe()->only(['meterNo', 'dateMovedIn', 'houseNo', 'street_id']);
+        if ($user->hasRole('resident')){
+//            $resident = $residentRepository->find($user->id);
+            $resident = Resident::where('user_id', $user->id)->first();
+            $updateResident = $request->only(['meterNo', 'dateMovedIn', 'houseNo', 'street_id']);
             $residentRepository->update($updateResident, $resident->id);
         }
         return $this->sendResponse(new UserResource($user), 'User updated successfully');
