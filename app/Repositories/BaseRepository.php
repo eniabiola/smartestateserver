@@ -107,6 +107,33 @@ abstract class BaseRepository
         return $query->paginate($perPage, $columns);
     }
 
+    public function paginateViewBasedOnUser($perPage, $columns = ['*'], $search, $estate_id, $user_id)
+    {
+        $query = $this->model->newQuery();
+        $table = $this->model->getTable();
+        $isColExist = Schema::hasColumn($table,'user_id');
+        if (Auth::user()->hasrole('superadministrator'))
+        {
+            if ($estate_id == null)
+            {
+                $estate_id = Estate::query()->distinct()->first()->id;
+            }
+        } else {
+            $estate_id = \request()->user()->estate_id;
+        }
+
+        $query->where(function($quer) use($estate_id){
+           $quer->where('estate_id', $estate_id);
+        })
+            ->when($isColExist, function ($query){
+                   $query->where('user_id', Auth::id());
+                })
+            ->orderBy('created_at', 'DESC');
+
+//        $query = $this->searchFields($query, $search);
+        return $query->paginate($perPage, $columns);
+    }
+
     /**
      * Build a query for retrieving all records.
      *

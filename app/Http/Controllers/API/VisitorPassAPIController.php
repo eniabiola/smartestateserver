@@ -49,6 +49,22 @@ class VisitorPassAPIController extends AppBaseController
     }
 
     /**
+     * Display a listing of the visitor passes based on a particular user.
+     * GET|HEAD /visitor_passes_per_user/{user_id}
+     *
+     * @param Request $request
+     * @param user_id
+     * @return Response
+     */
+    public function userIndex(Request $request, $user_id)
+    {
+        $search = $request->get('search');
+        $estate_id = $request->get('estate_id');
+        $invoices = $this->visitorPassRepository->paginateViewBasedOnUser('20', ['*'], $search, $estate_id, $user_id);
+
+        return $this->sendResponse(VisitorPassResource::collection($invoices)->response()->getData(true), 'Invoices retrieved successfully');
+    }
+    /**
      * Store a newly created VisitorPass in storage.
      * POST /visitorPasses
      *

@@ -52,6 +52,23 @@ class ComplainAPIController extends AppBaseController
     }
 
     /**
+     * Display a listing of the Invoice based on a particular user.
+     * GET|HEAD /complains_per_user/{user_id}
+     *
+     * @param Request $request
+     * @param user_id
+     * @return Response
+     */
+    public function userIndex(Request $request, $user_id)
+    {
+        $search = $request->get('search');
+        $estate_id = $request->get('estate_id');
+        $invoices = $this->complainRepository->paginateViewBasedOnUser('20', ['*'], $search, $estate_id, $user_id);
+
+        return $this->sendResponse(ComplainAPIResource::collection($invoices)->response()->getData(true), 'Invoices retrieved successfully');
+    }
+
+    /**
      * Store a newly created Complain in storage.
      * POST /complains
      *

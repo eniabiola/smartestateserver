@@ -57,6 +57,38 @@ class WalletHistoryAPIController extends AppBaseController
     }
 
     /**
+     * Display a listing of the WalletHistory based on a particular user.
+     * GET|HEAD /walletHistories_per_user/{user_id}
+     *
+     * @param Request $request
+     * @param user_id
+     * @return Response
+     */
+    public function userIndex(Request $request, $user_id)
+    {
+        if(Auth::user()->hasrole('administrator')){
+            abort(404);
+            return $this->sendError("You have no right to view this page");
+        }
+        $walletHistories = Transaction::query()
+            ->when(Auth::user()->hasrole('administrator'), function ($query){
+                $query->whereHas('user', function($query){
+                    $query->where('estate_id',request()->user()->estate_id)
+                    ->where('user_id', $user_id);
+                });
+            })
+            ->when(Auth::user()->hasrole('superadministrator'), function ($query){
+                $query->whereHas('user', function($query){
+                    $query->where('estate_id',request()->user()->estate_id);
+                });
+            })
+            ->orderBy('created_at', 'DESC')
+            ->get();
+
+        return $this->sendResponse($walletHistories->toArray(), 'Wallet Histories retrieved successfully');
+    }
+
+    /**
      * Store a newly created WalletHistory in storage.
      * POST /walletHistories
      *

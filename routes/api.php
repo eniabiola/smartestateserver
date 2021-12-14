@@ -54,12 +54,15 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::resource('residents', ResidentAPIController::class)->only(['index', 'show', 'update']);
     Route::resource('module_accesses', ModuleAccessAPIController::class);
     Route::resource('role_module_access', RoleModuleAccessAPIController::class)->only('store');
+    Route::get('visitor_passes_per_user/{user_id}', [\App\Http\Controllers\API\VisitorPassAPIController::class, 'userIndex']);
     Route::resource('visitor_passes', VisitorPassAPIController::class);
     Route::resource('visitor_pass_categories', VisitorPassCategoryAPIController::class);
     Route::resource('billings', \BillingAPIController::class);
     Route::post('pay-invoice', [\App\Http\Controllers\API\InvoiceAPIController::class, 'payInvoice']);
+    Route::get('invoices_per_user/{user_id}', [\App\Http\Controllers\API\InvoiceAPIController::class, 'userIndex']);
     Route::resource('invoices', \InvoiceAPIController::class);
     Route::resource('transactions', \TransactionAPIController::class);
+    Route::get('wallet_histories_per_user/{user_id}', [\App\Http\Controllers\API\WalletHistoryAPIController::class, 'userIndex']);
     Route::resource('wallet_histories', \WalletHistoryAPIController::class);
     Route::resource('streets', \StreetAPIController::class)->except('index');
     Route::post('/pay', [\App\Http\Controllers\API\FlutterwaveController::class, 'initialize'])->name('pay');
@@ -67,6 +70,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::get('complain_categories/complain/{id}', [\App\Http\Controllers\API\ComplainCategoryAPIController::class, 'getComplainByCategoryId']);
     Route::resource('complain_categories', \ComplainCategoryAPIController::class);
     Route::get('complains/close-ticket/{id}', [\App\Http\Controllers\API\ComplainAPIController::class, 'closeComplain']);
+    Route::get('complains_per_user/{user_id}', [\App\Http\Controllers\API\ComplainAPIController::class, 'userIndex']);
     Route::resource('complains', \ComplainAPIController::class);
     Route::resource('complain_responses', \ComplainResponseAPIController::class);
     Route::resource('notifications', \NotificationAPIController::class);
