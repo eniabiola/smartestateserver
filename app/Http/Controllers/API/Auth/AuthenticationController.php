@@ -111,7 +111,7 @@ class AuthenticationController extends BaseController
             'name' => $user->firstname." ".$user->othernames,
             'email' => $user->email,
             'phone' => $user->phone,
-            "imageName" => $this->imageName != "default.jpg" ? Storage::url('userImages/' .$this->imageName) : \url('/')."/default.jpg",
+            "imageName" => $user->imageName != "default.jpg" ? Storage::url('userImages/' .$this->imageName) : \url('/')."/default.jpg",
             'is_active' => $user->isActive,
             'role' => $role,
             'estate' => $user->estate_id == null ? null :[
