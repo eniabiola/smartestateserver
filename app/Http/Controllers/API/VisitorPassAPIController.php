@@ -11,6 +11,7 @@ use App\Repositories\VisitorPassRepository;
 use App\Services\UtilityService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
+use Illuminate\Support\Facades\Mail;
 use Response;
 use Carbon\Carbon;
 use Auth;
@@ -199,7 +200,7 @@ class VisitorPassAPIController extends AppBaseController
           $user => $user,
         ];
         $email = new sendVisitorPassMail($maildata);
-        Mail::to($this->maildata['email'])->send($email);
+        Mail::to($user->email)->send($email);
         return $this->sendResponse($visitor_pass, "The pass code is valid");
     }
 }
