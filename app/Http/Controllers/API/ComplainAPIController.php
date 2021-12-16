@@ -91,7 +91,7 @@ class ComplainAPIController extends AppBaseController
             }
             $filename = $imageUploadAction['data'];
         } else {
-            $filename = "default.jpg";
+            $filename = null;
         }
         $request->merge(['user_id' => $user->id, 'estate_id' => $user->estate_id,
                          'ticket_no' => $ticket_id, 'status' => "active",
