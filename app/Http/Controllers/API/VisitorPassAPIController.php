@@ -200,7 +200,7 @@ class VisitorPassAPIController extends AppBaseController
           $user => $user,
         ];
         $email = new sendVisitorPassMail($maildata);
-        Mail::to($user->email)->send($email);
+        Mail::to($visitorPass->user->email)->send($email);
         return $this->sendResponse($visitor_pass, "The pass code is valid");
     }
 }
