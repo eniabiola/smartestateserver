@@ -77,7 +77,7 @@ class Complain extends Model
      */
     public static $rules = [
         'complain_category_id' => 'required|integer|exists:complain_categories,id',
-        'subject' => 'required|string|max:20',
+        'subject' => 'required|string|max:50',
         'priority' => 'required|string|max:20',
         'file' => 'nullable|string',
         'description' => 'required|string',
