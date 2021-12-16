@@ -170,7 +170,7 @@ class VisitorPassAPIController extends AppBaseController
         $visitorPass = VisitorPass::query()
             ->where('generatedCode', $request->invitation_code)
 //            ->where(\DB::raw('CAST(visitationDate as date)'), '>=', "2021-11-23")
-            ->whereDate('visitationDate', date('Y-m-d'))
+//            ->whereDate('visitationDate', date('Y-m-d'))
             ->first();
         if (!$visitorPass) return $this->sendError("Pass is either invalid or you're not scheduled for today.");
 
