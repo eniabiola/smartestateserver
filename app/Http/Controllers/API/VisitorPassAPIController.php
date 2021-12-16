@@ -172,7 +172,6 @@ class VisitorPassAPIController extends AppBaseController
 //            ->where(\DB::raw('CAST(visitationDate as date)'), '>=', "2021-11-23")
             ->whereDate('visitationDate', date('Y-m-d'))
             ->first();
-        return $visitorPass;
         if (!$visitorPass) return $this->sendError("Pass is either invalid or you're not scheduled for today.");
 
         if ($active == "active" && $visitorPass->status == "active") return $this->sendError("This Pass code is already in use.");

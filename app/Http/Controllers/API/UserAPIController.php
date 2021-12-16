@@ -62,7 +62,8 @@ class UserAPIController extends AppBaseController
             ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
             ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
             ->where('roles.name', '!=', 'resident')
-           ->where('users.estate_id', $estate_id);
+            ->where('users.estate_id', $estate_id)
+            ->select('users.*');
         $users = $this->userRepository->searchFields($users, $request->search);
 //        return $this->sendResponse(UserResource::collection($users->paginate(20))->response()->getData(true), 'Users retrieved successfully');
 
@@ -216,7 +217,7 @@ class UserAPIController extends AppBaseController
     {
         $user = User::find($request->id);
         $adminUser = Auth::user();
-        if ($adminUser->hasRole('resident') && $adminUser->estate_id == $user->estate_id)
+        if ($adminUser->hasRole('administrator') && $adminUser->estate_id == $user->estate_id)
         {
             $this->validate($request, [
                 'id' => 'required|exists:users,id'
