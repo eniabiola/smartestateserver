@@ -196,8 +196,8 @@ class VisitorPassAPIController extends AppBaseController
         ];
         //TODO: Queued Mail to inform the user of the activity of the guest whether in or out
         $maildata = [
-          $message => $message,
-          $user => $user,
+          "message" => $message,
+          "user" => $user,
         ];
         $email = new sendVisitorPassMail($maildata);
         Mail::to($visitorPass->user->email)->send($email);
