@@ -29,6 +29,7 @@ class ComplainAPIResource extends JsonResource
             "file" => $this->file != null ? Storage::url('complainImages/' .$this->file) : null,
             "description" => $this->description,
             "status" => $this->status,
+            "date_created" => $this->created_at != null ? date('d/m/y H:i:s', strtotime($this->created_at)) : null,
             $this->mergeWhen($this->complainResponses()->exists(),
                 ['complain_responses' => $this->complainResponses])
         ];
