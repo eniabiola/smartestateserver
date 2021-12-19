@@ -44,6 +44,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     Route::post('estate_toggle_status', [\App\Http\Controllers\API\EstateAPIController::class, 'toggleStatus']);
     Route::post('street_toggle_status', [\App\Http\Controllers\API\StreetAPIController::class, 'toggleStatus']);
     Route::get('get_authenticated_user', [AuthenticationController::class, 'get_user']);
+    Route::get('dashboard_analytics', [\App\Http\Controllers\API\DashboardController::class, 'dashboardAnalytics']);
     Route::post('reset_password', [AuthenticationController::class, 'resetPassword']);
     Route::resource('users', UserAPIController::class)->except('destroy');
     Route::resource('estates', EstateAPIController::class);
