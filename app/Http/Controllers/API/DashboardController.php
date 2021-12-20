@@ -44,11 +44,15 @@ class DashboardController extends AppBaseController
             ->count();
 
         $graph = $this->dashboardRepo->getVisitorPass()
-            ->selectRaw("count('visitationDate') as count, visitationDate")
+//
+//            ->selectRaw("count('visitationDate') as count, visitationDate")
+//            ->selectRaw("count('visitationDate') as count, DATE_FORMAT(visitationDate,'%d/%m/%Y') as visitationDate")
+
+            ->select(\DB::raw('DATE_FORMAT(visitationDate, "%d/%m/%Y") as visitationDate1, count("visitationDate") as count'))
             ->groupBy('visitationDate')
             ->get();
 
-
+//         $graph->for
         $result_array = [
             'active_visits' => $active_visits,
             'total_visits' => $total_visits,
