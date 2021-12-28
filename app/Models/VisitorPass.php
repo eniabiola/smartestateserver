@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $generatedCode
  * @property string $guestName
  * @property string $status
+ * @property string $pass_type
  * @property integer $user_id
  * @property string|\Carbon\Carbon $visitationDate
  * @property string|\Carbon\Carbon $generatedDate
@@ -51,6 +52,7 @@ class VisitorPass extends Model
         'generatedDate',
         'dateExpires',
         'duration',
+        'pass_type',
         'isActive'
     ];
 
@@ -66,6 +68,9 @@ class VisitorPass extends Model
         'guestName' => 'string',
         'status' => 'string',
         'user_id' => 'integer',
+        'expected_number_of_guests' => 'integer',
+        'number_of_guests_in' => 'integer',
+        'number_of_guests_out' => 'integer',
         'visitationDate' => 'date:Y-m-d H:i:s',
         'generatedDate' => 'date:Y-m-d H:i:s',
         'dateExpires' => 'date:Y-m-d H:i:s',
@@ -81,7 +86,10 @@ class VisitorPass extends Model
      */
     public static $rules = [
         'visitationDate' => 'required',
-        'guestName' => 'required|string|max:255',
+        'guestName' => 'nullable|required_if:pass_type,==,individual|string',
+        'event' => 'nullable|required_if:pass_type,==,group|string',
+        'expected_number_of_guests' => 'nullable|required_if:pass_type,==,group|integer',
+        'pass_type' => 'required|in:individual,group',
         'duration' => 'required|integer',
     ];
 
@@ -102,10 +110,11 @@ class VisitorPass extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
-    public function visitorPassCategory()
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function visitorGroup()
     {
-        return $this->belongsTo(\App\Models\VisitorPassCategory::class, 'visitor_pass_category_id');
+        return $this->hasOne(\App\Models\VisitorPassGroup::class);
     }
+
 }

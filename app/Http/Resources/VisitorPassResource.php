@@ -26,7 +26,9 @@ class VisitorPassResource extends JsonResource
             "user" => $this->user->surname,
             "status" => $this->status,
             "checked_in_time" => $this->checked_in_time != null ? date('d/m/y H:i:s', strtotime($this->checked_in_time)) : null,
-            "checked_out_time" => $this->checked_out_time != null ? date('d/m/y H:i:s', strtotime($this->checked_out_time)) : null
+            "checked_out_time" => $this->checked_out_time != null ? date('d/m/y H:i:s', strtotime($this->checked_out_time)) : null,
+            $this->mergeWhen($this->visitorGroup()->exists(),
+                ['visitor_group' => new VisitorGroupResource($this->visitorGroup)])
             ];
     }
 }

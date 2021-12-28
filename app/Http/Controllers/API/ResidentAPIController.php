@@ -7,6 +7,7 @@ use App\Http\Requests\API\UpdateResidentAPIRequest;
 use App\Http\Resources\ResidentResource;
 use App\Jobs\createNewResidentInvoice;
 use App\Jobs\sendResidentWelcomeMail;
+use Illuminate\Auth\Events\Registered;
 use App\Mail\sendResidentWelcomeMail as ResidentMail;
 use App\Models\Billing;
 use App\Models\Estate;
@@ -102,8 +103,7 @@ class ResidentAPIController extends AppBaseController
 //            return $userInput;
             $user = $userRepository->create($userInput);
 //            return $user;
-            $user->assignRole('resident');
-
+            $user->sendEmailVerificationNotification();
             $input['user_id'] = $user->id;
             $input['estate_id'] = $estate->id;
             $input['estate_id'] = $estate->id;
@@ -127,7 +127,7 @@ class ResidentAPIController extends AppBaseController
             $wallet->user_id = $user->id;
             $wallet->save();
             DB::commit();
-            return $this->sendResponse(new ResidentResource($resident), 'Resident saved successfully');
+            return $this->sendResponse(new ResidentResource($resident), 'Your account has been successfully created and an email has been sent to verify your email');
         } catch (\Exception $th)
         {
             report($th->getMessage());

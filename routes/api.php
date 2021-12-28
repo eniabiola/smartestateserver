@@ -36,7 +36,7 @@ Route::get('city_filter_by_state/{state_id}', [\App\Http\Controllers\API\CityAPI
 Route::get('billing_job_testing', [\App\Http\Controllers\API\TestingController::class, 'billingJobTesting']);
 Route::get('roles-for-user-creations', [\App\Http\Controllers\API\RoleAPIController::class, 'userCreationIndex']);
 
-Route::group(['middleware' => ['jwt.verify']], function() {
+Route::group(['middleware' => ['jwt.verify'/*, 'api_user_verified'*/]], function() {
     Route::get('logout', [AuthenticationController::class, 'logout']);
     Route::post('user_toggle_status', [\App\Http\Controllers\API\UserAPIController::class, 'toggleStatus']);
     Route::post('resident-activate-deactivate', [\App\Http\Controllers\API\ResidentAPIController::class, 'changeUserStatus']);

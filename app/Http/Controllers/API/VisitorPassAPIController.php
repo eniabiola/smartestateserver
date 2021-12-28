@@ -6,7 +6,9 @@ use App\Http\Requests\API\CreateVisitorPassAPIRequest;
 use App\Http\Requests\API\UpdateVisitorPassAPIRequest;
 use App\Http\Resources\VisitorPassResource;
 use App\Mail\sendVisitorPassMail;
+use App\Models\VisitorGroup;
 use App\Models\VisitorPass;
+use App\Models\VisitorPassGroup;
 use App\Repositories\VisitorPassRepository;
 use App\Services\UtilityService;
 use Illuminate\Http\Request;
@@ -61,9 +63,9 @@ class VisitorPassAPIController extends AppBaseController
     {
         $search = $request->get('search');
         $estate_id = $request->get('estate_id');
-        $invoices = $this->visitorPassRepository->paginateViewBasedOnUser('20', ['*'], $search, $estate_id, $user_id);
+        $visitor_passes = $this->visitorPassRepository->paginateViewBasedOnUser('20', ['*'], $search, $estate_id, $user_id);
 
-        return $this->sendResponse(VisitorPassResource::collection($invoices)->response()->getData(true), 'Invoices retrieved successfully');
+        return $this->sendResponse(VisitorPassResource::collection($visitor_passes)->response()->getData(true), 'Invoices retrieved successfully');
     }
     /**
      * Store a newly created VisitorPass in storage.
@@ -86,7 +88,13 @@ class VisitorPassAPIController extends AppBaseController
         $input = $request->all();
 
         $visitorPass = $this->visitorPassRepository->create($input);
-
+        if ($request->pass_type == "group"){
+            $visitorGroup = new VisitorPassGroup();
+            $visitorGroup->visitor_pass_id = $visitorPass->id;
+            $visitorGroup->event = $request->event;
+            $visitorGroup->expected_number_of_guests = $request->expected_number_of_guests;
+            $visitorGroup->save();
+        }
         return $this->sendResponse(new VisitorPassResource($visitorPass), 'Visitor Pass saved successfully');
     }
 
@@ -121,8 +129,6 @@ class VisitorPassAPIController extends AppBaseController
      */
     public function update($id, UpdateVisitorPassAPIRequest $request)
     {
-        $input = $request->all();
-
         /** @var VisitorPass $visitorPass */
         $visitorPass = $this->visitorPassRepository->find($id);
 
@@ -130,6 +136,27 @@ class VisitorPassAPIController extends AppBaseController
             return $this->sendError('Visitor Pass not found');
         }
 
+        if ($request->pass_type == "group"){
+
+            $visitorPassGroup = VisitorPassGroup::query()->where('visitor_pass_id', $id)->first();
+            if ($visitorPassGroup){
+                
+            } else{
+                $visitorGroup = new VisitorPassGroup();
+            }
+            VisitorPassGroup::query()->updateOrCreate(
+                ['visitor_pass_id', $id],
+                []);
+            $visitorGroup->visitor_pass_id = $visitorPass->id;
+            $visitorGroup->event = $request->event;
+            $visitorGroup->expected_number_of_guests = $request->expected_number_of_guests;
+            $visitorGroup->save();
+        }
+
+        $old_expected_number_guest = $visitorPass->expected_number_guests;
+        $in_already = $visitorPass->expected_number_guests - $visitorPass->remaining_number_guests;
+        $request->merge(['remaining_number_guests' => $request->expected_number_guests - $in_already]);
+        $input = $request->all();
         $visitorPass = $this->visitorPassRepository->update($input, $id);
 
         return $this->sendResponse($visitorPass->toArray(), 'VisitorPass updated successfully');
@@ -166,23 +193,36 @@ class VisitorPassAPIController extends AppBaseController
         $active = $request->get('status');
         if ($invitation_code == null || $active == null) return $this->sendError("invalid URL");
 
-        $today_date = date('Y-m-d');
-//        return $today_date;
         $visitorPass = VisitorPass::query()
             ->where('generatedCode', $request->invitation_code)
 //            ->where(\DB::raw('CAST(visitationDate as date)'), '>=', "2021-11-23")
-//            ->whereDate('visitationDate', date('Y-m-d'))
+            ->whereDate('visitationDate', date('Y-m-d'))
             ->first();
         if (!$visitorPass) return $this->sendError("Pass is either invalid or you're not scheduled for today.");
 
-        if ($active == "active" && $visitorPass->status == "active") return $this->sendError("This Pass code is already in use.");
-        $user = $visitorPass->user->surname." ".$visitorPass->user->surname;
+        if ($active == "active" && $visitorPass->status == "active" && $visitorPass->remaining_number_guests == 0) return $this->sendError("This Pass code is already in use.");
+
+        switch ($active)
+        {
+            case "active":
+                $visitorPass->checked_in_time = date('Y-m-d h:i:s');
+                $message = "Your guest {$visitorPass->guestname} has just been allowed into the estate at {$visitorPass->checked_in_time}";
+            break;
+            case "inactive":
+                $visitorPass->checked_out_time = date('Y-m-d h:i:s');
+                $message = "Your guest {$visitorPass->guestname} has just been checkout of the estate at {$visitorPass->checked_out_time}";
+            break;
+            case "close":
+                if ($visitorPass->number_of_guests_in != 0 && $visitorPass->number_of_guests_in != $visitorPass->number_of_guests_out)
+                {
+                    return $this->sendError("You cannot close an active visitor pass");
+                }
+
+                //do something
+            break;
+        }
         if ($active == "active"){
-            $visitorPass->checked_in_time = date('Y-m-d h:i:s');
-            $message = "Your guest {$visitorPass->guestname} has just been allowed into the estate at {$visitorPass->checked_in_time}";
         } else {
-            $visitorPass->checked_out_time = date('Y-m-d h:i:s');
-            $message = "Your guest {$visitorPass->guestname} has just been checkout of the estate at {$visitorPass->checked_out_time}";
         }
         $visitorPass->status = $active;
         $visitorPass->save();
@@ -194,13 +234,17 @@ class VisitorPassAPIController extends AppBaseController
             "estate" => $visitorPass->estate->name,
             "user" => $visitorPass->user->surname,
         ];
-        //TODO: Queued Mail to inform the user of the activity of the guest whether in or out
+
+        $user = $visitorPass->user->surname." ".$visitorPass->user->surname;
         $maildata = [
           "message" => $message,
           "user" => $user,
         ];
-        $email = new sendVisitorPassMail($maildata);
-        Mail::to($visitorPass->user->email)->send($email);
+        if ($active == "active" || $active == "inactive")
+        {
+            $email = new sendVisitorPassMail($maildata);
+            Mail::to($visitorPass->user->email)->send($email);
+        }
         return $this->sendResponse($visitor_pass, "The pass code is valid");
     }
 }
