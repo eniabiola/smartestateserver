@@ -1,0 +1,122 @@
+[
+    {
+        "name": "id",
+        "dbType": "bigInteger,true,true",
+        "htmlType": null,
+        "validations": null,
+        "searchable": false,
+        "fillable": false,
+        "primary": true,
+        "inForm": false,
+        "inIndex": false,
+        "inView": false
+    },
+    {
+        "name": "front_end_url",
+        "dbType": "string,150",
+        "htmlType": "text",
+        "validations": "required|string|max:150|string|max:150",
+        "searchable": true,
+        "fillable": true,
+        "primary": false,
+        "inForm": true,
+        "inIndex": true,
+        "inView": true
+    },
+    {
+        "name": "security_unit",
+        "dbType": "string,191:nullable",
+        "htmlType": "text",
+        "validations": "nullable|string|max:191|nullable|string|max:191",
+        "searchable": true,
+        "fillable": true,
+        "primary": false,
+        "inForm": true,
+        "inIndex": true,
+        "inView": true
+    },
+    {
+        "name": "fire_and_emergency",
+        "dbType": "string,191:nullable",
+        "htmlType": "text",
+        "validations": "nullable|string|max:191|nullable|string|max:191",
+        "searchable": true,
+        "fillable": true,
+        "primary": false,
+        "inForm": true,
+        "inIndex": true,
+        "inView": true
+    },
+    {
+        "name": "police_post",
+        "dbType": "string,191:nullable",
+        "htmlType": "text",
+        "validations": "nullable|string|max:191|nullable|string|max:191",
+        "searchable": true,
+        "fillable": true,
+        "primary": false,
+        "inForm": true,
+        "inIndex": true,
+        "inView": true
+    },
+    {
+        "name": "hospital",
+        "dbType": "string,191:nullable",
+        "htmlType": "text",
+        "validations": "nullable|string|max:191|nullable|string|max:191",
+        "searchable": true,
+        "fillable": true,
+        "primary": false,
+        "inForm": true,
+        "inIndex": true,
+        "inView": true
+    },
+    {
+        "name": "CRI",
+        "dbType": "string,191:nullable",
+        "htmlType": "text",
+        "validations": "nullable|string|max:191|nullable|string|max:191",
+        "searchable": true,
+        "fillable": true,
+        "primary": false,
+        "inForm": true,
+        "inIndex": true,
+        "inView": true
+    },
+    {
+        "name": "clinic",
+        "dbType": "string,191:nullable",
+        "htmlType": "text",
+        "validations": "nullable|string|max:191|nullable|string|max:191",
+        "searchable": true,
+        "fillable": true,
+        "primary": false,
+        "inForm": true,
+        "inIndex": true,
+        "inView": true
+    },
+    {
+        "name": "created_at",
+        "dbType": "datetime:nullable",
+        "htmlType": "date",
+        "validations": "nullable|nullable",
+        "searchable": false,
+        "fillable": false,
+        "primary": false,
+        "inForm": false,
+        "inIndex": false,
+        "inView": false
+    },
+    {
+        "name": "updated_at",
+        "dbType": "datetime:nullable",
+        "htmlType": "date",
+        "validations": "nullable|nullable",
+        "searchable": false,
+        "fillable": false,
+        "primary": false,
+        "inForm": false,
+        "inIndex": false,
+        "inView": false
+    }
+]

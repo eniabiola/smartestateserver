@@ -83,3 +83,6 @@ Route::group(['middleware' => ['jwt.verify', 'api_user_verified']], function() {
 
 Route::resource('countries', \CountryAPIController::class);
 
+
+
+Route::resource('settings', \SettingAPIController::class);

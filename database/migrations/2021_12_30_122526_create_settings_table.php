@@ -16,7 +16,12 @@ class CreateSettingsTable extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
             $table->string('front_end_url', 150);
-            $table->string('');
+            $table->string('security_unit')->nullable();
+            $table->string('fire_and_emergency')->nullable();
+            $table->string('police_post')->nullable();
+            $table->string('hospital')->nullable();
+            $table->string('CRI')->nullable();
+            $table->string('clinic')->nullable();
             $table->timestamps();
         });
     }
