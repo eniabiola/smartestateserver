@@ -23,6 +23,7 @@ Route::get('testing', function ()
 Route::get('/check', function () {
     Artisan::call('queue:work');
 });
+Route::get('resend-verification-email', [App\Http\Controllers\API\VerificationController::class, 'resend'])->middleware('jwt.verify');
 Route::post('login', [AuthenticationController::class, 'authenticate']);
 Route::post('register', [AuthenticationController::class, 'adminRegister']);
 Route::post('register', [AuthenticationController::class, 'residentRegister']);
@@ -36,10 +37,11 @@ Route::get('city_filter_by_state/{state_id}', [\App\Http\Controllers\API\CityAPI
 Route::get('billing_job_testing', [\App\Http\Controllers\API\TestingController::class, 'billingJobTesting']);
 Route::get('roles-for-user-creations', [\App\Http\Controllers\API\RoleAPIController::class, 'userCreationIndex']);
 
-Route::group(['middleware' => ['jwt.verify'/*, 'api_user_verified'*/]], function() {
+Route::group(['middleware' => ['jwt.verify', 'api_user_verified']], function() {
     Route::get('logout', [AuthenticationController::class, 'logout']);
     Route::post('user_toggle_status', [\App\Http\Controllers\API\UserAPIController::class, 'toggleStatus']);
     Route::post('resident-activate-deactivate', [\App\Http\Controllers\API\ResidentAPIController::class, 'changeUserStatus']);
+    Route::post('activate-deactivate-pass/{id}', [\App\Http\Controllers\API\VisitorPassAPIController::class, 'activateDeactivatePass']);
     Route::get('estate-index-paginate', [\App\Http\Controllers\API\EstateAPIController::class, 'indexPaginate']);
     Route::post('estate_toggle_status', [\App\Http\Controllers\API\EstateAPIController::class, 'toggleStatus']);
     Route::post('street_toggle_status', [\App\Http\Controllers\API\StreetAPIController::class, 'toggleStatus']);

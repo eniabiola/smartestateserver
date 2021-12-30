@@ -17,6 +17,7 @@ class VisitorPassResource extends JsonResource
         return [
             "id" => $this->id,
             "guestName" => $this->guestName,
+            "pass_type" => $this->pass_type,
             "pass_code" => $this->generatedCode,
             "visitationDate" => date('d/m/y H:i:s', strtotime($this->visitationDate)),
             "duration" => $this->duration,
@@ -25,6 +26,7 @@ class VisitorPassResource extends JsonResource
             "estate" => $this->estate->name,
             "user" => $this->user->surname,
             "status" => $this->status,
+            "authorization_comment" => $this->authorization_comment,
             "checked_in_time" => $this->checked_in_time != null ? date('d/m/y H:i:s', strtotime($this->checked_in_time)) : null,
             "checked_out_time" => $this->checked_out_time != null ? date('d/m/y H:i:s', strtotime($this->checked_out_time)) : null,
             $this->mergeWhen($this->visitorGroup()->exists(),

@@ -140,7 +140,7 @@ class VisitorPassAPIController extends AppBaseController
 
             $visitorPassGroup = VisitorPassGroup::query()->where('visitor_pass_id', $id)->first();
             if ($visitorPassGroup){
-                
+
             } else{
                 $visitorGroup = new VisitorPassGroup();
             }
@@ -246,5 +246,22 @@ class VisitorPassAPIController extends AppBaseController
             Mail::to($visitorPass->user->email)->send($email);
         }
         return $this->sendResponse($visitor_pass, "The pass code is valid");
+    }
+
+    public function activateDeactivatePass($id, Request $request)
+    {
+        $request->validate([
+           'authorization' => 'required|string|in:approved,rejected',
+            'authorization_comment'      =>  'nullable|required_if:authorization,==,rejected|string|max:200'
+        ]);
+        $visitorPass = VisitorPass::query()->find($id);
+        if (!$visitorPass) { return $this->sendError("VisitorPass does not exist."); }
+        if ($visitorPass->pass_type != "group") { return $this->sendError("VisitorPass does not need authorization."); }
+//        if (!$visitorPass) { return $this->sendError("VisitorPass does not exist."); }
+        $visitorPass->status = $request->authorization;
+        $visitorPass->authorization_comment = $request->authorization_comment;
+        $visitorPass->save();
+        return $this->sendResponse($visitorPass, "Pass successfully {$request->authorization}");
+
     }
 }
