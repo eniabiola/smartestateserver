@@ -24,12 +24,16 @@ class VerificationController extends Controller
         return redirect()->to('https://vgcpora.baloshapps.com');
     }
 
-    public function resend() {
-        if (auth()->user()->hasVerifiedEmail()) {
+    public function resend(Request $request) {
+        $input = $request->validate([
+            "email" => "required|email:rfc,dns|exists:users,email"
+        ]);
+        $user = User::query()->where('email', $request->email)->first();
+        if ($user->email_verified_at != null) {
             return response()->json(["msg" => "Email already verified."], 400);
         }
 
-        auth()->user()->sendEmailVerificationNotification();
+        $user->sendEmailVerificationNotification();
 
         return response()->json(["msg" => "Email verification link sent on your email id"]);
     }

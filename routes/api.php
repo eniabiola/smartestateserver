@@ -23,7 +23,7 @@ Route::get('testing', function ()
 Route::get('/check', function () {
     Artisan::call('queue:work');
 });
-Route::get('resend-verification-email', [App\Http\Controllers\API\VerificationController::class, 'resend'])->middleware('jwt.verify');
+Route::post('resend-verification-email', [App\Http\Controllers\API\VerificationController::class, 'resend']);
 Route::post('login', [AuthenticationController::class, 'authenticate']);
 Route::post('register', [AuthenticationController::class, 'adminRegister']);
 Route::post('register', [AuthenticationController::class, 'residentRegister']);
