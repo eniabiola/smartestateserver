@@ -99,7 +99,7 @@ class UserAPIController extends AppBaseController
             $estate = Estate::where('estateCode', $request->estateCode)->first();
             $request->merge(['estate_id' => $estate->id]);
         }
-        $request->merge(['imageName' => $filename]);
+        $request->merge(['imageName' => $filename, 'email_verified_at' => date("Y-m-d H:i:s")]);
         $input = $request->all();
 
         $user = $this->userRepository->create($input);
@@ -118,7 +118,7 @@ class UserAPIController extends AppBaseController
         $email = new UserWelcomeMail($details);
         Mail::to($details['email'])->queue($email);
 
-        return $this->sendResponse(new UserResource($user), 'User saved successfully');
+        return $this->sendResponse(new UserResource($user), 'User account successfully created');
     }
 
     /**

@@ -11,7 +11,8 @@ class VerificationController extends Controller
 
     public function verify($user_id, Request $request) {
         if (!$request->hasValidSignature()) {
-            return response()->json(["msg" => "Invalid/Expired url provided."], 401);
+            return redirect()->to('https://vgcpora.baloshapps.com/auth/verification-expired');
+//            return response()->json(["msg" => "Invalid/Expired url provided."], 401);
         }
 
         $user = User::findOrFail($user_id);

@@ -77,5 +77,4 @@ class Setting extends Model
         'updated_at' => 'nullable'
     ];
 
-
 }

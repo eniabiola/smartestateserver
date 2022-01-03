@@ -127,7 +127,7 @@ class ResidentAPIController extends AppBaseController
             $wallet->user_id = $user->id;
             $wallet->save();
             DB::commit();
-            return $this->sendResponse(new ResidentResource($resident), 'Your account has been successfully created and an email has been sent to verify your email');
+            return $this->sendResponse(new ResidentResource($resident), 'Your account has been successfully created and an email has been sent to verify your email.');
         } catch (\Exception $th)
         {
             report($th->getMessage());
