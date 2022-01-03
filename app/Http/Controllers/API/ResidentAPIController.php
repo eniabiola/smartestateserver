@@ -103,7 +103,8 @@ class ResidentAPIController extends AppBaseController
 //            return $userInput;
             $user = $userRepository->create($userInput);
 //            return $user;
-            $user->sendEmailVerificationNotification();
+            $user->assignRole('resident');
+
             $input['user_id'] = $user->id;
             $input['estate_id'] = $estate->id;
             $input['estate_id'] = $estate->id;
@@ -115,9 +116,6 @@ class ResidentAPIController extends AppBaseController
             ];
             $resident = $this->residentRepository->create($input);
 
-            $email = new ResidentMail($details);
-            Mail::to($details['email'])->queue($email);
-            createNewResidentInvoice::dispatch($user);
 
             $wallet = new Wallet();
             $wallet->prev_balance = 0.00;
@@ -127,6 +125,12 @@ class ResidentAPIController extends AppBaseController
             $wallet->user_id = $user->id;
             $wallet->save();
             DB::commit();
+
+            $user->sendEmailVerificationNotification();
+            $email = new ResidentMail($details);
+            Mail::to($details['email'])->queue($email);
+            createNewResidentInvoice::dispatch($user);
+
             return $this->sendResponse(new ResidentResource($resident), 'Your account has been successfully created and an email has been sent to verify your email.');
         } catch (\Exception $th)
         {
