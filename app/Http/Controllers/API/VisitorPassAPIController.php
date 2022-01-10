@@ -196,12 +196,20 @@ class VisitorPassAPIController extends AppBaseController
         $visitorPass = VisitorPass::query()
             ->where('generatedCode', $request->invitation_code)
 //            ->where(\DB::raw('CAST(visitationDate as date)'), '>=', "2021-11-23")
-            ->whereDate('visitationDate', date('Y-m-d'))
+//            ->whereDate('visitationDate', date('Y-m-d'))
             ->first();
-        if (!$visitorPass) return $this->sendError("Pass is either invalid or you're not scheduled for today.");
+        if (!$visitorPass) return $this->sendError("Pass is invalid.");
 
         if ($active == "active" && $visitorPass->status == "active" && $visitorPass->remaining_number_guests == 0) return $this->sendError("This Pass code is already in use.");
 
+        if ($active == "active" && $visitorPass->visitationDate < date("Y-m-d")) return $this->sendError("This Pass code is not scheduled for today.");
+
+        if ($active == "active"  || $active == "inactive" )
+        {
+            if ($visitorPass)
+            return $this->sendError("This Pass code is already in use.");
+
+        }
         switch ($active)
         {
             case "active":
@@ -235,13 +243,14 @@ class VisitorPassAPIController extends AppBaseController
             "user" => $visitorPass->user->surname,
         ];
 
-        $user = $visitorPass->user->surname." ".$visitorPass->user->surname;
-        $maildata = [
-          "message" => $message,
-          "user" => $user,
-        ];
         if ($active == "active" || $active == "inactive")
         {
+
+            $user = $visitorPass->user->surname." ".$visitorPass->user->surname;
+            $maildata = [
+                "message" => $message,
+                "user" => $user,
+            ];
             $email = new sendVisitorPassMail($maildata);
             Mail::to($visitorPass->user->email)->send($email);
         }
