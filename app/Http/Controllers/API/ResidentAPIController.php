@@ -7,6 +7,7 @@ use App\Http\Requests\API\UpdateResidentAPIRequest;
 use App\Http\Resources\ResidentResource;
 use App\Jobs\createNewResidentInvoice;
 use App\Jobs\sendResidentWelcomeMail;
+use App\Mail\GeneralMail;
 use Illuminate\Auth\Events\Registered;
 use App\Mail\sendResidentWelcomeMail as ResidentMail;
 use App\Models\Billing;
@@ -128,6 +129,17 @@ class ResidentAPIController extends AppBaseController
 
             $user->sendEmailVerificationNotification();
             $email = new ResidentMail($details);
+            Mail::to($details['email'])->queue($email);
+            $details = [
+
+            ];
+            $details = [
+                "subject" => "Invoice Payment",
+                "name" => $user->surname. " ".$user->othernames,
+                "message" => "Dear {$estate->name} administrator, there is a new resident waiting for activation.",
+                "email" => $estate->email
+            ];
+            $email = new GeneralMail($details);
             Mail::to($details['email'])->queue($email);
             createNewResidentInvoice::dispatch($user);
 
