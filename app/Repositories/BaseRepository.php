@@ -125,8 +125,8 @@ abstract class BaseRepository
         $query->where(function($quer) use($estate_id){
            $quer->where('estate_id', $estate_id);
         })
-            ->when($isColExist, function ($query){
-                   $query->where('user_id', Auth::id());
+            ->when($isColExist, function ($query) use($user_id){
+                   $query->where('user_id', $user_id);
                 })
             ->orderBy('created_at', 'DESC');
 
