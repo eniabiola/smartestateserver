@@ -193,45 +193,65 @@ class VisitorPassAPIController extends AppBaseController
         $active = $request->get('status');
         if ($invitation_code == null || $active == null) return $this->sendError("invalid URL");
 
+        /**
+         * Check if the URL is valid
+         * Check if the Code passed is right
+         * Get the pass_type
+         * if the status is active is the day valid
+         * if the status is active check the pass_type
+                *if pass_type is group then count and set the status to active, if count = number_allwed return the error message
+                *if pass_type is individual then check if it is already active then return the error message
+         * if the status is close, check if it is active or inactive, if true return message
+         * if the status is inactive, check if it is active, if not send error message else perform similar steps as for status = active
+         *
+         */
         $visitorPass = VisitorPass::query()
             ->where('generatedCode', $request->invitation_code)
-//            ->where(\DB::raw('CAST(visitationDate as date)'), '>=', "2021-11-23")
-//            ->whereDate('visitationDate', date('Y-m-d'))
             ->first();
+
         if (!$visitorPass) return $this->sendError("Pass is invalid.");
-
-        if ($active == "active" && $visitorPass->status == "active" && $visitorPass->remaining_number_guests == 0) return $this->sendError("This Pass code is already in use.");
-
-        if ($active == "active" && $visitorPass->visitationDate < date("Y-m-d")) return $this->sendError("This Pass code is not scheduled for today.");
-
-        if ($active == "active"  || $active == "inactive" )
-        {
-            if ($visitorPass)
-            return $this->sendError("This Pass code is already in use.");
-
+        if ($visitorPass->pass_type == "group") {
+            $visitorPassGroup = VisitorPassGroup::query()->where('visitor_pass_id', $visitorPass->id)->first();
+            if ($visitorPassGroup->isApproved != true && $active != "close") return $this->sendError("This group Pass has not been approved");
         }
-        switch ($active)
+
+            switch ($active)
         {
             case "active":
+                if (strtotime(date("Y-m-d", strtotime($visitorPass->visitationDate))) != strtotime(date("Y-m-d"))) return $this->sendError("This Pass code is not scheduled for today.");
+                if ($visitorPass->pass_type == "group")
+                {
+                    if ($visitorPassGroup->expected_number_of_guests == $visitorPassGroup->number_of_guests_in)
+                        return $this->sendError("This group pass has reached its limit");
+                    $visitorPassGroup->number_of_guests_in  += 1;
+                    $visitorPassGroup->save();
+                }
+                if ($visitorPass->pass_type == "individual" && $visitorPass->status == "active")
+                    return $this->sendError("The visitor pass is already in use");
                 $visitorPass->checked_in_time = date('Y-m-d h:i:s');
-                $message = "Your guest {$visitorPass->guestname} has just been allowed into the estate at {$visitorPass->checked_in_time}";
+                $message = "Your guest ". $visitorPass->guestname ?? null ." has just been allowed into the estate at {$visitorPass->checked_in_time}";
             break;
             case "inactive":
+                if ($visitorPass->status != "active")
+                    return $this->sendError("This pass has not been used.");
+                if ($visitorPass->pass_type == "group")
+                {
+                    $visitorPassGroup->number_of_guests_out  += 1;
+                    $visitorPassGroup->save();
+
+                    if ($visitorPassGroup->expected_number_of_guests != $visitorPassGroup->number_of_guests_out)
+                        $active = "active";
+                }
                 $visitorPass->checked_out_time = date('Y-m-d h:i:s');
-                $message = "Your guest {$visitorPass->guestname} has just been checkout of the estate at {$visitorPass->checked_out_time}";
+                $message = "Your guest ". $visitorPass->guestname ?? null ." has just been checkout of the estate at {$visitorPass->checked_out_time}";
             break;
             case "close":
-                if ($visitorPass->number_of_guests_in != 0 && $visitorPass->number_of_guests_in != $visitorPass->number_of_guests_out)
-                {
-                    return $this->sendError("You cannot close an active visitor pass");
-                }
+                if ($visitorPass->status == "active" || $visitorPass->status == "inactive")
+                    return $this->sendError("you cannot cancel a used or in-use pass.");
 
-                //do something
             break;
         }
-        if ($active == "active"){
-        } else {
-        }
+
         $visitorPass->status = $active;
         $visitorPass->save();
         $visitor_pass = [
@@ -243,7 +263,7 @@ class VisitorPassAPIController extends AppBaseController
             "user" => $visitorPass->user->surname,
         ];
 
-        if ($active == "active" || $active == "inactive")
+        if (($active == "active" || $active == "inactive") && $visitorPass->pass_type == "individual")
         {
 
             $user = $visitorPass->user->surname." ".$visitorPass->user->surname;
