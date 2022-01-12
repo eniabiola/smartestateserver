@@ -246,7 +246,7 @@ class VisitorPassAPIController extends AppBaseController
                 $message = "Your guest ". $visitorPass->guestname ?? null ." has just been checkout of the estate at {$visitorPass->checked_out_time}";
             break;
             case "close":
-                if ($visitorPass->status == "active" || $visitorPass->status == "inactive")
+                if ($visitorPass->status == "active")
                     return $this->sendError("you cannot cancel a used or in-use pass.");
 
             break;
