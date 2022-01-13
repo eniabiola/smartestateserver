@@ -6,11 +6,11 @@ We welcome you to {{ $maildata['estate'] }}
 Your login email is {{$maildata['email']}}
 And Password is as set.
 
-To login to your dashbord please click
-@component('mail::button', ['url' => 'http://dev.smartestateapp.com/auth/login'])
-Button Text
+To login to your dashbord please click the activate link below
+@component('mail::button', ['url' => 'http://vgcpora.baloshapp.com/auth/login'])
+Activate
 @endcomponent
 
-Thanks,<br>
+Thank You,<br>
 {{ config('app.name') }}
 @endcomponent
