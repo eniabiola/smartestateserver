@@ -218,6 +218,7 @@ class VisitorPassAPIController extends AppBaseController
             switch ($active)
         {
             case "active":
+                $message = "Your guest ". $visitorPass->guestname ." has arrived.";
                 if (strtotime(date("Y-m-d", strtotime($visitorPass->visitationDate))) != strtotime(date("Y-m-d"))) return $this->sendError("This Pass code is not scheduled for today.");
                 if ($visitorPass->pass_type == "group")
                 {
@@ -225,13 +226,14 @@ class VisitorPassAPIController extends AppBaseController
                         return $this->sendError("This group pass has reached its limit");
                     $visitorPassGroup->number_of_guests_in  += 1;
                     $visitorPassGroup->save();
+                    $message = "Your guest has arrived";
                 }
                 if ($visitorPass->pass_type == "individual" && $visitorPass->status == "active")
                     return $this->sendError("The visitor pass is already in use");
                 $visitorPass->checked_in_time = date('Y-m-d h:i:s');
-                $message = "Your guest ". $visitorPass->guestname ?? null ." has just been allowed into the estate at {$visitorPass->checked_in_time}";
             break;
             case "inactive":
+                $message = "Your guest ". $visitorPass->guestname ." has departed";
                 if ($visitorPass->status != "active")
                     return $this->sendError("This pass has not been used.");
                 if ($visitorPass->pass_type == "group")
@@ -243,7 +245,7 @@ class VisitorPassAPIController extends AppBaseController
                         $active = "active";
                 }
                 $visitorPass->checked_out_time = date('Y-m-d h:i:s');
-                $message = "Your guest ". $visitorPass->guestname ?? null ." has just been checkout of the estate at {$visitorPass->checked_out_time}";
+                $message = "Your guest has departed.";
             break;
             case "close":
                 if ($visitorPass->status == "active")

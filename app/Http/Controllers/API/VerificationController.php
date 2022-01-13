@@ -27,7 +27,7 @@ class VerificationController extends Controller
     public function resend(Request $request) {
         $input = $request->validate([
             "email" => "required|email:rfc,dns|exists:users,email"
-        ]);
+        ], ['email.exists' => 'Your email was not found.']);
         $user = User::query()->where('email', $request->email)->first();
         if ($user->email_verified_at != null) {
             return response()->json(["msg" => "Email already verified."], 400);
