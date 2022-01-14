@@ -182,7 +182,7 @@ class UserAPIController extends AppBaseController
         if ($user->hasRole('resident')){
 //            $resident = $residentRepository->find($user->id);
             $resident = Resident::where('user_id', $user->id)->first();
-            $updateResident = $request->only(['meterNo', 'dateMovedIn', 'houseNo', 'street_id']);
+            $updateResident = $request->only(['meterNo', 'houseNo', 'street_id']);
             $residentRepository->update($updateResident, $resident->id);
         }
         return $this->sendResponse(new UserResource($user), 'User updated successfully');

@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  * @property string $meterNo
  * @property string $street_id
  * @property string $houseNo
- * @property string|\Carbon\Carbon $dateMovedIn
  */
 class Resident extends Model
 {
@@ -39,7 +38,6 @@ class Resident extends Model
         'houseNo',
         'street_id',
         'meterNo',
-        'dateMovedIn'
     ];
 
     /**
@@ -54,7 +52,6 @@ class Resident extends Model
         'meterNo' => 'string',
         'houseNo' => 'string',
         'street_id' => 'integer',
-        'dateMovedIn' => 'datetime'
     ];
 
     /**
@@ -67,7 +64,6 @@ class Resident extends Model
         'meterNo' => 'nullable|string|max:40',
         'street_id' => 'required|integer|exists:streets,id',
         'houseNo' => 'required|max:12',
-        'dateMovedIn' => 'required|date',
     ];
 
     /**

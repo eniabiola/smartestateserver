@@ -82,7 +82,7 @@ class ResidentAPIController extends AppBaseController
             DB::beginTransaction();
             $userInput = $request->safe()->only(['surname', 'othernames', 'phone', 'gender', 'email', 'password']);
             $userInput['password'] = bcrypt($request->password);
-            $input = $request->safe()->only(['meterNo', 'dateMovedIn', 'houseNo', 'street_id']);
+            $input = $request->safe()->only(['meterNo', 'houseNo', 'street_id']);
             $estate = Estate::where('estateCode', $request->estateCode)->first();
 //            return $estate;
             $userInput['estate_id'] = $estate->id;
@@ -207,7 +207,7 @@ class ResidentAPIController extends AppBaseController
         }
         $userInput = $request->safe()->only(['surname', 'othernames', 'phone', 'gender', 'email']);
         $userInput['imageName'] = $filename;
-        $input = $request->safe()->only(['meterNo', 'dateMovedIn', 'houseNo', 'street_id']);
+        $input = $request->safe()->only(['meterNo', 'houseNo', 'street_id']);
 
         $resident = Resident::find($id);
         $user = $userRepository->update($userInput, $resident->user_id);

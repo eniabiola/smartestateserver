@@ -20,7 +20,6 @@ class ResidentRepository extends BaseRepository
     protected $fieldSearchable = [
         'user_id',
         'meterNo',
-        'dateMovedIn'
     ];
 
     /**

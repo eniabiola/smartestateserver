@@ -128,7 +128,6 @@ class AuthenticationController extends BaseController
 
             $resident_info = [
                 'resident_id' => $resident->id,
-                'moved_in' => date('Y-m-d', strtotime($resident->dateMovedIn)),
                 'house_no' => $resident->houseNo,
                 'street' => $resident->street,
                 'meter_number' => $resident->meterNo,

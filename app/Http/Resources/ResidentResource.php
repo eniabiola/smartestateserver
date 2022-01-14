@@ -32,7 +32,6 @@ class ResidentResource extends JsonResource
             "houseNo" => $this->houseNo,
             "street_id" => $this->street_id,
             "street" => $this->street()->exists() ? $this->street->name : null,
-            "dateMovedIn" => date("Y-m-d", strtotime($this->dateMovedIn))
         ];
     }
 }
