@@ -104,9 +104,8 @@ class AuthenticationController extends BaseController
     public function getUserData($user)
     {
         $role_id = $user->roles->pluck('id');
-        $role = Role::find($role_id)->first();
+        $role = Role::find($role_id);
 
-//        return $role_id;
         $general_info =  [
             'id' => $user->id,
             'name' => $user->firstname." ".$user->othernames,
@@ -114,8 +113,8 @@ class AuthenticationController extends BaseController
             'phone' => $user->phone,
             "imageName" => $user->imageName != "default.jpg" ? Storage::url('userImages/' .$user->imageName) : \url('/')."/default.jpg",
             'is_active' => $user->isActive,
-            'role' => new RoleResource($role),
-//            'role_access' => !is_null($role->component) ? \Opis\Closure\unserialize($role->component) : null,
+            'role' => $role,
+            'role_access_component' => $role[0]->component,
             'estate' => $user->estate_id == null ? null :[
                 'id' => $user->estate_id,
                 'name' => $user->estate->name,

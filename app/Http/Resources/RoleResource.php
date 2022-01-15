@@ -18,7 +18,7 @@ class RoleResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
-            'component' => \Opis\Closure\unserialize($this->component),
+            'component' => !is_null($this->component) ? \Opis\Closure\unserialize($this->component) : [],
             'module_access' => $this->moduleAccess
         ];
         return parent::toArray($request);
