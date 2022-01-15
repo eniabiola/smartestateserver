@@ -35,6 +35,7 @@ class Role extends Model
     public $fillable = [
         'name',
         'guard_name',
+        'component',
         'slug',
     ];
 
@@ -57,7 +58,10 @@ class Role extends Model
      */
     public static $rules = [
         'name' => 'required|string|max:255,unique:roles,name',
-        'slug' => 'required|string|max:255,unique:roles,slug'
+        'slug' => 'required|string|max:255,unique:roles,slug',
+        'components' => 'nullable|array|min:1',
+        'components.*.comp' => 'nullable|string',
+        'components.*.status' => 'nullable|in:true,false'
     ];
 
     /**

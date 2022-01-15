@@ -35,7 +35,8 @@ class ComplainCategory extends Model
     public $fillable = [
         'name',
         'status',
-        'estate_id'
+        'estate_id',
+        'email'
     ];
 
     /**
@@ -47,7 +48,8 @@ class ComplainCategory extends Model
         'id' => 'integer',
         'name' => 'string',
         'status' => 'string',
-        'estate_id' => 'integer'
+        'estate_id' => 'integer',
+        'email' => 'string'
     ];
 
     /**
@@ -57,6 +59,7 @@ class ComplainCategory extends Model
      */
     public static $rules = [
         'name' => 'required|string|max:50|unique:complain_categories,name',
+        'email' => 'required|email:rfc,dns'
 //        'status' => 'required|string|max:20',
     ];
 

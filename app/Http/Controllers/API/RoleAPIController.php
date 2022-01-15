@@ -70,12 +70,10 @@ class RoleAPIController extends AppBaseController
      */
     public function store(CreateRoleAPIRequest $request)
     {
-        $request->merge(['guard_name' => "web"]);
+        $request->merge(['guard_name' => "web", 'component' => \Opis\Closure\serialize($request->components)]);
         $input = $request->all();
-
         $role = $this->roleRepository->create($input);
-
-        return $this->sendResponse($role->toArray(), 'Role saved successfully');
+        return $this->sendResponse(new RoleResource($role), 'Role saved successfully');
     }
 
     /**
@@ -109,6 +107,7 @@ class RoleAPIController extends AppBaseController
      */
     public function update($id, UpdateRoleAPIRequest $request)
     {
+        $request->merge(['component' => \Opis\Closure\serialize($request->components)]);
         $input = $request->all();
 
         /** @var Role $role */
@@ -120,7 +119,7 @@ class RoleAPIController extends AppBaseController
 
         $role = $this->roleRepository->update($input, $id);
 
-        return $this->sendResponse($role->toArray(), 'Role updated successfully');
+        return $this->sendResponse(new RoleResource($role), 'Role updated successfully');
     }
 
     /**

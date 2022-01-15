@@ -7,12 +7,15 @@ use App\Http\Requests\API\UpdateComplainAPIRequest;
 use App\Http\Resources\ComplainAPIResource;
 use App\Http\Resources\ComplainCollection;
 use App\Http\Resources\ComplainNotification;
+use App\Mail\GeneralMail;
 use App\Models\Complain;
+use App\Models\ComplainCategory;
 use App\Repositories\ComplainRepository;
 use App\Services\UploadService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Response;
 
 /**
@@ -93,11 +96,24 @@ class ComplainAPIController extends AppBaseController
         } else {
             $filename = null;
         }
+        $complain_category = ComplainCategory::find($request->complain_category_id);
         $request->merge(['user_id' => $user->id, 'estate_id' => $user->estate_id,
                          'ticket_no' => $ticket_id, 'status' => "active",
                          'file' => $filename]);
         $input = $request->all();
 
+        $user = \request()->user();
+        if (!empty($complain_category->email) and !is_null($complain_category->email))
+        {
+            $details = [
+                "subject" => "Raised complaint",
+                "name" => "Administrator",
+                "message" => "Dear administrator, {$user->surname} {$user->othernames} has a complain as regards {$complain_category->name}.",
+                "email" => $complain_category->email
+            ];
+            $email = new GeneralMail($details);
+            Mail::to($details['email'])->queue($email);
+        }
         $complain = $this->complainRepository->create($input);
 
         return $this->sendResponse(new ComplainAPIResource($complain), 'Complain sent successfully');
