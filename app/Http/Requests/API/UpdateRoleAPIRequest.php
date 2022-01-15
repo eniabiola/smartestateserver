@@ -28,7 +28,7 @@ class UpdateRoleAPIRequest extends APIRequest
             'name' => 'required|string|max:255,unique:roles,name,'.$this->route('id'),
             'components' => 'nullable|array|min:1',
             'components.*.comp' => 'nullable|string',
-            'components.*.status' => 'nullable|in:true,false'
+            'components.*.status' => 'nullable|boolean'
         ];
     }
 }
