@@ -25,7 +25,10 @@ class UpdateRoleAPIRequest extends APIRequest
     public function rules()
     {
         return [
-            'name' => 'required|string|max:255,unique:roles,name',$this->route('id')
+            'name' => 'required|string|max:255,unique:roles,name,'.$this->route('id'),
+            'components' => 'nullable|array|min:1',
+            'components.*.comp' => 'nullable|string',
+            'components.*.status' => 'nullable|in:true,false'
         ];
     }
 }
