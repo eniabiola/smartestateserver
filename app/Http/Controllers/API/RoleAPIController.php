@@ -93,7 +93,7 @@ class RoleAPIController extends AppBaseController
             return $this->sendError('Role not found');
         }
 
-        return $this->sendResponse($role->toArray(), 'Role retrieved successfully');
+        return $this->sendResponse(new RoleResource($role), 'Role retrieved successfully');
     }
 
     /**
