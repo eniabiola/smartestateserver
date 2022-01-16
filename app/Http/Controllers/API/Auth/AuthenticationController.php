@@ -114,7 +114,7 @@ class AuthenticationController extends BaseController
             "imageName" => $user->imageName != "default.jpg" ? Storage::url('userImages/' .$user->imageName) : \url('/')."/default.jpg",
             'is_active' => $user->isActive,
             'role' => $role,
-            'role_access_component' => \Opis\Closure\unserialize($role[0]->component) ?? [],
+            'role_access_component' => !empty($role) ? \Opis\Closure\unserialize($role[0]->component) : [],
             'estate' => $user->estate_id == null ? null :[
                 'id' => $user->estate_id,
                 'name' => $user->estate->name,
