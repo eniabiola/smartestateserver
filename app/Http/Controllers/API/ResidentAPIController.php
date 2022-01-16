@@ -131,10 +131,7 @@ class ResidentAPIController extends AppBaseController
             $email = new ResidentMail($details);
             Mail::to($details['email'])->queue($email);
             $details = [
-
-            ];
-            $details = [
-                "subject" => "Invoice Payment",
+                "subject" => "New User Alert",
                 "name" => $user->surname. " ".$user->othernames,
                 "message" => "Dear {$estate->name} administrator, there is a new resident waiting for activation.",
                 "email" => $estate->email
