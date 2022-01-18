@@ -217,12 +217,14 @@ class UserAPIController extends AppBaseController
     {
         $user = User::find($request->id);
         $adminUser = Auth::user();
+        $status = $user->isActive;
+        $message_status = $status == true ? "deactivated" : "activated";
         if ($adminUser->hasRole('administrator') && $adminUser->estate_id == $user->estate_id)
         {
             $this->validate($request, [
                 'id' => 'required|exists:users,id'
             ]);
-            return $this->sendResponse(new UserResource($this->userRepository->toggleStatus($request->id)), "User status successfully toggled.");
+            return $this->sendResponse(new UserResource($this->userRepository->toggleStatus($request->id)), "User has been successfully {$message_status}.");
         }
         return $this->sendError("You are unable to perform this operation", 401);
     }
