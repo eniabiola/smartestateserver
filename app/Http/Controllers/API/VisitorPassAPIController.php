@@ -238,6 +238,8 @@ class VisitorPassAPIController extends AppBaseController
                     return $this->sendError("This pass has not been used.");
                 if ($visitorPass->pass_type == "group")
                 {
+                    if ($visitorPassGroup->expected_number_of_guests == $visitorPassGroup->number_of_guests_out)
+                        return $this->sendError("All guests who entered with this pass code are out", 400);
                     $visitorPassGroup->number_of_guests_out  += 1;
                     $visitorPassGroup->save();
 
@@ -292,6 +294,11 @@ class VisitorPassAPIController extends AppBaseController
         $visitorPass->status = $request->authorization;
         $visitorPass->authorization_comment = $request->authorization_comment;
         $visitorPass->save();
+
+        $visitorPassGroup = VisitorPassGroup::query()->where('visitor_pass_id', $id)->first();
+        $visitorPassGroup->isApproved = true;
+        $visitorPassGroup->save();
+
         return $this->sendResponse($visitorPass, "Pass successfully {$request->authorization}");
 
     }
