@@ -219,6 +219,8 @@ class VisitorPassAPIController extends AppBaseController
         {
             case "active":
                 $message = "Your guest ". $visitorPass->guestname ." has arrived.";
+                if ($visitorPass->status == "active" && $visitorPass->pass_type == "individual") return $this->sendError("This Pass code is already in use.");
+
                 if (strtotime(date("Y-m-d", strtotime($visitorPass->visitationDate))) != strtotime(date("Y-m-d"))) return $this->sendError("This Pass code is not scheduled for today.");
                 if ($visitorPass->pass_type == "group")
                 {
