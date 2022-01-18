@@ -51,7 +51,7 @@ class AuthenticationController extends BaseController
         }
 
         $user = User::query()->where('email', $request->email)->first();
-        if ($user->isActive == false) return $this->sendError('Your account needs approval by the Estate Administrator.', 'Your account has been deactivated.', 400);
+        if ($user->isActive == false) return $this->sendError([], 'Your account needs approval by the Estate Administrator.', 400);
 
         $userToken = ['token' => $token, 'expires_at' => 30*$myTTL];
         $data = [
