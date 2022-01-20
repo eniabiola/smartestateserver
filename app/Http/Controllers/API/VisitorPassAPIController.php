@@ -5,7 +5,10 @@ namespace App\Http\Controllers\API;
 use App\Http\Requests\API\CreateVisitorPassAPIRequest;
 use App\Http\Requests\API\UpdateVisitorPassAPIRequest;
 use App\Http\Resources\VisitorPassResource;
+use App\Mail\GeneralMail;
 use App\Mail\sendVisitorPassMail;
+use App\Models\Estate;
+use App\Models\User;
 use App\Models\VisitorGroup;
 use App\Models\VisitorPass;
 use App\Models\VisitorPassGroup;
@@ -85,7 +88,9 @@ class VisitorPassAPIController extends AppBaseController
         $request->merge(['status' => "inactive", "user_id" => $user->id, 'estate_id' => $user->estate_id ?? 1]);
         $request->merge(['dateExpires' => Carbon::parse($request->visitationDate)->addHours($request->duration)]);
 
+        $estate = Estate::find($user->estate_id);
         $input = $request->all();
+        $message = 'Visitor Pass saved successfully';
 
         $visitorPass = $this->visitorPassRepository->create($input);
         if ($request->pass_type == "group"){
@@ -94,8 +99,18 @@ class VisitorPassAPIController extends AppBaseController
             $visitorGroup->event = $request->event;
             $visitorGroup->expected_number_of_guests = $request->expected_number_of_guests;
             $visitorGroup->save();
+            $message = "Your group pass request has been submitted to the Estate Administrator for Approval";
+
+            $details = [
+                "subject" => "New Group Pass Created",
+                "name" => "Estate Administrator",
+                "message" => "A new group pass has been created by {$user->surname} {$user->othernames}. This requires your authorization.",
+                "email" => $estate->email
+            ];
+            $email = new GeneralMail($details);
+            Mail::to($details['email'])->queue($email);
         }
-        return $this->sendResponse(new VisitorPassResource($visitorPass), 'Visitor Pass saved successfully');
+        return $this->sendResponse(new VisitorPassResource($visitorPass), $message);
     }
 
     /**
@@ -193,18 +208,6 @@ class VisitorPassAPIController extends AppBaseController
         $active = $request->get('status');
         if ($invitation_code == null || $active == null) return $this->sendError("invalid URL");
 
-        /**
-         * Check if the URL is valid
-         * Check if the Code passed is right
-         * Get the pass_type
-         * if the status is active is the day valid
-         * if the status is active check the pass_type
-         *if pass_type is group then count and set the status to active, if count = number_allwed return the error message
-         *if pass_type is individual then check if it is already active then return the error message
-         * if the status is close, check if it is active or inactive, if true return message
-         * if the status is inactive, check if it is active, if not send error message else perform similar steps as for status = active
-         *
-         */
         $visitorPass = VisitorPass::query()
             ->where('generatedCode', $request->invitation_code)
             ->first();
@@ -259,7 +262,7 @@ class VisitorPassAPIController extends AppBaseController
                 return $this->sendError("Not Valid");
                 break;
         }
-        \Log::debug($active);
+
         $visitorPass->status = $active;
         $visitorPass->save();
         $visitor_pass = [
@@ -303,6 +306,16 @@ class VisitorPassAPIController extends AppBaseController
         $visitorPassGroup = VisitorPassGroup::query()->where('visitor_pass_id', $id)->first();
         $visitorPassGroup->isApproved = true;
         $visitorPassGroup->save();
+
+        $user = User::query()->find($visitorPass->user_id);
+        $details = [
+            "subject" => "Group Pass Status",
+            "name" => $user->surname. " ".$user->othernames,
+            "message" => "Your pass has been {$request->authorization}. {$request->authorization_comment}.",
+            "email" => $user->email
+        ];
+        $email = new GeneralMail($details);
+        Mail::to($details['email'])->queue($email);
 
         return $this->sendResponse($visitorPass, "Pass successfully {$request->authorization}");
 
