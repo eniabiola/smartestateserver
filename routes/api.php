@@ -76,6 +76,7 @@ Route::group(['middleware' => ['jwt.verify', 'api_user_verified']], function() {
     Route::get('complains_per_user/{user_id}', [\App\Http\Controllers\API\ComplainAPIController::class, 'userIndex']);
     Route::resource('complains', \ComplainAPIController::class);
     Route::resource('complain_responses', \ComplainResponseAPIController::class);
+    Route::post('send_notifications', [\App\Http\Controllers\API\NotificationAPIController::class, 'sendNotificationMessages']);
     Route::resource('notifications', \NotificationAPIController::class);
     Route::resource('notification_groups', \NotificationGroupAPIController::class);
     Route::resource('wallets', \WalletAPIController::class)->only('index');

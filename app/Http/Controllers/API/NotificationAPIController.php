@@ -170,5 +170,7 @@ class NotificationAPIController extends AppBaseController
 
         sendNotificationMessages::dispatch($request->id);
 
+        return $this->sendSuccess("Your message has been sent");
+
     }
 }
