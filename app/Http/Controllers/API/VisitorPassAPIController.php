@@ -199,8 +199,8 @@ class VisitorPassAPIController extends AppBaseController
          * Get the pass_type
          * if the status is active is the day valid
          * if the status is active check the pass_type
-                *if pass_type is group then count and set the status to active, if count = number_allwed return the error message
-                *if pass_type is individual then check if it is already active then return the error message
+         *if pass_type is group then count and set the status to active, if count = number_allwed return the error message
+         *if pass_type is individual then check if it is already active then return the error message
          * if the status is close, check if it is active or inactive, if true return message
          * if the status is inactive, check if it is active, if not send error message else perform similar steps as for status = active
          *
@@ -215,7 +215,7 @@ class VisitorPassAPIController extends AppBaseController
             if ($visitorPassGroup->isApproved != true && $active != "close") return $this->sendError("This group Pass has not been approved");
         }
 
-            switch ($active)
+        switch ($active)
         {
             case "active":
                 $message = "Your guest ". $visitorPass->guestname ." has arrived.";
@@ -233,8 +233,12 @@ class VisitorPassAPIController extends AppBaseController
                 if ($visitorPass->pass_type == "individual" && $visitorPass->status == "active")
                     return $this->sendError("The visitor pass is already in use");
                 $visitorPass->checked_in_time = date('Y-m-d h:i:s');
-            break;
-            case "inactive":
+                break;
+            case "cancelled":
+                if ($visitorPass->status != "inactive")
+                    return $this->sendError("You cannot cancel a pass in use or used..");
+                break;
+            case "closed":
                 $message = "Your guest ". $visitorPass->guestname ." has departed";
                 if ($visitorPass->status != "active")
                     return $this->sendError("This pass has not been used.");
@@ -250,14 +254,12 @@ class VisitorPassAPIController extends AppBaseController
                 }
                 $visitorPass->checked_out_time = date('Y-m-d h:i:s');
                 $message = "Your guest has departed.";
-            break;
-            case "close":
-                if ($visitorPass->status == "active")
-                    return $this->sendError("you cannot cancel a used or in-use pass.");
-
-            break;
+                break;
+            default:
+                return $this->sendError("Not Valid");
+                break;
         }
-
+        \Log::debug($active);
         $visitorPass->status = $active;
         $visitorPass->save();
         $visitor_pass = [
@@ -267,6 +269,7 @@ class VisitorPassAPIController extends AppBaseController
             "dateExpires" => date('Y-m-d', strtotime($visitorPass->dateExpires)),
             "estate" => $visitorPass->estate->name,
             "user" => $visitorPass->user->surname,
+            "status" => $visitorPass->status,
         ];
 
         if (($active == "active" || $active == "inactive") && $visitorPass->pass_type == "individual")
@@ -286,7 +289,7 @@ class VisitorPassAPIController extends AppBaseController
     public function activateDeactivatePass($id, Request $request)
     {
         $request->validate([
-           'authorization' => 'required|string|in:approved,rejected',
+            'authorization' => 'required|string|in:approved,rejected',
             'authorization_comment'      =>  'nullable|required_if:authorization,==,rejected|string|max:200'
         ]);
         $visitorPass = VisitorPass::query()->find($id);
