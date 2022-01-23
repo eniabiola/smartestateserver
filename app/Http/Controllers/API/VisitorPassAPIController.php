@@ -243,8 +243,8 @@ class VisitorPassAPIController extends AppBaseController
                 break;
             case "closed":
                 $message = "Your guest ". $visitorPass->guestname ." has departed";
-                if ($visitorPass->status != "active")
-                    return $this->sendError("This pass has not been used.");
+/*                if ($visitorPass->status != "active")
+                    return $this->sendError("This pass has not been used.");*/
                 if ($visitorPass->pass_type == "group")
                 {
                     if ($visitorPassGroup->expected_number_of_guests == $visitorPassGroup->number_of_guests_out)
