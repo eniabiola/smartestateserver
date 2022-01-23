@@ -64,6 +64,7 @@ class ResidentAPIController extends AppBaseController
             ->whereHas('user', function ($query) use ($estate_id){
                 $query->where('users.estate_id', $estate_id);
             })
+            ->select('residents.*')
             ->when($search != null, function ($query) use($search_request, $search){
                 $query->where(function($query) use($search_request, $search){
                     foreach($search as $key => $value) {
