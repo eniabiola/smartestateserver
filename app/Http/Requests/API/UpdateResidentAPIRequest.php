@@ -34,7 +34,8 @@ class UpdateResidentAPIRequest extends APIRequest
             'othernames' => 'required',
             'phone' => 'required',
             'email' => 'required','string','max:255',
-            Rule::unique('users')->ignore($user_id->user_id, 'email')];
+//            Rule::unique('users')->ignore($user_id->user_id, 'email')
+        ];
 
 
         return array_merge(/*$user_rules, */$resident_rules, $custom_rules);
