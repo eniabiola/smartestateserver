@@ -215,7 +215,7 @@ class ResidentAPIController extends AppBaseController
         } else {
             $filename = $user->imageName;
         }
-        $userInput = $request->only(['surname', 'othernames', 'phone', 'gender', 'email']);
+        $userInput = $request->only(['surname', 'othernames', 'phone', 'email']);
         $userInput['imageName'] = $filename;
         $input = $request->safe()->only(['meterNo', 'houseNo', 'street_id']);
 
