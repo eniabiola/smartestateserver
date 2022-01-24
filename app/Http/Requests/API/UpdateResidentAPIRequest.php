@@ -26,10 +26,15 @@ class UpdateResidentAPIRequest extends APIRequest
      */
     public function rules()
     {
+        $user_id = Resident::query()->find($this->route('id'));
 //        $user_rules = User::$rules;
         $resident_rules = Resident::$rules;
-        $custom_rules = ['email' => 'required','string','max:255',
-            Rule::unique('users')->ignore($this->route('id'), 'email')];
+        $custom_rules = [
+            'surname' => 'required',
+            'othernames' => 'required',
+            'phone' => 'required',
+            'email' => 'required','string','max:255',
+            Rule::unique('users')->ignore($user_id->user_id, 'email')];
 
 
         return array_merge(/*$user_rules, */$resident_rules, $custom_rules);
