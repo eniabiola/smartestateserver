@@ -3,10 +3,11 @@ Dear {{ $maildata['name'] }}
 
 {{$maildata['message']}}
 
-{{--@component('mail::button', ['url' => ''])
+@if($maildata['url'])
+@component('mail::button', ['url' => $maildata["url"]])
 Button Text
-@endcomponent--}}
-
+@endcomponent
+@endif
 Thanks,<br>
 {{ config('app.name') }}
 @endcomponent

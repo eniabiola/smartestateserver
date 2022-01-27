@@ -108,8 +108,9 @@ class ComplainAPIController extends AppBaseController
             $details = [
                 "subject" => "Raised complaint",
                 "name" => "Administrator",
-                "message" => "Dear administrator, {$user->surname} {$user->othernames} has a complain as regards {$complain_category->name}.",
-                "email" => $complain_category->email
+                "message" => "{$user->surname} {$user->othernames} has a complain as regards {$complain_category->name}.",
+                "email" => $complain_category->email,
+                "url" => "https://vgcpora.baloshapps.com/auth/login"
             ];
             $email = new GeneralMail($details);
             Mail::to($details['email'])->queue($email);
