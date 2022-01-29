@@ -57,11 +57,12 @@ class NotificationAPIController extends AppBaseController
     public function store(CreateNotificationAPIRequest $request, UploadService $uploadService)
     {
         if ($request->has('file') && $request->file != null){
+
             $imageUploadAction = $uploadService->uploadImageBase64($request->file, "notificationImages/");
             if($imageUploadAction['status'] === false){
-                $message = "The file upload must be an image!";
+                $message = "Only images and PDF are supported.!";
                 $statuscode = 400;
-                return $this->failedResponse($message, $statuscode);
+                return $this->sendError($message, $statuscode);
             }
             $filename = $imageUploadAction['data'];
         } else {

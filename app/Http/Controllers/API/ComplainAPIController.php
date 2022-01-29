@@ -88,9 +88,9 @@ class ComplainAPIController extends AppBaseController
         if ($request->has('file') && $request->file != null){
             $imageUploadAction = $uploadService->uploadDocBase64($request->file, "complainImages/");
             if($imageUploadAction['status'] === false){
-                $message = "The file upload must be an image!";
+                $message = "Only images and PDF are supported.!";
                 $statuscode = 400;
-                return $this->failedResponse($message, $statuscode);
+                return $this->sendError($message, $statuscode);
             }
             $filename = $imageUploadAction['data'];
         } else {

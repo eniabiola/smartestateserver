@@ -12,7 +12,7 @@ class UploadService {
         try {
             $folderPath = $folder;
             $image_parts =  explode(";base64,", $image);
-            $image_type_aux = explode("image/", $image_parts[0]);
+            $image_type_aux = explode("/", $image_parts[0]);
             $image_type_new = explode(";base64,", $image_type_aux[1]);
             $image_type = $image_type_new[0];
             //specify the extensions allowed
