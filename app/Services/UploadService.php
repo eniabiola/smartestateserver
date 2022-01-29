@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class UploadService {
 
@@ -29,6 +30,34 @@ class UploadService {
         } catch (\Error $e){
             return ["status" => true, "data" => $image];
         }
+    }
+
+    public function uploadDocBase64($image, $folder)
+    {
+        try {
+            $base64_string = $image;
+            $base64_string_array = explode(';base64,', $base64_string);
+            $base64_only = $base64_string_array[1];
+
+            $bin = base64_decode($base64_only);
+            $mime_array = explode('/', $base64_string_array[0]);
+            $ext = $mime_array['1'];
+            $size = getImageSizeFromString($bin);
+            $filename = Str::random() . ".$ext";
+            // Specify the location where you want to save the image
+            $img_file = storage_path('app/public/document-files/' . $filename);
+            // Save binary data as raw data (that is, it will not remove metadata or invalid contents)
+
+
+//            $imagename = md5(uniqid(). time()) . '.'.$image_type;
+            $destinationpath = $folder . $filename;
+            Storage::put($destinationpath, $destinationpath);
+            return ["status" => true, "data" => $filename];
+        } catch (\Error $e){
+            return ["status" => true, "data" => $image];
+        }
+
+
     }
 
     public function deleteImage($deleteImage, $folder)

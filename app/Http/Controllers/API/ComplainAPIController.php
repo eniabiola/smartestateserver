@@ -86,7 +86,7 @@ class ComplainAPIController extends AppBaseController
         $ticket_id = "".str_pad($ticket_id+1, 5, '0', STR_PAD_LEFT);
 
         if ($request->has('file') && $request->file != null){
-            $imageUploadAction = $uploadService->uploadImageBase64($request->file, "complainImages/");
+            $imageUploadAction = $uploadService->uploadDocBase64($request->file, "complainImages/");
             if($imageUploadAction['status'] === false){
                 $message = "The file upload must be an image!";
                 $statuscode = 400;
