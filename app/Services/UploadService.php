@@ -16,7 +16,7 @@ class UploadService {
             $image_type_new = explode(";base64,", $image_type_aux[1]);
             $image_type = $image_type_new[0];
             //specify the extensions allowed
-            $extensions = array('png', 'gif', 'jpg', 'jpeg');
+            $extensions = array('png', 'gif', 'jpg', 'jpeg', 'pdf');
 
             if (in_array($image_type, $extensions) === false) {
                 // $error = $this->failedResponse($message, $status);
