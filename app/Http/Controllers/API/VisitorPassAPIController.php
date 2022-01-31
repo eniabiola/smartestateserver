@@ -221,6 +221,7 @@ class VisitorPassAPIController extends AppBaseController
         switch ($active)
         {
             case "active":
+                if ($visitorPass->status == "closed" && $visitorPass->pass_type == "individual") return $this->sendError("This pass code is used.");
                 $message = "Your guest ". $visitorPass->guestname ." has arrived.";
                 if ($visitorPass->status == "active" && $visitorPass->pass_type == "individual") return $this->sendError("This Pass code is already in use.");
 
@@ -242,6 +243,7 @@ class VisitorPassAPIController extends AppBaseController
                     return $this->sendError("You cannot cancel a pass in use or used..");
                 break;
             case "closed":
+                if ($visitorPass->status == "closed" && $visitorPass->pass_type == "individual") return $this->sendError("This pass code is used.");
                 $message = "Your guest ". $visitorPass->guestname ." has departed";
 /*                if ($visitorPass->status != "active")
                     return $this->sendError("This pass has not been used.");*/
