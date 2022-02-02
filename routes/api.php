@@ -48,6 +48,7 @@ Route::group(['middleware' => ['jwt.verify', 'api_user_verified']], function() {
     Route::get('get_authenticated_user', [AuthenticationController::class, 'get_user']);
     Route::get('dashboard_analytics', [\App\Http\Controllers\API\DashboardController::class, 'dashboardAnalytics']);
     Route::post('reset_password', [AuthenticationController::class, 'resetPassword']);
+    Route::post('resident_datatable', [\App\Http\Controllers\API\ResidentAPIController::class, 'indexDataTable']);
     Route::resource('users', UserAPIController::class)->except('destroy');
     Route::resource('estates', EstateAPIController::class);
     Route::resource('states', StateAPIController::class);
@@ -80,10 +81,9 @@ Route::group(['middleware' => ['jwt.verify', 'api_user_verified']], function() {
     Route::resource('notifications', \NotificationAPIController::class);
     Route::resource('notification_groups', \NotificationGroupAPIController::class);
     Route::resource('wallets', \WalletAPIController::class)->only('index');
+    Route::resource('settings', \SettingAPIController::class);
 });
 
 Route::resource('countries', \CountryAPIController::class);
 
 
-
-Route::resource('settings', \SettingAPIController::class);

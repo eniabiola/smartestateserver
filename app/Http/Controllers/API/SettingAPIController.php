@@ -53,6 +53,7 @@ class SettingAPIController extends AppBaseController
      */
     public function store(CreateSettingAPIRequest $request)
     {
+        $request->merge(['estate_id' => \request()->user()->estate_id]);
         $input = $request->all();
 
         $setting = $this->settingRepository->create($input);

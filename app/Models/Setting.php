@@ -9,23 +9,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * Class Setting
  * @package App\Models
- * @version December 30, 2021, 9:47 pm UTC
+ * @version February 2, 2022, 7:16 pm UTC
  *
- * @property string $front_end_url
- * @property string $security_unit
- * @property string $fire_and_emergency
- * @property string $police_post
- * @property string $hospital
- * @property string $CRI
- * @property string $clinic
+ * @property \App\Models\Estate $estate
+ * @property string $name
+ * @property string $value
+ * @property string $type
+ * @property integer $estate_id
  */
 class Setting extends Model
 {
-//    use SoftDeletes;
+    use SoftDeletes;
 
 
     public $table = 'settings';
-
+    
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
@@ -35,13 +33,10 @@ class Setting extends Model
 
 
     public $fillable = [
-        'front_end_url',
-        'security_unit',
-        'fire_and_emergency',
-        'police_post',
-        'hospital',
-        'CRI',
-        'clinic'
+        'name',
+        'value',
+        'type',
+        'estate_id'
     ];
 
     /**
@@ -51,13 +46,10 @@ class Setting extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'front_end_url' => 'string',
-        'security_unit' => 'string',
-        'fire_and_emergency' => 'string',
-        'police_post' => 'string',
-        'hospital' => 'string',
-        'CRI' => 'string',
-        'clinic' => 'string'
+        'name' => 'string',
+        'value' => 'string',
+        'type' => 'string',
+        'estate_id' => 'integer'
     ];
 
     /**
@@ -66,15 +58,19 @@ class Setting extends Model
      * @var array
      */
     public static $rules = [
-        'front_end_url' => 'required|string|max:150',
-        'security_unit' => 'nullable|string|max:191',
-        'fire_and_emergency' => 'nullable|string|max:191',
-        'police_post' => 'nullable|string|max:191',
-        'hospital' => 'nullable|string|max:191',
-        'CRI' => 'nullable|string|max:191',
-        'clinic' => 'nullable|string|max:191',
+        'name' => 'required|string|max:100',
+        'value' => 'required|string|max:100',
+        'type' => 'required|string|max:20',
         'created_at' => 'nullable',
-        'updated_at' => 'nullable'
+        'updated_at' => 'nullable',
+        'estate_id' => 'required'
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     **/
+    public function estate()
+    {
+        return $this->belongsTo(\App\Models\Estate::class, 'estate_id');
+    }
 }

@@ -283,22 +283,6 @@ abstract class BaseRepository
         return $model->delete();
     }
 
-    /**
-     * @param array $processedRequest
-     * @param $search_request
-     * @return array
-     */
-    public function getDataTableSearchParams($search_request): array
-    {
-        $search = [];
-        if ($search_request != null && $search_request != "") {
-            collect($this->getFieldsSearchable())->each(function ($field) use (&$search, $search_request) {
-                $search[$field] = $search_request;
-            });
-        }
-        return $search;
-    }
-
     public function searchFields(Builder $query, $search_term)
     {
         $search = $this->getDataTableSearchParams($search_term);
@@ -311,5 +295,30 @@ abstract class BaseRepository
             }
         }
         return $query;
+    }
+
+    /**
+     * Get all columns in the table
+     */
+    public function getTableColumns()
+    {
+        $tableColumns = $this->model->getTable();
+        return Schema::getColumnListing($tableColumns);
+    }
+
+    /**
+     * @param array $processedRequest
+     * @param $search_request
+     * @return array
+     */
+    public function getDataTableSearchParams(array $processedRequest, $search_request): array
+    {
+        $search = [];
+        if (!empty($processedRequest['search'])) {
+            collect($this->getFieldsSearchable())->each(function ($field) use (&$search, $search_request) {
+                $search[$field] = $search_request;
+            });
+        }
+        return $search;
     }
 }

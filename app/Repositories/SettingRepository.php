@@ -8,7 +8,7 @@ use App\Repositories\BaseRepository;
 /**
  * Class SettingRepository
  * @package App\Repositories
- * @version December 30, 2021, 9:47 pm UTC
+ * @version February 2, 2022, 7:16 pm UTC
 */
 
 class SettingRepository extends BaseRepository
@@ -17,13 +17,10 @@ class SettingRepository extends BaseRepository
      * @var array
      */
     protected $fieldSearchable = [
-        'front_end_url',
-        'security_unit',
-        'fire_and_emergency',
-        'police_post',
-        'hospital',
-        'CRI',
-        'clinic'
+        'name',
+        'value',
+        'type',
+        'estate_id'
     ];
 
     /**

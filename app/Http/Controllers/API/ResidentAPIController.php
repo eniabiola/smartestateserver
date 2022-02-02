@@ -8,6 +8,7 @@ use App\Http\Resources\ResidentResource;
 use App\Jobs\createNewResidentInvoice;
 use App\Jobs\sendResidentWelcomeMail;
 use App\Mail\GeneralMail;
+use App\Services\DatatableService;
 use Illuminate\Auth\Events\Registered;
 use App\Mail\sendResidentWelcomeMail as ResidentMail;
 use App\Models\Billing;
@@ -80,6 +81,95 @@ class ResidentAPIController extends AppBaseController
             ->searchFields($residents, $request->search ?? null);*/
         return $this->sendResponse(ResidentResource::collection($residents->paginate(20))->response()->getData(true), 'Residents retrieved successfully');
     }
+
+    public function indexDataTable(Request $request, DatatableService $datatableService)
+    {
+
+        if (Auth::user()->hasrole('superadministrator'))
+        {
+            if ($request->get('estate_id') == null) return $this->sendError("What estate residents will you love to see");
+            $estate_id = $request->get('estate_id');
+        } else {
+            $estate_id = \request()->user()->estate_id;
+        }
+        $search = [];
+        $processedRequest = $datatableService->processRequest($request);
+        $search_request = $processedRequest['search'];
+
+        $search = $this->residentRepository->getDataTableSearchParams($processedRequest, $search_request);
+
+        $builder = Resident::query()
+            ->join('users', 'users.id', 'residents.user_id')
+            ->join('streets', 'streets.id', 'residents.street_id')
+            ->whereHas('user', function ($query) use ($estate_id){
+                $query->where('users.estate_id', $estate_id);
+            })
+            ->select('residents.*',
+                'streets.name AS streets__dot__name',
+                'users.surname AS users__dot__surname',
+                'users.othernames AS users__dot__othernames',
+                'users.phone AS users__dot__phone',
+                'users.email AS users__dot__email',
+                'users.isActive')
+            ->when($search_request != null, function ($query) use($search_request, $search){
+                $query->where(function($query) use($search_request, $search){
+                    foreach($search as $key => $value) {
+                        if (in_array($key, $this->residentRepository->getFieldsSearchable())) {
+                            $query->orWhere($key, 'LIKE', '%'.$value.'%');
+                        }
+                    }
+                });
+            });
+
+//        return $builder->get();
+        $columns = $this->residentRepository->getTableColumns();
+        array_push($columns, "users.surname", "users.othernames", "users.phone", "users.gender", "users.email");
+
+        return $datatableService->dataTable2($request, $builder, [
+            '*',
+            /**
+             * Name: {{resident.surname}} {{resident.othernames}}
+
+            Status: <span class="badge badge-success" *ngIf="this.resident.status == true">Active</span>
+            <span class="badge badge-danger" *ngIf="this.resident.status == false">Inactive</span>
+
+            Action: <div class="datatable-actions">
+            <div class="text-center">
+              <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Actions </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton"><button class="   id="details__ {{resident_id}}" dropdown-item" type="button" > Edit </button> </div> </div> </div>
+            </div>
+
+             */
+
+            'name' => function (Resident $resident) {
+                return $resident->users__dot__surname ." ".$resident->users__dot__othernames;
+            },
+            'status' => function (Resident $resident) {
+
+                return $resident->isActive ?  "<span class='badge badge-success'>Active</span>" :
+                    "<span class='badge badge-danger' >Inactive</span>";
+            },
+            'action' => function (Resident $resident) {
+
+                return "
+                <div class='datatable-actions'>
+                    <div class='text-center'>
+                        <div class='dropdown'>
+                            <button class='btn btn-primary dropdown-toggle button' type='button'
+                            id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true'
+                            aria-expanded='false'> Actions </button>
+                        <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                            <button class=''   id='details__". $resident->id ." dropdown-item' type='button' > Edit </button>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                ";
+            }
+        ], $columns);
+    }
+
 
     /**
      * Store a newly created Resident in storage.
