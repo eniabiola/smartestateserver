@@ -14,5 +14,5 @@ Login to dashboard
 @endcomponent
 
 Thanks,<br>
-{{ config('app.name') }}
+{{ $maildata['from'] }}
 @endcomponent

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\AppBaseController;
 use App\Mail\GeneralMail;
 use App\Mail\UserWelcomeMail;
+use App\Models\Estate;
 use App\Models\Transaction;
 use App\Models\OldWallet;
 use App\Models\WalletFundingTransactionLog;
@@ -169,11 +170,13 @@ class FlutterwaveController extends AppBaseController
         {
             return $this->sendError($message);
         }
-
+        $estate = Estate::query()
+            ->find(Auth::user()->estate_id);
         $details = [
             "subject" => "Wallet Funding",
             "name" => Auth::user()->surname. " ".Auth::user()->othernames,
             "message" => "Your wallet has been funded with {$wallet->amount} <br> and your new wallet balance is {$wallet->current_balance}",
+            "from" => $estate->mail_slug,
         ];
 
         $email = new GeneralMail($details);

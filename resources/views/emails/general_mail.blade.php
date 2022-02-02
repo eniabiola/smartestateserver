@@ -9,5 +9,5 @@ Dear {{ $maildata['name'] }}
     @endcomponent
 @endif
 Thanks,<br>
-{{ config('app.name') }}
+{{ $maildata["from"] }}
 @endcomponent

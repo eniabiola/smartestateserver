@@ -10,6 +10,8 @@ use App\Http\Resources\ComplainNotification;
 use App\Mail\GeneralMail;
 use App\Models\Complain;
 use App\Models\ComplainCategory;
+use App\Models\Estate;
+use App\Models\Setting;
 use App\Repositories\ComplainRepository;
 use App\Services\UploadService;
 use Illuminate\Http\Request;
@@ -103,6 +105,12 @@ class ComplainAPIController extends AppBaseController
         $input = $request->all();
 
         $user = \request()->user();
+        $estate = Estate::query()
+                    ->find($user->estate_id);
+        $settings = Setting::query()
+                    ->where('estate_id', $user->estate_id)
+                    ->where('name', 'front_end_url')
+                    ->first();
         if (!empty($complain_category->email) and !is_null($complain_category->email))
         {
             $details = [
@@ -112,6 +120,7 @@ class ComplainAPIController extends AppBaseController
                 "email" => $complain_category->email,
                 "url" => "https://vgcpora.baloshapps.com/auth/login",
                 "button_text" => "Login to view Complain",
+                "from" => $estate->mail_slug,
             ];
             $email = new GeneralMail($details);
             Mail::to($details['email'])->queue($email);

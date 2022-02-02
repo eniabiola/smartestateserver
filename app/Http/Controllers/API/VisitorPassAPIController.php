@@ -105,7 +105,8 @@ class VisitorPassAPIController extends AppBaseController
                 "subject" => "New Group Pass Created",
                 "name" => "Estate Administrator",
                 "message" => "A new group pass has been created by {$user->surname} {$user->othernames}. This requires your authorization.",
-                "email" => $estate->email
+                "email" => $estate->email,
+                "from" => $estate->mail_slug
             ];
             $email = new GeneralMail($details);
             Mail::to($details['email'])->queue($email);
@@ -293,6 +294,8 @@ class VisitorPassAPIController extends AppBaseController
 
     public function activateDeactivatePass($id, Request $request)
     {
+        $user = \request()->user();
+        $estate = Estate::find($user->estate_id);
         $request->validate([
             'authorization' => 'required|string|in:approved,rejected',
             'authorization_comment'      =>  'nullable|required_if:authorization,==,rejected|string|max:200'
@@ -314,7 +317,8 @@ class VisitorPassAPIController extends AppBaseController
             "subject" => "Group Pass Status",
             "name" => $user->surname. " ".$user->othernames,
             "message" => "Your pass has been {$request->authorization}. {$request->authorization_comment}.",
-            "email" => $user->email
+            "email" => $user->email,
+            "from" => $estate->mail_slug,
         ];
         $email = new GeneralMail($details);
         Mail::to($details['email'])->queue($email);

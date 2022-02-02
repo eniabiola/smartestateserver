@@ -217,6 +217,7 @@ class ResidentAPIController extends AppBaseController
                 "estate" =>  $estate->name,
                 "surname" => $user->surname,
                 "othernames" => $user->othernames,
+                "from" => $estate->mail_slug
             ];
             $resident = $this->residentRepository->create($input);
 
@@ -237,7 +238,8 @@ class ResidentAPIController extends AppBaseController
                 "subject" => "New User Alert",
                 "name" => $user->surname. " ".$user->othernames,
                 "message" => "Dear {$estate->name} administrator, there is a new resident waiting for activation.",
-                "email" => $estate->email
+                "email" => $estate->email,
+                "from" => $estate->mail_slug,
             ];
             $email = new GeneralMail($details);
             Mail::to($details['email'])->queue($email);

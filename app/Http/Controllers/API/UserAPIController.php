@@ -112,7 +112,8 @@ class UserAPIController extends AppBaseController
             "email" => $request->email,
             "message" => "An account has been created for you as a $role->name of $request->name estate",
             "password" => $request->password,
-            "url"      => url('/')."/auth/login"
+            "url"      => url('/')."/auth/login",
+            "from"     => $estate->mail_slug
         ];
 
         $email = new UserWelcomeMail($details);

@@ -114,7 +114,8 @@ class EstateAPIController extends AppBaseController
           "email" => $request->email,
           "message" => "An account has been created for you as the estate manager of $request->name estate",
           "password" => $password,
-          "url"      => url('/')."/auth/login"
+          "url"      => url('/')."/auth/login",
+          "from"    => $request->mail_slug
         ];
 
         $email = new UserWelcomeMail($details);
