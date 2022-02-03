@@ -127,21 +127,6 @@ class ResidentAPIController extends AppBaseController
 
         return $datatableService->dataTable2($request, $builder, [
             '*',
-            /**
-             * Name: {{resident.surname}} {{resident.othernames}}
-
-            Status: <span class="badge badge-success" *ngIf="this.resident.status == true">Active</span>
-            <span class="badge badge-danger" *ngIf="this.resident.status == false">Inactive</span>
-
-            Action: <div class="datatable-actions">
-            <div class="text-center">
-              <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Actions </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton"><button class="   id="details__ {{resident_id}}" dropdown-item" type="button" > Edit </button> </div> </div> </div>
-            </div>
-
-             */
-
             'name' => function (Resident $resident) {
                 return $resident->users__dot__surname ." ".$resident->users__dot__othernames;
             },
@@ -157,7 +142,7 @@ class ResidentAPIController extends AppBaseController
                     <div class='text-center'> <div class='dropdown'>
                     <button class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> Actions </button>
                     <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                    <button class='dropdown-item'   id='details__ {{resident_id}}' type='button' > Details</button> </div><div class='dropdown-menu' aria-labelledby='dropdownMenuButton'><button class='dropdown-item'   id='edit__$resident->id' type='button' > Edit </button> </div>  </div> </div>
+                    <button class='dropdown-item'   id='details__$resident->id' type='button' > Details</button> </div><div class='dropdown-menu' aria-labelledby='dropdownMenuButton'><button class='dropdown-item'   id='edit__$resident->id' type='button' > Edit </button> </div>  </div> </div>
                 </div>
                 ";
             }
