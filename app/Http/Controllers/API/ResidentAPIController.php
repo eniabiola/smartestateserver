@@ -59,14 +59,14 @@ class ResidentAPIController extends AppBaseController
             $estate_id = \request()->user()->estate_id;
         }
         $search_request = $request->search ?? null;
-        $search = $this->residentRepository->getDataTableSearchParams([]);
+//        $search = $this->residentRepository->getDataTableSearchParams([]);
         $residents = Resident::query()
             ->join('users', 'users.id', 'residents.user_id')
             ->whereHas('user', function ($query) use ($estate_id){
                 $query->where('users.estate_id', $estate_id);
             })
             ->select('residents.*')
-            ->when($search != null, function ($query) use($search_request, $search){
+            /*->when($search != null, function ($query) use($search_request, $search){
                 $query->where(function($query) use($search_request, $search){
                     foreach($search as $key => $value) {
                         if (in_array($key, $this->residentRepository->getFieldsSearchable())) {
@@ -74,7 +74,7 @@ class ResidentAPIController extends AppBaseController
                         }
                     }
                 });
-            })
+            })*/
             ->orderBy('residents.created_at', 'DESC');
         /*    return $residents->get();
         $residents = $this->residentRepository
