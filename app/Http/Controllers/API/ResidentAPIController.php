@@ -9,6 +9,7 @@ use App\Jobs\createNewResidentInvoice;
 use App\Jobs\sendResidentWelcomeMail;
 use App\Mail\GeneralMail;
 use App\Services\DatatableService;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
 use App\Mail\sendResidentWelcomeMail as ResidentMail;
 use App\Models\Billing;
@@ -84,6 +85,10 @@ class ResidentAPIController extends AppBaseController
 
     public function indexDataTable(Request $request, DatatableService $datatableService)
     {
+        $date_from = $request->query('date_from') != "null" && $request->query('date_from') != "" ? $request->query('date_from') : null;
+        $date_to = $request->query('date_to') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
+        $street = $request->query('street') != "null" && $request->query('date_from') != "" ? $request->query('date_from') : null;
+        $status = $request->query('status') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
 
         if (Auth::user()->hasrole('superadministrator'))
         {
@@ -119,9 +124,19 @@ class ResidentAPIController extends AppBaseController
                         }
                     }
                 });
+            })
+            ->when(!is_null($date_from) && !is_null($date_to), function ($query) use($date_from, $date_to){
+                $from = Carbon::parse($date_from)->startOfDay()->format("Y-m-d H:i:s");
+                $to = Carbon::parse($date_to)->endOfDay()->format("Y-m-d H:i:s");
+                $query->whereBetween("residents.created_at", [$from, $to]);
+            })
+            ->when(!is_null($street), function ($query) use($street){
+                $query->where("residents.street_id", $street);
+            })
+            ->when(!is_null($status), function ($query) use($status){
+                $query->whereBetween("residents.isActive", $status);
             });
 
-//        return $builder->get();
         $columns = $this->residentRepository->getTableColumns();
         array_push($columns, "users.surname", "users.othernames", "users.phone", "users.gender", "users.email");
 
@@ -138,12 +153,7 @@ class ResidentAPIController extends AppBaseController
             'action' => function (Resident $resident) {
 
                 return "
-                <div class='datatable-actions'>
-                    <div class='text-center'> <div class='dropdown'>
-                    <button class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> Actions </button>
-                    <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                    <button class='dropdown-item'   id='details__$resident->id' type='button' > Details</button> </div><div class='dropdown-menu' aria-labelledby='dropdownMenuButton'><button class='dropdown-item'   id='edit__$resident->id' type='button' > Edit </button> </div>  </div> </div>
-                </div>
+                <div class='datatable-actions'> <div class='text-center'> <div class='dropdown'> <button class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> Actions </button> <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'> <button class='dropdown-item'   id='details__$resident->id' type='button'> Details</button> <button id='edit__$resident->id' class='dropdown-item' type='button'> Edit </button> </div> </div> </div> </div>
                 ";
             }
         ], $columns);
