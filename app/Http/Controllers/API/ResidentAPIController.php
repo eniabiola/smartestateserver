@@ -59,7 +59,7 @@ class ResidentAPIController extends AppBaseController
             $estate_id = \request()->user()->estate_id;
         }
         $search_request = $request->search ?? null;
-        $search = $this->residentRepository->getDataTableSearchParams($search_request);
+        $search = $this->residentRepository->getDataTableSearchParams([]);
         $residents = Resident::query()
             ->join('users', 'users.id', 'residents.user_id')
             ->whereHas('user', function ($query) use ($estate_id){
