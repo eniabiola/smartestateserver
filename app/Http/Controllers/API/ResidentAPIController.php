@@ -154,16 +154,10 @@ class ResidentAPIController extends AppBaseController
 
                 return "
                 <div class='datatable-actions'>
-                    <div class='text-center'>
-                        <div class='dropdown'>
-                            <button class='btn btn-primary dropdown-toggle button' type='button'
-                            id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true'
-                            aria-expanded='false'> Actions </button>
-                        <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                            <button class=''   id='details__". $resident->id ." dropdown-item' type='button' > Edit </button>
-                        </div>
-                        </div>
-                    </div>
+                    <div class='text-center'> <div class='dropdown'>
+                    <button class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> Actions </button>
+                    <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                    <button class='dropdown-item'   id='details__ {{resident_id}}' type='button' > Details</button> </div><div class='dropdown-menu' aria-labelledby='dropdownMenuButton'><button class='dropdown-item'   id='edit__$resident->id' type='button' > Edit </button> </div>  </div> </div>
                 </div>
                 ";
             }
