@@ -44,12 +44,9 @@ class DashboardController extends AppBaseController
             ->count();
 
         $graph = $this->dashboardRepo->getVisitorPass()
-//
-//            ->selectRaw("count('visitationDate') as count, visitationDate")
-//            ->selectRaw("count('visitationDate') as count, DATE_FORMAT(visitationDate,'%d/%m/%Y') as visitationDate")
 
-            ->select(\DB::raw('DATE_FORMAT(visitationDate, "%d/%m/%Y") as visitationDate1, count("visitationDate") as count'))
-            ->groupBy('visitationDate')
+            ->select(\DB::raw('DATE_FORMAT(visitationDate, "%m/%Y") as visitationDate1'), \DB::raw('MONTH(created_at) as month,  count("visitationDate") as count'))
+            ->groupBy('month')
             ->get();
 
 //         $graph->for

@@ -13,11 +13,14 @@ use App\Models\ComplainCategory;
 use App\Models\Estate;
 use App\Models\Setting;
 use App\Repositories\ComplainRepository;
+use App\Services\DatatableService;
 use App\Services\UploadService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Response;
 
 /**
@@ -54,6 +57,66 @@ class ComplainAPIController extends AppBaseController
         $complains = $this->complainRepository->paginateViewBasedOnRole('20', ['*'], $search, $estate_id);
 
         return $this->sendResponse(ComplainAPIResource::collection($complains)->response()->getData(true), 'Complains retrieved successfully');
+    }
+
+    public function indexDataTable(Request $request, DatatableService $datatableService)
+    {
+        $date_from = $request->query('date_from') != "null" && $request->query('date_from') != "" ? $request->query('date_from') : null;
+        $date_to = $request->query('date_to') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
+        $street = $request->query('guest_name') != "null" && $request->query('guest_name') != "" ? $request->query('date_from') : null;
+        $status = $request->query('status') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
+
+        $search = [];
+        $processedRequest = $datatableService->processRequest($request);
+        $search_request = $processedRequest['search'];
+
+        $search = $this->complainRepository->getDataTableSearchParams($processedRequest, $search_request);
+
+        $builder = $this->complainRepository->builderBasedOnRole('complains.estate_id', $request->get('estate_id'))
+            ->join('users', 'users.id', 'complains.user_id')
+            ->leftJoin('estates', 'estates.id', 'complains.estate_id')
+            ->select('complains.*',
+                'estates.name AS estates__dot__name',
+            )
+            ->when($search_request != null, function ($query) use($search_request, $search){
+                $query->where(function($query) use($search_request, $search){
+                    foreach($search as $key => $value) {
+                        if (in_array($key, $this->complainRepository->getFieldsSearchable())) {
+                            $query->orWhere($key, 'LIKE', '%'.$value.'%');
+                        }
+                    }
+                });
+            })
+            ->when(!is_null($date_from) && !is_null($date_to), function ($query) use($date_from, $date_to){
+                $from = Carbon::parse($date_from)->startOfDay()->format("Y-m-d H:i:s");
+                $to = Carbon::parse($date_to)->endOfDay()->format("Y-m-d H:i:s");
+                $query->whereBetween("visitor_passes.created_at", [$from, $to]);
+            })
+            ->when(!is_null($status), function ($query) use($status){
+                $query->whereBetween("visitorPasss.isActive", $status);
+            });
+
+        $columns = $this->complainRepository->getTableColumns();
+        array_push($columns, "users.surname", "users.othernames", "users.phone", "users.email");
+
+        return $datatableService->dataTable2($request, $builder, [
+            '*',
+            "user" => function(Complain $complain){
+            return $complain->user()->exists() ? $complain->user->surname." ".$complain->user->othernames : null;
+            },
+            "file_url" => function(Complain $complain){
+                return $complain->file != null ? Storage::url('complainImages/' .$complain->file) : null;
+            },
+            "date_created" => function(Complain $complain){
+                return date('d/m/y H:i:s', strtotime($complain->created_at));
+            },
+            'action' => function (Complain $complain) {
+
+                return "
+                <div class='datatable-actions'> <div class='text-center'> <div class='dropdown'> <button class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> Actions </button> <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'> <button class='dropdown-item'   id='details__$complain->id' type='button'> Details</button> <button id='edit__$complain->id' class='dropdown-item' type='button'> Edit </button> </div> </div> </div> </div>
+                ";
+            }
+        ], $columns);
     }
 
     /**

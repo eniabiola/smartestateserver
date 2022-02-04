@@ -135,6 +135,17 @@ class DatatableService
         //get the right query
 
         $countProducts = $builder->count();
+        if ($length == -1)
+        {
+
+            $data = $builder
+                ->orderBy($columntoOrderBy, $orderByValue)
+                ->when($length != -1, function($query) use($start, $length){
+                    $query->offset($start)
+                         ->limit($length);
+                })
+                ->get();
+        }
         $data = $builder
                 ->orderBy($columntoOrderBy, $orderByValue)
                 ->offset($start)

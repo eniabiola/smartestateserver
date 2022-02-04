@@ -12,8 +12,10 @@ use App\Models\Role;
 use App\Models\User;
 use App\Repositories\ResidentRepository;
 use App\Repositories\UserRepository;
+use App\Services\DatatableService;
 use App\Services\UploadService;
 use App\Services\UtilityService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Illuminate\Support\Facades\Auth;
@@ -69,6 +71,67 @@ class UserAPIController extends AppBaseController
 
         return $this->sendResponse(UserResource::collection($users->get()), 'Users retrieved successfully');
     }
+
+
+    public function indexDataTable(Request $request, DatatableService $datatableService)
+    {
+        $date_from = $request->query('date_from') != "null" && $request->query('date_from') != "" ? $request->query('date_from') : null;
+        $date_to = $request->query('date_to') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
+        $street = $request->query('guest_name') != "null" && $request->query('guest_name') != "" ? $request->query('date_from') : null;
+        $status = $request->query('status') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
+
+        if (Auth::user()->hasrole('superadministrator'))
+        {
+            if ($request->get('estate_id') == null) return $this->sendError("What estate visitorPasss will you love to see");
+            $estate_id = $request->get('estate_id');
+        } else {
+            $estate_id = \request()->user()->estate_id;
+        }
+        $search = [];
+        $processedRequest = $datatableService->processRequest($request);
+        $search_request = $processedRequest['search'];
+
+        $search = $this->userRepository->getDataTableSearchParams($processedRequest, $search_request);
+
+        $builder = $this->userRepository->builderBasedOnRole('users.estate_id', $request->get('estate_id'))
+            ->leftJoin('estates', 'estates.id', 'users.estate_id')
+            ->join('model_has_roles', 'model_has_roles.model_id', 'users.id')
+            ->join('roles', 'roles.id', 'model_has_roles.role_id')
+            ->select('users.*',
+                'estates.name AS estates__dot__name',
+                'roles.name AS roles__dot__name',)
+            ->when($search_request != null, function ($query) use($search_request, $search){
+                $query->where(function($query) use($search_request, $search){
+                    foreach($search as $key => $value) {
+                        if (in_array($key, $this->userRepository->getFieldsSearchable())) {
+                            $query->orWhere($key, 'LIKE', '%'.$value.'%');
+                        }
+                    }
+                });
+            })
+            ->when(!is_null($date_from) && !is_null($date_to), function ($query) use($date_from, $date_to){
+                $from = Carbon::parse($date_from)->startOfDay()->format("Y-m-d H:i:s");
+                $to = Carbon::parse($date_to)->endOfDay()->format("Y-m-d H:i:s");
+                $query->whereBetween("visitor_passes.created_at", [$from, $to]);
+            })
+            ->when(!is_null($status), function ($query) use($status){
+                $query->whereBetween("visitorPasss.isActive", $status);
+            });
+
+        $columns = $this->userRepository->getTableColumns();
+        array_push($columns, "users.surname", "users.othernames", "users.phone", "users.email");
+
+        return $datatableService->dataTable2($request, $builder, [
+            '*',
+            'action' => function (User $user) {
+
+                return "
+                <div class='datatable-actions'> <div class='text-center'> <div class='dropdown'> <button class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> Actions </button> <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'> <button class='dropdown-item'   id='details__$user->id' type='button'> Details</button> <button id='edit__$user->id' class='dropdown-item' type='button'> Edit </button> </div> </div> </div> </div>
+                ";
+            }
+        ], $columns);
+    }
+
 
     /**
      * Store a newly created User in storage.

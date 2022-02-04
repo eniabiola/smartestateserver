@@ -49,6 +49,10 @@ Route::group(['middleware' => ['jwt.verify', 'api_user_verified']], function() {
     Route::get('dashboard_analytics', [\App\Http\Controllers\API\DashboardController::class, 'dashboardAnalytics']);
     Route::post('reset_password', [AuthenticationController::class, 'resetPassword']);
     Route::post('resident_datatable', [\App\Http\Controllers\API\ResidentAPIController::class, 'indexDataTable']);
+    Route::post('visitor_pass_datatable', [\App\Http\Controllers\API\VisitorPassAPIController::class, 'indexDataTable']);
+    Route::post('user_datatable', [\App\Http\Controllers\API\UserAPIController::class, 'indexDataTable']);
+    Route::post('complain_datatable', [\App\Http\Controllers\API\ComplainAPIController::class, 'indexDataTable']);
+    Route::post('notification_datatable', [\App\Http\Controllers\API\NotificationAPIController::class, 'indexDataTable']);
     Route::resource('users', UserAPIController::class)->except('destroy');
     Route::resource('estates', EstateAPIController::class);
     Route::resource('states', StateAPIController::class);

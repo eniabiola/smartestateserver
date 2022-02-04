@@ -107,6 +107,33 @@ abstract class BaseRepository
         return $query->paginate($perPage, $columns);
     }
 
+    public function builderBasedOnRole($estate_column_name,$estate_id)
+    {
+        $query = $this->model->newQuery();
+        $table = $this->model->getTable();
+        $isColExist = Schema::hasColumn($table,'user_id');
+        if (Auth::user()->hasrole('superadministrator'))
+        {
+            if ($estate_id == null)
+            {
+                $estate_id = Estate::query()->distinct()->first()->id;
+            }
+        } else {
+            $estate_id = \request()->user()->estate_id;
+        }
+
+        $query->where(function($quer) use($estate_id, $estate_column_name){
+            $quer->where($estate_column_name, $estate_id);
+        })
+            ->when(Auth::user()->hasRole('resident'), function ($query) use($isColExist){
+                $query->when($isColExist, function ($query){
+                    $query->where('user_id', Auth::id());
+                });
+            })
+            ->orderBy('created_at', 'DESC');
+            return $query;
+    }
+
     public function paginateViewBasedOnUser($perPage, $columns = ['*'], $search, $estate_id, $user_id)
     {
         $query = $this->model->newQuery();

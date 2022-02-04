@@ -13,6 +13,7 @@ use App\Models\VisitorGroup;
 use App\Models\VisitorPass;
 use App\Models\VisitorPassGroup;
 use App\Repositories\VisitorPassRepository;
+use App\Services\DatatableService;
 use App\Services\UtilityService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -49,9 +50,67 @@ class VisitorPassAPIController extends AppBaseController
         $search = $request->get('search');
         $estate_id = $request->get('estate_id');
         $visitorPasses = $this->visitorPassRepository->paginateViewBasedOnRole('20', ['*'], $search, $estate_id);
-
-
         return $this->sendResponse(VisitorPassResource::collection($visitorPasses)->response()->getData(true), 'Visitor Passes retrieved successfully');
+    }
+
+    public function indexDataTable(Request $request, DatatableService $datatableService)
+    {
+        $date_from = $request->query('date_from') != "null" && $request->query('date_from') != "" ? $request->query('date_from') : null;
+        $date_to = $request->query('date_to') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
+        $street = $request->query('guest_name') != "null" && $request->query('guest_name') != "" ? $request->query('date_from') : null;
+        $status = $request->query('status') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
+
+        $search = [];
+        $processedRequest = $datatableService->processRequest($request);
+        $search_request = $processedRequest['search'];
+
+        $search = $this->visitorPassRepository->getDataTableSearchParams($processedRequest, $search_request);
+
+        $builder = $this->visitorPassRepository->builderBasedOnRole('visitor_passes.estate_id', $request->get('estate_id'))
+            ->join('users', 'users.id', 'visitor_passes.user_id')
+            ->join('estates', 'estates.id', 'visitor_passes.estate_id')
+            ->select('visitor_passes.*',
+                'estates.name AS estates__dot__name',
+                'users.surname AS users__dot__surname',
+                'users.othernames AS users__dot__othernames',
+                'users.phone AS users__dot__phone',
+                'users.email AS users__dot__email',)
+            ->when($search_request != null, function ($query) use($search_request, $search){
+                $query->where(function($query) use($search_request, $search){
+                    foreach($search as $key => $value) {
+                        if (in_array($key, $this->visitorPassRepository->getFieldsSearchable())) {
+                            $query->orWhere($key, 'LIKE', '%'.$value.'%');
+                        }
+                    }
+                });
+            })
+            ->when(!is_null($date_from) && !is_null($date_to), function ($query) use($date_from, $date_to){
+                $from = Carbon::parse($date_from)->startOfDay()->format("Y-m-d H:i:s");
+                $to = Carbon::parse($date_to)->endOfDay()->format("Y-m-d H:i:s");
+                $query->whereBetween("visitor_passes.created_at", [$from, $to]);
+            })
+            ->when(!is_null($status), function ($query) use($status){
+                $query->whereBetween("visitorPasss.isActive", $status);
+            });
+
+        $columns = $this->visitorPassRepository->getTableColumns();
+        array_push($columns, "users.surname", "users.othernames", "users.phone", "users.email");
+
+        return $datatableService->dataTable2($request, $builder, [
+            '*',
+            'name' => function (VisitorPass $visitorPass) {
+                return $visitorPass->users__dot__surname ." ".$visitorPass->users__dot__othernames;
+            },
+            'status' => function (VisitorPass $visitorPass) {
+                return "<span class='badge badge-success'>.$visitorPass->isActive.</span>";
+            },
+            'action' => function (VisitorPass $visitorPass) {
+
+                return "
+                <div class='datatable-actions'> <div class='text-center'> <div class='dropdown'> <button class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> Actions </button> <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'> <button class='dropdown-item'   id='details__$visitorPass->id' type='button'> Details</button> <button id='edit__$visitorPass->id' class='dropdown-item' type='button'> Edit </button> </div> </div> </div> </div>
+                ";
+            }
+        ], $columns);
     }
 
     /**
