@@ -264,24 +264,41 @@ class VisitorPassAPIController extends AppBaseController
 
     public function passAuthentication(Request $request)
     {
+        $array = [
+            "url" => \request()->fullUrl(),
+            "sent_requests" => $request->all()
+        ];
+        file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication request: @ ' .date("Y-m-d H:i:s") .' '. print_r($array, true) . "\n\n", FILE_APPEND);
         $invitation_code = $request->get('invitation_code');
         $active = $request->get('status');
-        if ($invitation_code == null || $active == null) return $this->sendError("invalid URL");
+        if ($invitation_code == null || $active == null) {
+            file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication response: @ ' .date("Y-m-d H:i:s") .' '. print_r("invalid URL") . "\n\n", FILE_APPEND);
+            return $this->sendError("invalid URL");
+        }
 
         $visitorPass = VisitorPass::query()
             ->where('generatedCode', $request->invitation_code)
             ->first();
 
-        if (!$visitorPass) return $this->sendError("Pass is invalid.");
+        if (!$visitorPass) {
+        file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication response: @ ' .date("Y-m-d H:i:s") .' '. print_r("Pass is invalid.") . "\n\n", FILE_APPEND);
+        return $this->sendError("Pass is invalid.");
+        }
         if ($visitorPass->pass_type == "group") {
             $visitorPassGroup = VisitorPassGroup::query()->where('visitor_pass_id', $visitorPass->id)->first();
-            if ($visitorPassGroup->isApproved != true && $active != "close") return $this->sendError("This group Pass has not been approved");
+            if ($visitorPassGroup->isApproved != true && $active != "close") {
+                file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication response: @ ' .date("Y-m-d H:i:s") .' '. print_r("This group Pass has not been approved") . "\n\n", FILE_APPEND);
+                return $this->sendError("This group Pass has not been approved");
+            }
         }
 
         switch ($active)
         {
             case "active":
-                if ($visitorPass->status == "closed" && $visitorPass->pass_type == "individual") return $this->sendError("This pass code is used.");
+                if ($visitorPass->status == "closed" && $visitorPass->pass_type == "individual") {
+                    file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication response: @ ' .date("Y-m-d H:i:s") .' '. print_r("This group Pass has not been approved") . "\n\n", FILE_APPEND);
+                    return $this->sendError("This pass code is used.");
+                }
                 $message = "Your guest ". $visitorPass->guestname ." has arrived.";
                 if ($visitorPass->status == "active" && $visitorPass->pass_type == "individual") return $this->sendError("This Pass code is already in use.");
 
@@ -289,7 +306,10 @@ class VisitorPassAPIController extends AppBaseController
                 if ($visitorPass->pass_type == "group")
                 {
                     if ($visitorPassGroup->expected_number_of_guests == $visitorPassGroup->number_of_guests_in)
-                        return $this->sendError("This group pass has reached its limit");
+                        {
+                            file_put_contents('pass_authentication' . date('Y-m-d') . '.txt', 'Pass Authentication response: @ ' . date("Y-m-d H:i:s") . ' ' . print_r("This group pass has reached its limit", 1) . "\n\n", FILE_APPEND);
+                            return $this->sendError("This group pass has reached its limit");
+                        }
                     $visitorPassGroup->number_of_guests_in  += 1;
                     $visitorPassGroup->save();
                     $message = "Your guest has arrived";
@@ -385,4 +405,5 @@ class VisitorPassAPIController extends AppBaseController
         return $this->sendResponse($visitorPass, "Pass successfully {$request->authorization}");
 
     }
+
 }
