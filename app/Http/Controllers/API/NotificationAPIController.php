@@ -91,7 +91,7 @@ class NotificationAPIController extends AppBaseController
         return $datatableService->dataTable2($request, $builder, [
             '*',
             'file_path' => function(Notification $notification){
-                return $notification->file ? Storage::url('notificationImages/' .$notification->file) : null;
+                return $notification->file ? "<a href='Storage::url('notificationImages/' .$notification->file)' target='_blank'><i class='icon-attachment red'></i></a>" : null;
             },
             'created_by_user' => function (Notification $notification){
                 return $notification->createdBy->surname." ".$notification->createdBy->othernames;
@@ -114,8 +114,32 @@ class NotificationAPIController extends AppBaseController
             'action' => function (Notification $notification) {
 
                 return "
-                <div class='datatable-actions'> <div class='text-center'> <div class='dropdown'> <button class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> Actions </button> <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'> <button class='dropdown-item'   id='details__$notification->id' type='button'> Details</button> <button id='edit__$notification->id' class='dropdown-item' type='button'> Edit </button> </div> </div> </div> </div>
-                ";
+                 <div class='datatable-actions'>
+                    <div class='text-center'>
+                        <div class='dropdown'>
+                            <button  class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton'
+                            data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                                Actions
+                            </button>
+                            <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                                <button class='dropdown-item' (click)='getComplaint(message.id, 'viewMessage')'
+                                id='viewmessage__$notification->id' type='button' >
+                                    View Message
+                                </button>
+                                <button [hidden]='roleId == 3' (click)='getComplaint(message.id, 'createMessage')'
+                                class='dropdown-item' id='update__$notification->id' type='button'>
+                                    Update Message
+                                </button>
+                                <button [hidden]='roleId == 3' (click)='selectComplaint(message.id, message.name)'
+                                class='dropdown-item'  data-toggle='modal' data-target='#deleteMessage'
+                                id='delete__$notification->id' type='button'>
+                                    Delete Message
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+           ";
             }
         ], $columns);
     }

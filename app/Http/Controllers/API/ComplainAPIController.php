@@ -98,11 +98,33 @@ class ComplainAPIController extends AppBaseController
 
         $columns = $this->complainRepository->getTableColumns();
         array_push($columns, "users.surname", "users.othernames", "users.phone", "users.email");
+/*
+ *
 
+Action: <div class="datatable-actions"> <div class="text-center"> <div class="dropdown"> <button  class="btn btn-primary dropdown-toggle button" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> Actions </button> <div class="dropdown-menu" aria-labelledby="dropdownMenuButton"> <button [hidden]="roleId != 3" (click)="getComplaint(data.id)" data-toggle="modal" data-target="#editComplaint"  id="view__ {{complain_id}}" type="button" > View</button> <button class="dropdown-item" id="update__ {{complain_id}}" type="button"> Update </button> <button  class="dropdown-item" (click)="getComplaint(data.id)" data-toggle="modal" 	data-target="#deleteComplaint" id="delete__ {{complain_id}}" type="button"> Delete </button> </div> </div> </div> </div>
+
+ */
         return $datatableService->dataTable2($request, $builder, [
             '*',
             "user" => function(Complain $complain){
             return $complain->user()->exists() ? $complain->user->surname." ".$complain->user->othernames : null;
+            },
+            "priority" => function(Complain $complain)
+            {
+                if ($complain->priority == "high")   $priority = "<span class='badge badge-danger' >{{}}</span>";
+                if ($complain->priority == "medium")   $priority = "<span class='badge badge-warning' >{{}}</span>";
+                if ($complain->priority == "low")   $priority = "<span class='badge badge-success' >{{}}</span>";
+
+                return $priority;
+            },
+            "status" => function(Complain $complain)
+            {
+
+                if ($complain->status == "open")   $status = "<span class='badge badge-info'> Open </span>";
+                if ($complain->status == "active")   $status = "<span class='badge badge-success'> Active </span>";
+                if ($complain->status == "closed")   $status = "<span class='badge badge-danger'> Closed </span>";
+
+                return$status;
             },
             "file_url" => function(Complain $complain){
                 return $complain->file != null ? Storage::url('complainImages/' .$complain->file) : null;
@@ -113,8 +135,30 @@ class ComplainAPIController extends AppBaseController
             'action' => function (Complain $complain) {
 
                 return "
-                <div class='datatable-actions'> <div class='text-center'> <div class='dropdown'> <button class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> Actions </button> <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'> <button class='dropdown-item'   id='details__$complain->id' type='button'> Details</button> <button id='edit__$complain->id' class='dropdown-item' type='button'> Edit </button> </div> </div> </div> </div>
-                ";
+               <div class='datatable-actions'>
+    <div class='text-center'>
+        <div class='dropdown'>
+            <button  class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton'
+            data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                Actions
+            </button>
+            <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                <button [hidden]='roleId != 3' (click)='getComplaint(data.id)' data-toggle='modal'
+                data-target='#editComplaint'  id='view__$complain->id' type='button' >
+                    View
+                </button>
+                <button class='dropdown-item' id='update__$complain->id' type='button'>
+                    Update
+                </button>
+                <button  class='dropdown-item' (click)='getComplaint(data.id)' data-toggle='modal'
+                data-target='#deleteComplaint' id='delete__$complain->id' type='button'>
+                    Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+ ";
             }
         ], $columns);
     }

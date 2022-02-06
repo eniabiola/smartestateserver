@@ -123,10 +123,31 @@ class UserAPIController extends AppBaseController
 
         return $datatableService->dataTable2($request, $builder, [
             '*',
+            'role' => function (User $user)
+            {
+                if ($user->roles[0]->name == "superadministrator") return  "<span class='badge badge-pill badge-danger'>$user->roles[0]->name</span>";
+                if ($user->roles[0]->name == "administrator") return  "<span class='badge badge-pill primary'>$user->roles[0]->name</span>";
+                if ($user->roles[0]->name == "superadministrator") return  "<span class='badge badge-pill success'>$user->roles[0]->name</span>";
+                if ($user->roles[0]->name == "resident" ||$user->roles[0]->name == "security" ) return  "<span class='badge badge-pill primary'>$user->roles[0]->name</span>";
+            },
             'action' => function (User $user) {
-
                 return "
-                <div class='datatable-actions'> <div class='text-center'> <div class='dropdown'> <button class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> Actions </button> <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'> <button class='dropdown-item'   id='details__$user->id' type='button'> Details</button> <button id='edit__$user->id' class='dropdown-item' type='button'> Edit </button> </div> </div> </div> </div>
+                <div class='datatable-actions'>
+                    <div class='text-center'>
+                        <div class='dropdown'>
+                            <button  class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton'
+                             data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                                Actions
+                            </button>
+                            <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                                <button (click)='getUser(user.id)' class='edit-card dropdown-item' data-toggle='modal'
+                                    data-target='#editContact id='update__$user->id' type='button'>
+                                        Update User
+                                    </button>
+                            </div>
+                        </div>
+                    </div>
+                </div
                 ";
             }
         ], $columns);
