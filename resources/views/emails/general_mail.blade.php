@@ -3,7 +3,7 @@ Dear {{ $maildata['name'] }}
 
 {{$maildata['message']}}
 
-@if($maildata['url'])
+@if(\Illuminate\Support\Arr::exists('url', $maildata))
     @component('mail::button', ['url' => $maildata["url"]])
     {{$maildata["button_text"]}}
     @endcomponent

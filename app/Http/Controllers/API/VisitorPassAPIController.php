@@ -266,6 +266,7 @@ class VisitorPassAPIController extends AppBaseController
     {
         $array = [
             "url" => \request()->fullUrl(),
+            "ip" => \request()->ip(),
             "sent_requests" => $request->all()
         ];
         file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication request: @ ' .date("Y-m-d H:i:s") .' '. print_r($array, true) . "\n\n", FILE_APPEND);
@@ -299,10 +300,21 @@ class VisitorPassAPIController extends AppBaseController
                     file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication response: @ ' .date("Y-m-d H:i:s") .' '. print_r("This group Pass has not been approved") . "\n\n", FILE_APPEND);
                     return $this->sendError("This pass code is used.");
                 }
-                $message = "Your guest ". $visitorPass->guestname ." has arrived.";
-                if ($visitorPass->status == "active" && $visitorPass->pass_type == "individual") return $this->sendError("This Pass code is already in use.");
 
-                if (strtotime(date("Y-m-d", strtotime($visitorPass->visitationDate))) != strtotime(date("Y-m-d"))) return $this->sendError("This Pass code is not scheduled for today.");
+                $now = Carbon::now()->timezone('Africa/Lagos')->format("Y-m-d H:i:s");
+                $entry_date = $visitorPass->visitationDate;
+                $entry_date_formatted =  Carbon::parse($entry_date)->format("Y-m-d H:i:s");
+                $exit_date = Carbon::parse($entry_date)->addHour($visitorPass->duration)->format("Y-m-d H:i:s");
+
+                $message = "Your guest ". $visitorPass->guestname ." has arrived.";
+                if ($visitorPass->status == "active" && $visitorPass->pass_type == "individual") {
+                    file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication response: @ ' .date("Y-m-d H:i:s") .' '. print_r("This Pass code is already in use.") . "\n\n", FILE_APPEND);
+                    return $this->sendError("This Pass code is already in use.");
+                }
+                if (($now >= $entry_date_formatted) && ($exit_date > $now)) {
+                    file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication response: @ ' .date("Y-m-d H:i:s") .' '. print_r("This Pass code is not scheduled for today.") . "\n\n", FILE_APPEND);
+                    return $this->sendError("This Pass code is not scheduled for today.");
+                }
                 if ($visitorPass->pass_type == "group")
                 {
                     if ($visitorPassGroup->expected_number_of_guests == $visitorPassGroup->number_of_guests_in)
@@ -314,23 +326,27 @@ class VisitorPassAPIController extends AppBaseController
                     $visitorPassGroup->save();
                     $message = "Your guest has arrived";
                 }
-                if ($visitorPass->pass_type == "individual" && $visitorPass->status == "active")
+                if ($visitorPass->pass_type == "individual" && $visitorPass->status == "active") {
+                    file_put_contents('pass_authentication' . date('Y-m-d') . '.txt', 'Pass Authentication response: @ ' . date("Y-m-d H:i:s") . ' ' . print_r("The visitor pass is already in use", 1) . "\n\n", FILE_APPEND);
                     return $this->sendError("The visitor pass is already in use");
+                }
                 $visitorPass->checked_in_time = date('Y-m-d h:i:s');
                 break;
             case "cancelled":
-                if ($visitorPass->status != "inactive")
-                    return $this->sendError("You cannot cancel a pass in use or used..");
+                if ($visitorPass->status != "inactive") {
+                    file_put_contents('pass_authentication' . date('Y-m-d') . '.txt', 'Pass Authentication response: @ ' . date("Y-m-d H:i:s") . ' ' . print_r("You cannot cancel a pass in use or used.", 1) . "\n\n", FILE_APPEND);
+                    return $this->sendError("You cannot cancel a pass in use or used.");
+                }
                 break;
             case "closed":
                 if ($visitorPass->status == "closed" && $visitorPass->pass_type == "individual") return $this->sendError("This pass code is used.");
                 $message = "Your guest ". $visitorPass->guestname ." has departed";
-/*                if ($visitorPass->status != "active")
-                    return $this->sendError("This pass has not been used.");*/
                 if ($visitorPass->pass_type == "group")
                 {
-                    if ($visitorPassGroup->expected_number_of_guests == $visitorPassGroup->number_of_guests_out)
+                    if ($visitorPassGroup->expected_number_of_guests == $visitorPassGroup->number_of_guests_out) {
+                        file_put_contents('pass_authentication' . date('Y-m-d') . '.txt', 'Pass Authentication response: @ ' . date("Y-m-d H:i:s") . ' ' . print_r("All guests who entered with this pass code are out", 1) . "\n\n", FILE_APPEND);
                         return $this->sendError("All guests who entered with this pass code are out", 400);
+                    }
                     $visitorPassGroup->number_of_guests_out  += 1;
                     $visitorPassGroup->save();
 
@@ -359,7 +375,6 @@ class VisitorPassAPIController extends AppBaseController
 
         if (($active == "active" || $active == "inactive") && $visitorPass->pass_type == "individual")
         {
-
             $user = $visitorPass->user->surname." ".$visitorPass->user->surname;
             $maildata = [
                 "message" => $message,
@@ -368,6 +383,7 @@ class VisitorPassAPIController extends AppBaseController
             $email = new sendVisitorPassMail($maildata);
             Mail::to($visitorPass->user->email)->send($email);
         }
+
         return $this->sendResponse($visitor_pass, "The pass code is valid");
     }
 
@@ -401,7 +417,7 @@ class VisitorPassAPIController extends AppBaseController
         ];
         $email = new GeneralMail($details);
         Mail::to($details['email'])->queue($email);
-
+        file_put_contents('pass_authentication' . date('Y-m-d') . '.txt', 'Pass Authentication response: @ ' . date("Y-m-d H:i:s") . ' ' . print_r($details, 1) . "\n\n", FILE_APPEND);
         return $this->sendResponse($visitorPass, "Pass successfully {$request->authorization}");
 
     }
