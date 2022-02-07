@@ -136,31 +136,31 @@ Action: <div class="datatable-actions"> <div class="text-center"> <div class="dr
                 return $complain->complainCategory->name ?? null;
             },
             'action' => function (Complain $complain) {
-
+                $role_id = auth()->user()->roles[0]->id;
                 return "
-               <div class='datatable-actions'>
-    <div class='text-center'>
-        <div class='dropdown'>
-            <button  class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton'
-            data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-                Actions
-            </button>
-            <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                <button [hidden]='roleId != 3' (click)='getComplaint(data.id)' data-toggle='modal'
-                data-target='#editComplaint'  id='view__$complain->id' type='button' >
-                    View
-                </button>
-                <button class='dropdown-item' id='update__$complain->id' type='button'>
-                    Update
-                </button>
-                <button  class='dropdown-item' (click)='getComplaint(data.id)' data-toggle='modal'
-                data-target='#deleteComplaint' id='delete__$complain->id' type='button'>
-                    Delete
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+                          <div class='datatable-actions'>
+                            <div class='text-center'>
+                                <div class='dropdown'>
+                                    <button  class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton'
+                                     data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                                        Actions
+                                    </button>
+                                    <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                                        <button hidden=". $role_id != 3 ? true : false  ."class='dropdown-item'  id='view__".$complain->id."'
+                                        type='button' >
+                                            View
+                                        </button>
+                                        <button class='dropdown-item' id='update__".$complain->id."' type='button'>
+                                            Update
+                                        </button>
+                                        <button  class='dropdown-item' (click)='getComplaint(data.id)' data-toggle='modal'
+                                            data-target='#deleteComplaint' id='delete__".$complain->id."' type='button'>
+                                            Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
  ";
             }
         ], $columns);
