@@ -125,10 +125,14 @@ class UserAPIController extends AppBaseController
             '*',
             'role' => function (User $user)
             {
-                if ($user->roles[0]->name == "superadministrator") return  "<span class='badge badge-pill badge-danger'>$user->roles[0]->name</span>";
-                if ($user->roles[0]->name == "administrator") return  "<span class='badge badge-pill primary'>$user->roles[0]->name</span>";
-                if ($user->roles[0]->name == "superadministrator") return  "<span class='badge badge-pill success'>$user->roles[0]->name</span>";
-                if ($user->roles[0]->name == "resident" ||$user->roles[0]->name == "security" ) return  "<span class='badge badge-pill primary'>$user->roles[0]->name</span>";
+//                return $user->roles[0]->name;
+                if ($user->roles[0]->name == "superadministrator") return  "<span class='badge badge-pill badge-danger'>".$user->roles[0]->name."</span>";
+                if ($user->roles[0]->name == "administrator") return  "<span class='badge badge-pill primary'>".$user->roles[0]->name."</span>";
+                if ($user->roles[0]->name == "superadministrator") return  "<span class='badge badge-pill success'>".$user->roles[0]->name."</span>";
+                if ($user->roles[0]->name == "resident" ||$user->roles[0]->name == "security" ) return  "<span class='badge badge-pill primary'>".$user->roles[0]->name."</span>";
+            },
+            'name' => function(User $user){
+                return $user->surname. " ".$user->othernames;
             },
             'action' => function (User $user) {
                 return "

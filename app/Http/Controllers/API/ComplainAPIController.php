@@ -131,6 +131,10 @@ Action: <div class="datatable-actions"> <div class="text-center"> <div class="dr
             "date_created" => function(Complain $complain){
                 return date('d/m/y H:i:s', strtotime($complain->created_at));
             },
+            "complain_category" => function(Complain $complain)
+            {
+                return $complain->complainCategory->name ?? null;
+            },
             'action' => function (Complain $complain) {
 
                 return "

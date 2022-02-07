@@ -55,6 +55,7 @@ class VisitorPassAPIController extends AppBaseController
 
     public function indexDataTable(Request $request, DatatableService $datatableService)
     {
+        $role_id = auth()->user()->roles[0]->id;
         $date_from = $request->query('date_from') != "null" && $request->query('date_from') != "" ? $request->query('date_from') : null;
         $date_to = $request->query('date_to') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
         $street = $request->query('guest_name') != "null" && $request->query('guest_name') != "" ? $request->query('date_from') : null;
@@ -104,10 +105,36 @@ class VisitorPassAPIController extends AppBaseController
             'status' => function (VisitorPass $visitorPass) {
                 return "<span class='badge badge-success'>.$visitorPass->isActive.</span>";
             },
-            'action' => function (VisitorPass $visitorPass) {
-
+            'action' => function (VisitorPass $visitorPass) use($role_id) {
+                $button = null;
+                if ($visitorPass->status == "open" && $role_id == 4)
+                {
+                    $button = "<button class='dropdown-item' id='checkout__$visitorPass->id' type='button'> Check out</button>
+                    <button class='dropdown-item' id='checkin__$visitorPass->id' type='button'> Check in</button>";
+                }
                 return "
-                <div class='datatable-actions'> <div class='text-center'> <div class='dropdown'> <button class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> Actions </button> <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'> <button class='dropdown-item'   id='details__$visitorPass->id' type='button'> Details</button> <button id='edit__$visitorPass->id' class='dropdown-item' type='button'> Edit </button> </div> </div> </div> </div>
+                <div class='datatable-actions'>
+                    <div class='text-center'>
+                        <div class='dropdown'>
+                            <button  class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton'
+                            data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                                Actions
+                            </button>
+                            <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+                                <button class='edit-card dropdown-item'id='viewpass__".$visitorPass->id."' type='button'>
+                                    View pass
+                                </button>
+                                $button
+                                <button class='dropdown-item'  id='shareviamessage__$visitorPass->id' type='button'>
+                                    Share via message
+                                </button>
+                                <button class='dropdown-item'  id='shareviawhatsapp__$visitorPass->id' type='button'>
+                                    Share via whatsapp
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 ";
             }
         ], $columns);
