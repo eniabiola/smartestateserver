@@ -17,19 +17,12 @@ class VisitorPassRepository extends BaseRepository
      * @var array
      */
     protected $fieldSearchable = [
-        'estate_id',
-        'generatedCode',
-        'guestName',
-        'status',
-        'user_id',
-        'visitationDate',
-        'generatedDate',
-        'dateExpires',
-        'duration',
-        'expected_number_guests',
-        'number_of_guests_in',
-        'number_of_guests_out',
-        'isActive'
+        'visitor_passes.estate_id',
+        'visitor_passes.generatedCode',
+        'visitor_passes.guestName',
+        'visitor_passes.visitationDate',
+        'visitor_passes.generatedDate',
+        'visitor_passes.duration',
     ];
 
     /**

@@ -107,7 +107,6 @@ class DatatableService
         $posted_data_raw = $request->getContent();
 
         parse_str($posted_data_raw, $posted_data);
-
         $columntoOrderBy = $posted_data['order'][0]['column'];
         $orderByValue = $posted_data['order'][0]['dir'];
         if ($columntoOrderBy != 0)
@@ -135,9 +134,6 @@ class DatatableService
         //get the right query
 
         $countProducts = $builder->count();
-        if ($length == -1)
-        {
-
             $data = $builder
                 ->orderBy($columntoOrderBy, $orderByValue)
                 ->when($length != -1, function($query) use($start, $length){
@@ -145,12 +141,7 @@ class DatatableService
                          ->limit($length);
                 })
                 ->get();
-        }
-        $data = $builder
-                ->orderBy($columntoOrderBy, $orderByValue)
-                ->offset($start)
-                ->limit($length)
-                ->get();
+        
 //                ->toSql();
         $data2return = [];
         $serial_no = $start;

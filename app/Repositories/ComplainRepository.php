@@ -17,15 +17,16 @@ class ComplainRepository extends BaseRepository
      * @var array
      */
     protected $fieldSearchable = [
-        'complain_category_id',
-        'user_id',
-        'estate_id',
-        'ticket_no',
-        'subject',
-        'priority',
-        'file',
-        'description',
-        'status'
+        'complains.complain_category_id',
+        'users.surname',
+        'users.othernames',
+        'estates.name',
+        'complains.ticket_no',
+        'complains.subject',
+        'complains.priority',
+        'complains.file',
+        'complains.description',
+        'complains.status'
     ];
 
     /**
