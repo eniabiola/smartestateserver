@@ -123,6 +123,9 @@ class UserAPIController extends AppBaseController
 
         return $datatableService->dataTable2($request, $builder, [
             '*',
+            'role_id' => function (User $user) {
+                return $user->roles[0]->id;
+            },
             'role' => function (User $user)
             {
 //                return $user->roles[0]->name;

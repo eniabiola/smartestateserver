@@ -104,7 +104,7 @@ class Estate extends Model
      */
     public static $rules = [
         'city_id' => 'required|integer|exists:cities,id',
-        'mail_slug' => 'required|string|max:15',
+        'mail_slug' => 'required|string|max:5',
         'state_id' => 'required|integer|exists:states,id',
         'bank_id' => 'required|integer|exists:banks,id',
         'email' => 'required|string|max:100',

@@ -111,14 +111,12 @@ Action: <div class="datatable-actions"> <div class="text-center"> <div class="dr
             },
             "priority" => function(Complain $complain)
             {
-                if ($complain->priority == strtolower("high"))   return "<span class='badge badge-danger' >{{}}</span>";
-                if ($complain->priority == strtolower("medium"))   return "<span class='badge badge-warning' >{{}}</span>";
-                if ($complain->priority == strtolower("low"))   return "<span class='badge badge-success' >{{}}</span>";
-
+                if ($complain->priority == strtolower("high"))   return "<span class='badge badge-danger' >$complain->priority</span>";
+                if ($complain->priority == strtolower("medium"))   return "<span class='badge badge-warning' >$complain->priority</span>";
+                if ($complain->priority == strtolower("low"))   return "<span class='badge badge-success' >$complain->priority</span>";
             },
             "status" => function(Complain $complain)
             {
-
                 if ($complain->status == strtolower("open"))   $status = "<span class='badge badge-info'> Open </span>";
                 if ($complain->status == strtolower("active"))   $status = "<span class='badge badge-success'> Active </span>";
                 if ($complain->status == strtolower("closed"))   $status = "<span class='badge badge-danger'> Closed </span>";
