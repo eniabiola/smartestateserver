@@ -103,7 +103,12 @@ class VisitorPassAPIController extends AppBaseController
                 return $visitorPass->users__dot__surname ." ".$visitorPass->users__dot__othernames;
             },
             'status' => function (VisitorPass $visitorPass) {
-                return "<span class='badge badge-success'>.$visitorPass->isActive.</span>";
+                if($visitorPass->status == null || $visitorPass->status == strtolower("inactive")) return "<span class='badge badge-pill badge-info'>Open</span> ";
+if($visitorPass->status == strtolower("active")) return "<span class='badge badge-pill badge-success'>Checked In</span>";
+if($visitorPass->status == strtolower("approved")) return "<span class='badge badge-pill badge-success'>Approved</span>";
+if($visitorPass->status == strtolower("close") || $visitorPass->status == "closed") return "<span class='badge badge-pill badge-dark'>Close</span>";
+if($visitorPass->status == strtolower("rejected")) return "<span class='badge badge-pill badge-danger'>Rejected</span>";
+if($visitorPass->status == strtolower("expired")) return "<span class='badge badge-pill badge-danger'>Expired</span>";
             },
             'action' => function (VisitorPass $visitorPass) use($role_id) {
                 $button = null;

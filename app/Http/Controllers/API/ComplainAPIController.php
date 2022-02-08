@@ -137,8 +137,8 @@ Action: <div class="datatable-actions"> <div class="text-center"> <div class="dr
             },
             'action' => function (Complain $complain) {
                 $role_id = auth()->user()->roles[0]->id;
-                return "
-                          <div class='datatable-actions'>
+                $role = $role_id != 3 ? "true" : "false";
+                return "  <div class='datatable-actions'>
                             <div class='text-center'>
                                 <div class='dropdown'>
                                     <button  class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton'
@@ -146,7 +146,7 @@ Action: <div class="datatable-actions"> <div class="text-center"> <div class="dr
                                         Actions
                                     </button>
                                     <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                                        <button hidden=". $role_id != 3 ? true : false  ."class='dropdown-item'  id='view__".$complain->id."'
+                                        <button hidden=". $role ."class='dropdown-item'  id='view__".$complain->id."'
                                         type='button' >
                                             View
                                         </button>

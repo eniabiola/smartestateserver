@@ -139,19 +139,19 @@ class UserAPIController extends AppBaseController
                 <div class='datatable-actions'>
                     <div class='text-center'>
                         <div class='dropdown'>
-                            <button  class='btn btn-primary dropdown-toggle button' type='button' id='dropdownMenuButton'
-                             data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+                            <button  class='btn btn-primary dropdown-toggle button' type='button'
+                            id='dropdownMenuButton' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
                                 Actions
                             </button>
                             <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                                <button (click)='getUser(user.id)' class='edit-card dropdown-item' data-toggle='modal'
-                                    data-target='#editContact id='update__$user->id' type='button'>
-                                        Update User
-                                    </button>
+                                <button class='edit-card dropdown-item' id='update__$user->id' type='button'>
+                                    Update User
+                                </button>
                             </div>
                         </div>
                     </div>
-                </div
+                </div>
+
                 ";
             }
         ], $columns);
