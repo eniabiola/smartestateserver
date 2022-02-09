@@ -87,8 +87,8 @@ class ResidentAPIController extends AppBaseController
     {
         $date_from = $request->query('date_from') != "null" && $request->query('date_from') != "" ? $request->query('date_from') : null;
         $date_to = $request->query('date_to') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
-        $street = $request->query('street') != "null" && $request->query('date_from') != "" ? $request->query('date_from') : null;
-        $status = $request->query('status') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
+        $street = $request->query('street') != "null" && $request->query('street') != "" ? $request->query('street') : null;
+        $status = $request->query('status') != "null" && $request->query('status') != "" ? $request->query('status') : null;
 
         if (Auth::user()->hasrole('superadministrator'))
         {
@@ -134,8 +134,9 @@ class ResidentAPIController extends AppBaseController
                 $query->where("residents.street_id", $street);
             })
             ->when(!is_null($status), function ($query) use($status){
-                $query->whereBetween("residents.isActive", $status);
+                $query->where("users.isActive", $status);
             });
+            \Log::debug($status);
 
         $columns = $this->residentRepository->getTableColumns();
         array_push($columns, "users.surname", "users.othernames", "users.phone", "users.gender", "users.email");
