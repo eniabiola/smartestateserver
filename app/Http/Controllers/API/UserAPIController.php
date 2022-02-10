@@ -66,8 +66,8 @@ class UserAPIController extends AppBaseController
             ->where('roles.name', '!=', 'resident')
             ->where('users.estate_id', $estate_id)
             ->select('users.*');
-        $users = $this->userRepository->searchFields($users, $request->search);
-//        return $this->sendResponse(UserResource::collection($users->paginate(20))->response()->getData(true), 'Users retrieved successfully');
+        // $users = $this->userRepository->searchFields($users, $request->search);
+        return $this->sendResponse(UserResource::collection($users->paginate(20))->response()->getData(true), 'Users retrieved successfully');
 
         return $this->sendResponse(UserResource::collection($users->get()), 'Users retrieved successfully');
     }
@@ -99,7 +99,7 @@ class UserAPIController extends AppBaseController
             ->join('roles', 'roles.id', 'model_has_roles.role_id')
             ->select('users.*',
                 'estates.name AS estates__dot__name',
-                'roles.name AS roles__dot__name',)
+                'roles.name AS roles__dot__name')
             ->when($search_request != null, function ($query) use($search_request, $search){
                 $query->where(function($query) use($search_request, $search){
                     foreach($search as $key => $value) {
