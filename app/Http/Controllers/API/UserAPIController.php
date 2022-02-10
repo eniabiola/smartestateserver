@@ -78,7 +78,6 @@ class UserAPIController extends AppBaseController
         $date_from = $request->query('date_from') != "null" && $request->query('date_from') != "" ? $request->query('date_from') : null;
         $date_to = $request->query('date_to') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
         $street = $request->query('guest_name') != "null" && $request->query('guest_name') != "" ? $request->query('date_from') : null;
-        $status = $request->query('status') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
 
         if (Auth::user()->hasrole('superadministrator'))
         {
@@ -95,6 +94,7 @@ class UserAPIController extends AppBaseController
 
         $builder = $this->userRepository->builderBasedOnRole('users.estate_id', $request->get('estate_id'))
             ->leftJoin('estates', 'estates.id', 'users.estate_id')
+            ->leftJoin('residents', 'residents.user_id', 'users.id')
             ->join('model_has_roles', 'model_has_roles.model_id', 'users.id')
             ->join('roles', 'roles.id', 'model_has_roles.role_id')
             ->select('users.*',
@@ -112,10 +112,10 @@ class UserAPIController extends AppBaseController
             ->when(!is_null($date_from) && !is_null($date_to), function ($query) use($date_from, $date_to){
                 $from = Carbon::parse($date_from)->startOfDay()->format("Y-m-d H:i:s");
                 $to = Carbon::parse($date_to)->endOfDay()->format("Y-m-d H:i:s");
-                $query->whereBetween("visitor_passes.created_at", [$from, $to]);
+                $query->whereBetween("users.created_at", [$from, $to]);
             })
-            ->when(!is_null($status), function ($query) use($status){
-                $query->whereBetween("visitorPasss.isActive", $status);
+            ->when(!is_null($street), function ($query) use($street){
+                $query->whereBetween("residents.street_id", $street);
             });
 
         $columns = $this->userRepository->getTableColumns();
