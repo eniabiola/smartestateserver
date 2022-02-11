@@ -136,7 +136,6 @@ class ResidentAPIController extends AppBaseController
             ->when(!is_null($status), function ($query) use($status){
                 $query->where("users.isActive", $status);
             });
-            \Log::debug($status);
 
         $columns = $this->residentRepository->getTableColumns();
         array_push($columns, "users.surname", "users.othernames", "users.phone", "users.gender", "users.email");

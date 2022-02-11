@@ -63,8 +63,7 @@ class ComplainAPIController extends AppBaseController
     {
         $date_from = $request->query('date_from') != "null" && $request->query('date_from') != "" ? $request->query('date_from') : null;
         $date_to = $request->query('date_to') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
-        $street = $request->query('guest_name') != "null" && $request->query('guest_name') != "" ? $request->query('date_from') : null;
-        $status = $request->query('status') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
+        $category = $request->query('category') != "null" && $request->query('category') != "" ? $request->query('category') : null;
 
         $search = [];
         $processedRequest = $datatableService->processRequest($request);
@@ -92,8 +91,8 @@ class ComplainAPIController extends AppBaseController
                 $to = Carbon::parse($date_to)->endOfDay()->format("Y-m-d H:i:s");
                 $query->whereBetween("visitor_passes.created_at", [$from, $to]);
             })
-            ->when(!is_null($status), function ($query) use($status){
-                $query->whereBetween("visitorPasss.isActive", $status);
+            ->when(!is_null($category), function ($query) use($category){
+                $query->whereBetween("complains.complain_category_id", $category);
             });
 
         $columns = $this->complainRepository->getTableColumns();

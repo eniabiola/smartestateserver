@@ -8,6 +8,7 @@ use App\Http\Resources\VisitorPassResource;
 use App\Mail\GeneralMail;
 use App\Mail\sendVisitorPassMail;
 use App\Models\Estate;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\VisitorGroup;
 use App\Models\VisitorPass;
@@ -46,7 +47,6 @@ class VisitorPassAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-
         $search = $request->get('search');
         $estate_id = $request->get('estate_id');
         $visitorPasses = $this->visitorPassRepository->paginateViewBasedOnRole('20', ['*'], $search, $estate_id);
@@ -104,11 +104,11 @@ class VisitorPassAPIController extends AppBaseController
             },
             'status' => function (VisitorPass $visitorPass) {
                 if($visitorPass->status == null || $visitorPass->status == strtolower("inactive")) return "<span class='badge badge-pill badge-info'>Open</span> ";
-if($visitorPass->status == strtolower("active")) return "<span class='badge badge-pill badge-success'>Checked In</span>";
-if($visitorPass->status == strtolower("approved")) return "<span class='badge badge-pill badge-success'>Approved</span>";
-if($visitorPass->status == strtolower("close") || $visitorPass->status == "closed") return "<span class='badge badge-pill badge-dark'>Close</span>";
-if($visitorPass->status == strtolower("rejected")) return "<span class='badge badge-pill badge-danger'>Rejected</span>";
-if($visitorPass->status == strtolower("expired")) return "<span class='badge badge-pill badge-danger'>Expired</span>";
+                    if($visitorPass->status == strtolower("active")) return "<span class='badge badge-pill badge-success'>Checked In</span>";
+                    if($visitorPass->status == strtolower("approved")) return "<span class='badge badge-pill badge-success'>Approved</span>";
+                    if($visitorPass->status == strtolower("close") || $visitorPass->status == "closed") return "<span class='badge badge-pill badge-dark'>Close</span>";
+                    if($visitorPass->status == strtolower("rejected")) return "<span class='badge badge-pill badge-danger'>Rejected</span>";
+                    if($visitorPass->status == strtolower("expired")) return "<span class='badge badge-pill badge-danger'>Expired</span>";
             },
             'action' => function (VisitorPass $visitorPass) use($role_id) {
                 $button = null;
@@ -161,6 +161,7 @@ if($visitorPass->status == strtolower("expired")) return "<span class='badge bad
 
         return $this->sendResponse(VisitorPassResource::collection($visitor_passes)->response()->getData(true), 'Invoices retrieved successfully');
     }
+
     /**
      * Store a newly created VisitorPass in storage.
      * POST /visitorPasses
@@ -171,6 +172,23 @@ if($visitorPass->status == strtolower("expired")) return "<span class='badge bad
      */
     public function store(CreateVisitorPassAPIRequest $request, UtilityService $utilityService)
     {
+        $visitor_pass_count = VisitorPass::query()
+            ->where('user_id', Auth::user()->id)
+            ->whereDate('created_at', Carbon::today())
+            ->count();
+
+        $settings = Setting::query()
+                ->where('name', 'pass_count')
+                ->where('estate_id', Auth::user()->estate_id)
+                ->first();
+        if ($settings){
+            if ($visitor_pass_count > intValue($settings->value))
+            {
+                return $this->sendError("You have exceeded your daily visitor pass quota");
+            }
+        }
+        echo "hello";
+        return;
         $code = mt_rand(100000, 999999);
         $generatedCode = str_shuffle($code);
         $date = date('Y-m-d H:i:s');

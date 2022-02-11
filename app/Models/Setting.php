@@ -19,11 +19,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Setting extends Model
 {
-    use SoftDeletes;
+//    use SoftDeletes;
 
 
     public $table = 'settings';
-    
+
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
