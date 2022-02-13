@@ -58,7 +58,8 @@ class VisitorPassAPIController extends AppBaseController
         $role_id = auth()->user()->roles[0]->id;
         $date_from = $request->query('date_from') != "null" && $request->query('date_from') != "" ? $request->query('date_from') : null;
         $date_to = $request->query('date_to') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
-        $street = $request->query('guest_name') != "null" && $request->query('guest_name') != "" ? $request->query('date_from') : null;
+        $guest_name = $request->query('guest_name') != "null" && $request->query('guest_name') != "" ? $request->query('guest_name') : null;
+        $generated_code = $request->query('pass_code') != "null" && $request->query('pass_code') != "" ? $request->query('pass_code') : null;
         $status = $request->query('status') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
 
         $search = [];
@@ -91,7 +92,13 @@ class VisitorPassAPIController extends AppBaseController
                 $query->whereBetween("visitor_passes.created_at", [$from, $to]);
             })
             ->when(!is_null($status), function ($query) use($status){
-                $query->whereBetween("visitorPasss.isActive", $status);
+                $query->where("visitor_passes.isActive", $status);
+            })
+            ->when(!is_null($guest_name), function ($query) use($guest_name){
+                $query->where("visitor_passes.guestName", $guest_name);
+            })
+            ->when(!is_null($generated_code), function ($query) use($generated_code){
+                $query->where("visitor_passes.generatedCode", $generated_code);
             });
 
         $columns = $this->visitorPassRepository->getTableColumns();
@@ -187,8 +194,6 @@ class VisitorPassAPIController extends AppBaseController
                 return $this->sendError("You have exceeded your daily visitor pass quota");
             }
         }
-        echo "hello";
-        return;
         $code = mt_rand(100000, 999999);
         $generatedCode = str_shuffle($code);
         $date = date('Y-m-d H:i:s');

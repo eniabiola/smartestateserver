@@ -64,8 +64,11 @@ class ComplainAPIController extends AppBaseController
         $date_from = $request->query('date_from') != "null" && $request->query('date_from') != "" ? $request->query('date_from') : null;
         $date_to = $request->query('date_to') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
         $category = $request->query('category') != "null" && $request->query('category') != "" ? $request->query('category') : null;
-
+        $priority = $request->query('priority') != "null" && $request->query('priority') != "" ? $request->query('priority') : null;
+        $status = $request->query('status') != "null" && $request->query('status') != "" ? $request->query('status') : null;
         $search = [];
+
+//        return $priority;
         $processedRequest = $datatableService->processRequest($request);
         $search_request = $processedRequest['search'];
 
@@ -92,7 +95,13 @@ class ComplainAPIController extends AppBaseController
                 $query->whereBetween("visitor_passes.created_at", [$from, $to]);
             })
             ->when(!is_null($category), function ($query) use($category){
-                $query->whereBetween("complains.complain_category_id", $category);
+                $query->where("complains.complain_category_id", $category);
+            })
+            ->when(!is_null($priority), function ($query) use($priority){
+                $query->where("complains.priority", ucfirst($priority));
+            })
+                ->when(!is_null($status), function ($query) use($status){
+                $query->where("complains.status", $status);
             });
 
         $columns = $this->complainRepository->getTableColumns();
