@@ -189,13 +189,16 @@ class VisitorPassAPIController extends AppBaseController
                 ->where('estate_id', Auth::user()->estate_id)
                 ->first();
         if ($settings){
-            if ($visitor_pass_count > intValue($settings->value))
+            if ($visitor_pass_count >= intval($settings->value))
             {
-                return $this->sendError("You have exceeded your daily visitor pass quota");
+                return $this->sendError("You have reached your daily visitor pass quota limit");
             }
+            $pass_remaining = intval($settings->value) - intval($visitor_pass_count);
         }
-        $code = mt_rand(100000, 999999);
-        $generatedCode = str_shuffle($code);
+
+
+        $generatedCode = random_int(100000, 999999);
+//        $generatedCode = str_shuffle($code);
         $date = date('Y-m-d H:i:s');
         $user = \request()->user();
         $request->merge(['generatedCode' => $generatedCode,'generatedDate' => $date, 'visitationDate' => $request->visitationDate]);
@@ -204,7 +207,7 @@ class VisitorPassAPIController extends AppBaseController
 
         $estate = Estate::find($user->estate_id);
         $input = $request->all();
-        $message = 'Visitor Pass saved successfully';
+        $message = 'Visitor Pass saved successfully and you have '. $pass_remaining .' visitor pass left for today';
 
         $visitorPass = $this->visitorPassRepository->create($input);
         if ($request->pass_type == "group"){
