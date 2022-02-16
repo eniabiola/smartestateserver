@@ -29,34 +29,6 @@ class FlutterwaveController extends AppBaseController
         //This generates a payment reference
         $reference = Flutterwave::generateReference();
 
-        // Enter the details of the payment
-        $data = [
-            'payment_options' => 'card,banktransfer',
-            'amount' => $request->amount,
-            'email' => request()->user()->email,
-            'tx_ref' => $reference,
-            'currency' => "NGN",
-            'redirect_url' => route('api.callback'),
-            'customer' => [
-                'email' => request()->user()->email,
-                "phone_number" => request()->user()->phone,
-                "name" => request()->user()->surname
-            ],
-
-            "customizations" => [
-                "title" => 'Wallet Funding',
-                "description" => date("Y-m-d H:i:s")
-            ]
-        ];
-
-        $payment = Flutterwave::initializePayment($data);
-
-
-        if ($payment['status'] !== 'success') {
-            \Log::debug(print_r($payment, true));
-            return $this->sendError("An error occurred", 400);
-        }
-
         $transaction = new Transaction();
         $transaction->user_id = Auth::id();
         $transaction->estate_id = Auth::user()->estate_id;
@@ -70,7 +42,7 @@ class FlutterwaveController extends AppBaseController
         $transaction->date_initiated = date("Y-m-d H:i:s");
         $transaction->save();
 
-            return $this->sendResponse($payment['data']['link'], "Redirect to Payment Link");
+            return $this->sendResponse($reference, "Payment Reference");
     }
 
 
