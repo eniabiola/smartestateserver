@@ -152,11 +152,11 @@ Action: <div class="datatable-actions"> <div class="text-center"> <div class="dr
                                         Actions
                                     </button>
                                     <div class='dropdown-menu' aria-labelledby='dropdownMenuButton'>
-                                        <button hidden=". $role ."class='dropdown-item'  id='view__".$complain->id."'
+                                        <button class='dropdown-item'  id='view__".$complain->id."'
                                         type='button' >
                                             View
                                         </button>
-                                        <button class='dropdown-item' id='update__".$complain->id."' type='button'>
+                                        <button hidden=". $role ." class='dropdown-item' id='update__".$complain->id."' type='button'>
                                             Update
                                         </button>
                                         <button  class='dropdown-item' (click)='getComplaint(data.id)' data-toggle='modal'
