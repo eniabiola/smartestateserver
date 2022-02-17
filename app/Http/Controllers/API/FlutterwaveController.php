@@ -52,7 +52,7 @@ class FlutterwaveController extends AppBaseController
      */
     public function callback(Request $request)
     {
-        $status = request()->status;
+        $status = $request->status;
         $reference = $request->tx_ref;
         $transactionID = $request->transaction_id;
         $transaction = Transaction::where('transaction_reference', $reference)->first();

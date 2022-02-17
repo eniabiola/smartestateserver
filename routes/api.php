@@ -74,7 +74,7 @@ Route::group(['middleware' => ['jwt.verify', 'api_user_verified']], function() {
     Route::resource('wallet_histories', \WalletHistoryAPIController::class);
     Route::resource('streets', \StreetAPIController::class)->except('index');
     Route::post('/pay', [\App\Http\Controllers\API\FlutterwaveController::class, 'initialize'])->name('pay');
-    Route::get('/flutterwave/callback', [\App\Http\Controllers\API\FlutterwaveController::class, 'callback'])->name('callback');
+    Route::post('/flutterwave/callback', [\App\Http\Controllers\API\FlutterwaveController::class, 'callback'])->name('callback');
     Route::get('complain_categories/complain/{id}', [\App\Http\Controllers\API\ComplainCategoryAPIController::class, 'getComplainByCategoryId']);
     Route::resource('complain_categories', \ComplainCategoryAPIController::class);
     Route::get('complains/close-ticket/{id}', [\App\Http\Controllers\API\ComplainAPIController::class, 'closeComplain']);
