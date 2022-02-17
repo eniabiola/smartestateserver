@@ -92,7 +92,7 @@ class VisitorPassAPIController extends AppBaseController
                 $query->whereBetween("visitor_passes.created_at", [$from, $to]);
             })
             ->when(!is_null($status), function ($query) use($status){
-                $query->where("visitor_passes.isActive", $status);
+                $query->where("visitor_passes.status", $status);
             })
             ->when(!is_null($guest_name), function ($query) use($guest_name){
                 $query->where("visitor_passes.guestName", $guest_name);
