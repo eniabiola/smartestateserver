@@ -60,7 +60,7 @@ class VisitorPassAPIController extends AppBaseController
         $date_to = $request->query('date_to') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
         $guest_name = $request->query('guest_name') != "null" && $request->query('guest_name') != "" ? $request->query('guest_name') : null;
         $generated_code = $request->query('pass_code') != "null" && $request->query('pass_code') != "" ? $request->query('pass_code') : null;
-        $status = $request->query('status') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
+        $status = $request->query('status') != "null" && $request->query('status') != "" ? $request->query('status') : null;
 
         $search = [];
         $processedRequest = $datatableService->processRequest($request);
