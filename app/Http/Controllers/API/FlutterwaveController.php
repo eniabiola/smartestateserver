@@ -7,7 +7,7 @@ use App\Mail\GeneralMail;
 use App\Mail\UserWelcomeMail;
 use App\Models\Estate;
 use App\Models\Transaction;
-use App\Models\OldWallet;
+use App\Models\Wallet;
 use App\Models\WalletFundingTransactionLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -110,13 +110,13 @@ class FlutterwaveController extends AppBaseController
             $status = true;
 
 
-            $wallet = OldWallet::query()->where('user_id', request()->user()->id)->first();
+            $wallet = Wallet::query()->where('user_id', request()->user()->id)->first();
 
             if($wallet)
             {
                 $walletPrev_balance = $wallet->prev_balance;
             } else {
-                $wallet = new OldWallet();
+                $wallet = new Wallet();
                 $walletPrev_balance = 0.00;
             }
             $wallet->user_id = request()->user()->id;
