@@ -62,10 +62,10 @@ class Handler extends ExceptionHandler
         if ($exception instanceof \PDOException)
         {
             report($exception->getMessage());
-            return $this->failedResponse("Error performing operation.", 400);
+            return $this->failedResponse("Error performing operation PD.", 400);
         }
         if ($exception instanceof ModelNotFoundException) {
-            return $this->failedResponse("Error retrieving selection", 400);
+            return $this->failedResponse("Error retrieving selection MF", 400);
         }
         if ($exception instanceof MethodNotAllowedHttpException) {
             return $this->failedResponse("Wrong action for endpoint", 400);
