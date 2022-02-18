@@ -65,6 +65,7 @@ class Handler extends ExceptionHandler
             return $this->failedResponse("Error performing operation PD.", 400);
         }
         if ($exception instanceof ModelNotFoundException) {
+            report($exception->getMessage());
             return $this->failedResponse("Error retrieving selection MF", 400);
         }
         if ($exception instanceof MethodNotAllowedHttpException) {
