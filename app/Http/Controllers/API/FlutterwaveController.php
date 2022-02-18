@@ -132,7 +132,7 @@ class FlutterwaveController extends AppBaseController
             $status = false;
         }
         else{
-            $transaction->transacton_status = "failed";
+            $transaction->transaction_status = "failed";
             $message = "The transaction failed";
             $status = false;
         }
