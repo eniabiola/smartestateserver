@@ -197,7 +197,7 @@ class VisitorPassAPIController extends AppBaseController
         }
 
 
-        $generatedCode = random_int(100000, 999999);
+        $generatedCode = $this->generateUniqueCode();
 //        $generatedCode = str_shuffle($code);
         $date = date('Y-m-d H:i:s');
         $user = \request()->user();
@@ -479,6 +479,20 @@ class VisitorPassAPIController extends AppBaseController
         file_put_contents('pass_authentication' . date('Y-m-d') . '.txt', 'Pass Authentication response: @ ' . date("Y-m-d H:i:s") . ' ' . print_r($details, true) . "\n\n", FILE_APPEND);
         return $this->sendResponse($visitorPass, "Pass successfully {$request->authorization}");
 
+    }
+
+    /**
+     * Write code on Method
+     *
+     * @return response()
+     */
+    public function generateUniqueCode()
+    {
+        do {
+            $code = random_int(100000, 999999);
+        } while (VisitorPass::where("generatedCode", "=", $code)->first());
+
+        return $code;
     }
 
 }
