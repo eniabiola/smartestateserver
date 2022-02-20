@@ -10,10 +10,12 @@ use App\Mail\PasswordResetEmail;
 use App\Models\PasswordReset;
 use App\Models\Resident;
 use App\Models\Role;
+use App\Models\Setting;
 use App\Models\User;
 use http\Url;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -26,6 +28,19 @@ use JWTAuth;
 
 class AuthenticationController extends BaseController
 {
+    public $url;
+
+    public function __construct()
+    {
+        if (Auth::check())
+        {
+            $settings = Setting::query()
+                ->where("estate_id", Auth::user()->estate_id)
+                ->where('name', 'front_end_url')
+                ->first();
+            $this->url = $settings ? $settings->value : null;
+        }
+    }
 
     public function authenticate(Request $request)
     {
@@ -121,7 +136,7 @@ class AuthenticationController extends BaseController
                 'estate_code' => $user->estate->estateCode,
             ],
             'resident' => $user->resident()->exists() ? $user->resident : null,
-            ];
+        ];
 
         if ($user->hasRole('resident'))
         {
@@ -188,7 +203,7 @@ class AuthenticationController extends BaseController
         //TODO: send message to user to reset email
 
         $message = "Dear {$user->surname} {$user->othernames}, click on the link below to reset your password" . PHP_EOL;
-        $url = "http://vgcpora.baloshapps.com/auth/reset-password/{$token}";
+        $url = $this->url."/auth/reset-password/{$token}";
 
         $maildata = [
             'name' => $user->surname. " ".$user->othernames,

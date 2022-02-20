@@ -3,25 +3,34 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class VerificationController extends Controller
 {
 
     public function verify($user_id, Request $request) {
-        if (!$request->hasValidSignature()) {
-            return redirect()->to('https://vgcpora.baloshapps.com/auth/verification-expired');
-//            return response()->json(["msg" => "Invalid/Expired url provided."], 401);
-        }
 
         $user = User::findOrFail($user_id);
+
+        $settings = Setting::query()
+            ->where("estate_id", $user->estate_id)
+            ->where('name', 'front_end_url')
+            ->first();
+        $url = $settings ? $settings->value : null;
+
+        if (!$request->hasValidSignature()) {
+            return redirect()->to($url.'/auth/verification-expired');
+//            return response()->json(["msg" => "Invalid/Expired url provided."], 401);
+        }
 
         if (!$user->hasVerifiedEmail()) {
             $user->markEmailAsVerified();
         }
 
-        return redirect()->to('https://vgcpora.baloshapps.com');
+        return redirect()->to($url);
     }
 
     public function resend(Request $request) {
