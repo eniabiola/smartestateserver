@@ -188,12 +188,14 @@ class VisitorPassAPIController extends AppBaseController
                 ->where('name', 'pass_count')
                 ->where('estate_id', Auth::user()->estate_id)
                 ->first();
-        if ($settings && \request()->user()->hasRole('administrator')){
+        if ($settings && !\request()->user()->hasRole('administrator')){
             if ($visitor_pass_count >= intval($settings->value))
             {
                 return $this->sendError("You have reached your daily visitor pass quota limit");
             }
             $pass_remaining = intval($settings->value) - intval($visitor_pass_count);
+        } else {
+            $pass_remaining = "unlimited";
         }
 
 
