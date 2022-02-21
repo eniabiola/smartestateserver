@@ -188,7 +188,7 @@ class VisitorPassAPIController extends AppBaseController
                 ->where('name', 'pass_count')
                 ->where('estate_id', Auth::user()->estate_id)
                 ->first();
-        if ($settings){
+        if ($settings && \request()->user()->hasRole('administrator')){
             if ($visitor_pass_count >= intval($settings->value))
             {
                 return $this->sendError("You have reached your daily visitor pass quota limit");
@@ -493,6 +493,16 @@ class VisitorPassAPIController extends AppBaseController
         } while (VisitorPass::where("generatedCode", "=", $code)->first());
 
         return $code;
+    }
+
+    //deleted repeated code rows
+    public function deleteRepeatedFunctions()
+    {
+        $visitorPasses = VisitorPass::all();
+        $visitorPassesUnique = $visitorPasses->unique('id');
+        $visitorPassesDupes = $visitorPasses->diff($visitorPassesUnique);
+
+        dd($visitorPasses, $visitorPassesUnique, $visitorPassesDupes);
     }
 
 }
