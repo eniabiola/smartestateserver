@@ -234,7 +234,7 @@ Action: <div class="datatable-actions"> <div class="text-center"> <div class="dr
                 "name" => "Administrator",
                 "message" => "{$user->surname} {$user->othernames} has a complain as regards {$complain_category->name}.",
                 "email" => $complain_category->email,
-                "url" => "https://vgcpora.baloshapps.com/auth/login",
+                "url" => config("url_constants.front_end_url")."/auth/login",
                 "button_text" => "Login to view Complain",
                 "from" => $estate->mail_slug,
             ];

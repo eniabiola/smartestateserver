@@ -188,7 +188,7 @@ class AuthenticationController extends BaseController
         //TODO: send message to user to reset email
 
         $message = "Dear {$user->surname} {$user->othernames}, click on the link below to reset your password" . PHP_EOL;
-        $url = "http://vgcpora.baloshapps.com/auth/reset-password/{$token}";
+        $url = config("url_constants.front_end_url")."/auth/reset-password/{$token}";
 
         $maildata = [
             'name' => $user->surname. " ".$user->othernames,

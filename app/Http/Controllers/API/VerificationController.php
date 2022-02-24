@@ -11,7 +11,7 @@ class VerificationController extends Controller
 
     public function verify($user_id, Request $request) {
         if (!$request->hasValidSignature()) {
-            return redirect()->to('https://vgcpora.baloshapps.com/auth/verification-expired');
+            return redirect()->to(config("url_constants.front_end_url").'/auth/verification-expired');
 //            return response()->json(["msg" => "Invalid/Expired url provided."], 401);
         }
 
@@ -21,7 +21,7 @@ class VerificationController extends Controller
             $user->markEmailAsVerified();
         }
 
-        return redirect()->to('https://vgcpora.baloshapps.com');
+        return redirect()->to(config("url_constants.front_end_url"));
     }
 
     public function resend(Request $request) {
