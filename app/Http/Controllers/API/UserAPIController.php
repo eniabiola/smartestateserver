@@ -115,7 +115,7 @@ class UserAPIController extends AppBaseController
                 $query->whereBetween("users.created_at", [$from, $to]);
             })
             ->when(!is_null($street), function ($query) use($street){
-                $query->whereBetween("residents.street_id", $street);
+                $query->where("residents.street_id", $street);
             });
 
         $columns = $this->userRepository->getTableColumns();
