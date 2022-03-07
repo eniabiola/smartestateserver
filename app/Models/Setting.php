@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 
 
 /**
@@ -72,5 +73,30 @@ class Setting extends Model
     public function estate()
     {
         return $this->belongsTo(\App\Models\Estate::class, 'estate_id');
+    }
+
+
+
+
+
+    /**
+     * Get all setting
+     * @return array
+     */
+    public static function settings(){
+        $collection =  new Collection();
+        $settings = config('settings');
+        foreach ($settings as $section => $fields){
+            if(is_array($fields['elements'])) {
+
+                foreach ($fields['elements'] as $index => $element) {
+                    $fields['elements'][$index]['value'] = setting($element['name']);
+                }
+            }
+
+            $collection->put($section, $fields);
+        }
+
+        return $collection->toArray();
     }
 }

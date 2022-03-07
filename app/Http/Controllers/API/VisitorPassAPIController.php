@@ -184,16 +184,21 @@ class VisitorPassAPIController extends AppBaseController
             ->whereDate('created_at', Carbon::today())
             ->count();
 
-        $settings = Setting::query()
+
+        if (!\request()->user()->hasRole('administrator')){
+
+            $settings = Setting::query()
                 ->where('name', 'pass_count')
                 ->where('estate_id', Auth::user()->estate_id)
                 ->first();
-        if ($settings && !\request()->user()->hasRole('administrator')){
-            if ($visitor_pass_count >= intval($settings->value))
+            if ($settings)
             {
-                return $this->sendError("You have reached your daily visitor pass quota limit");
+                if ($visitor_pass_count >= intval($settings->value))
+                {
+                    return $this->sendError("You have reached your daily visitor pass quota limit");
+                }
+                $pass_remaining = intval($settings->value) - intval($visitor_pass_count);
             }
-            $pass_remaining = intval($settings->value) - intval($visitor_pass_count);
         } else {
             $pass_remaining = "unlimited";
         }
@@ -324,6 +329,9 @@ class VisitorPassAPIController extends AppBaseController
 
     public function passAuthentication(Request $request)
     {
+//        return Carbon::today()->timezone('Africa/Lagos')->toDateTimeString();
+        date_default_timezone_set('Africa/Lagos');
+
         $array = [
             "url" => \request()->fullUrl(),
             "ip" => \request()->ip(),
@@ -372,6 +380,7 @@ class VisitorPassAPIController extends AppBaseController
                     file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication response: @ ' .date("Y-m-d H:i:s") .' '. print_r("This Pass code is already in use.", true) . "\n\n", FILE_APPEND);
                     return $this->sendError("This Pass code is already in use.");
                 }
+//
                 if (!($now >= $entry_date_formatted) && ($exit_date > $now)) {
                     file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication response: @ ' .date("Y-m-d H:i:s") .' '. print_r("This Pass code is not scheduled for today.", true) . "\n\n", FILE_APPEND);
                     return $this->sendError("This Pass code is not scheduled for today.");

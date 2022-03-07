@@ -20,6 +20,7 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "laravelcollective/html": "^6.2",
+        "pusher/pusher-php-server": "^7.0",
         "spatie/laravel-permission": "^5.3",
         "tymon/jwt-auth": "^1.0",
         "yajra/laravel-datatables-oracle": "^9.19"
@@ -36,7 +37,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/helper.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
