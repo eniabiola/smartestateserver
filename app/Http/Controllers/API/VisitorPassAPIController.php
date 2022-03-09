@@ -329,7 +329,6 @@ class VisitorPassAPIController extends AppBaseController
 
     public function passAuthentication(Request $request)
     {
-//        return Carbon::today()->timezone('Africa/Lagos')->toDateTimeString();
         date_default_timezone_set('Africa/Lagos');
 
         $array = [
@@ -360,6 +359,10 @@ class VisitorPassAPIController extends AppBaseController
                 return $this->sendError("This group Pass has not been approved");
             }
         }
+        $now = Carbon::now()->timezone('Africa/Lagos')->format("Y-m-d H:i:s");
+        $entry_date = $visitorPass->visitationDate;
+        $entry_date_formatted =  Carbon::parse($entry_date)->format("Y-m-d H:i:s");
+        $exit_date = Carbon::parse($entry_date)->addHour($visitorPass->duration)->format("Y-m-d H:i:s");
 
         switch ($active)
         {
@@ -369,11 +372,6 @@ class VisitorPassAPIController extends AppBaseController
                     file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication response: @ ' .date("Y-m-d H:i:s") .' '. print_r("This group Pass has not been approved", true) . "\n\n", FILE_APPEND);
                     return $this->sendError("This pass code is used.");
                 }
-
-                $now = Carbon::now()->timezone('Africa/Lagos')->format("Y-m-d H:i:s");
-                $entry_date = $visitorPass->visitationDate;
-                $entry_date_formatted =  Carbon::parse($entry_date)->format("Y-m-d H:i:s");
-                $exit_date = Carbon::parse($entry_date)->addHour($visitorPass->duration)->format("Y-m-d H:i:s");
 
                 $message = "Your guest ". $visitorPass->guestname ." has arrived.";
                 if ($visitorPass->status == "active" && $visitorPass->pass_type == "individual") {
@@ -409,6 +407,7 @@ class VisitorPassAPIController extends AppBaseController
                 }
                 break;
             case "closed":
+                if ($now > $exit_date) { return $this->sendError("The pass has expired, you overstayed."); }
                 if ($visitorPass->status == "closed" && $visitorPass->pass_type == "individual") return $this->sendError("This pass code is used.");
                 $message = "Your guest ". $visitorPass->guestname ." has departed";
                 if ($visitorPass->pass_type == "group")
