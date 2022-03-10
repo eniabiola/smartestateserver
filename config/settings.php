@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'basic' => [
+    'pass_count' => [
         'title' => 'Visitor Pass Count',
         'desc' => 'Visitor Pass Count',
         'icon' => 'glyphicon glyphicon-sunglasses',

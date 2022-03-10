@@ -8,6 +8,7 @@
         "php": "^7.3|^8.0",
         "appointer/swaggervel": "dev-master",
         "coconutcraig/laravel-postmark": "^2.11",
+        "crystoline/laravel-rest-api": "^2.0",
         "doctrine/dbal": "~2.3",
         "fakerphp/faker": "^1.9.1",
         "fruitcake/laravel-cors": "^2.0",

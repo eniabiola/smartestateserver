@@ -6,6 +6,7 @@ use App\Http\Requests\API\CreateSettingAPIRequest;
 use App\Http\Requests\API\UpdateSettingAPIRequest;
 use App\Models\Setting;
 use App\Repositories\SettingRepository;
+use Crystoline\LaraRestApi\ISchoolFileUpload;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use Response;
@@ -47,14 +48,54 @@ class SettingAPIController extends AppBaseController
      *
      * @return Response
      */
-    public function store(CreateSettingAPIRequest $request)
+
+    public function store(Request $request)
     {
-        $request->merge(['estate_id' => \request()->user()->estate_id]);
-        $input = $request->all();
 
-        $setting = $this->settingRepository->create($input);
+        /**@var Setting* */
+        $rules = Setting::getValidationRules();
+        $data = $request->validate($rules);
+        /*$validator = Validator::make($request->all(), $rules);
+        $data = $validator->validated();*/
+        $validSettings = array_keys($rules);
 
-        return $this->sendResponse($setting->toArray(), 'Setting saved successfully');
+        foreach ($data as $key => $val) {
+            if ($request->hasFile($key) and $request->file($key)->isValid()) {
+
+                //validate file extension
+                /* $file = $request->file($key);
+                 $ext = $file->getClientOriginalExtension();
+                 if (!in_array($ext, ["jpg, jpeg"])) {
+                     throw new BamsException("Image must be in jpg");
+                 }*/
+                $original = setting($key);
+
+                $interfaces = class_implements(self::class);
+                $base = (isset($interfaces[ISchoolFileUpload::class])) ? self::fileBasePath($request) : '';
+                if ($base) {
+                    $base = trim($base, '/,\\') . '/';
+                }
+                $path = $request->$key->store('public/' . $base . $key);
+                $path = str_replace('public/', 'storage/', $path);
+
+                $val = asset($path);
+                if ($original) {
+                    // $original_path = str_replace('public/', 'storage/', $original);
+                    //Storage::delete($original_path);
+                }
+
+            }
+            if (in_array($key, $validSettings)) {
+
+                if (!is_null($val)) {
+                    \Log::debug($key." ! ". $val ."!".Setting::getDataType($key));
+                    Setting::set($key, $val, Setting::getDataType($key));
+                }
+            }
+        }
+
+        $s = self::getAllSettings();
+        return response()->json($s, 201);
     }
 
     /**
@@ -124,5 +165,20 @@ class SettingAPIController extends AppBaseController
         $setting->delete();
 
         return $this->sendSuccess('Setting deleted successfully');
+    }
+
+
+    public static function getAllSettings()
+    {
+        $setting = Setting::settings();
+        $s = [];
+        foreach ($setting as $section) {
+            foreach ($section['elements'] as $element) {
+                $name = $element['name'];
+                $value = setting($name);
+                $s[$name] = $value;
+            }
+        }
+        return $s;
     }
 }
