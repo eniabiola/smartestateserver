@@ -111,11 +111,11 @@ class VisitorPassAPIController extends AppBaseController
             },
             'status' => function (VisitorPass $visitorPass) {
                 if($visitorPass->status == null || $visitorPass->status == strtolower("inactive")) return "<span class='badge badge-pill badge-info'>Open</span> ";
-                    if($visitorPass->status == strtolower("active")) return "<span class='badge badge-pill badge-success'>Checked In</span>";
-                    if($visitorPass->status == strtolower("approved")) return "<span class='badge badge-pill badge-success'>Approved</span>";
-                    if($visitorPass->status == strtolower("close") || $visitorPass->status == "closed") return "<span class='badge badge-pill badge-dark'>Checkedout Out</span>";
-                    if($visitorPass->status == strtolower("rejected")) return "<span class='badge badge-pill badge-danger'>Rejected</span>";
-                    if($visitorPass->status == strtolower("expired")) return "<span class='badge badge-pill badge-danger'>Expired</span>";
+                if($visitorPass->status == strtolower("active")) return "<span class='badge badge-pill badge-success'>Checked In</span>";
+                if($visitorPass->status == strtolower("approved")) return "<span class='badge badge-pill badge-success'>Approved</span>";
+                if($visitorPass->status == strtolower("close") || $visitorPass->status == "closed") return "<span class='badge badge-pill badge-dark'>Checkedout Out</span>";
+                if($visitorPass->status == strtolower("rejected")) return "<span class='badge badge-pill badge-danger'>Rejected</span>";
+                if($visitorPass->status == strtolower("expired")) return "<span class='badge badge-pill badge-danger'>Expired</span>";
             },
             'action' => function (VisitorPass $visitorPass) use($role_id) {
                 $button = null;
@@ -193,11 +193,12 @@ class VisitorPassAPIController extends AppBaseController
                 ->first();
             if ($settings)
             {
-                if ($visitor_pass_count >= intval($settings->value))
+                // \Log::info($visitor_pass_count." ! ".intval($settings->val));
+                if ($visitor_pass_count >= intval($settings->val))
                 {
                     return $this->sendError("You have reached your daily visitor pass quota limit");
                 }
-                $pass_remaining = intval($settings->value) - intval($visitor_pass_count);
+                $pass_remaining = intval($settings->val) - intval($visitor_pass_count);
             }
         } else {
             $pass_remaining = "unlimited";
@@ -349,8 +350,8 @@ class VisitorPassAPIController extends AppBaseController
             ->first();
 
         if (!$visitorPass) {
-        file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication response: @ ' .date("Y-m-d H:i:s") .' '. print_r("Pass is invalid.", true) . "\n\n", FILE_APPEND);
-        return $this->sendError("Pass is invalid.");
+            file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication response: @ ' .date("Y-m-d H:i:s") .' '. print_r("Pass is invalid.", true) . "\n\n", FILE_APPEND);
+            return $this->sendError("Pass is invalid.");
         }
         if ($visitorPass->pass_type == "group") {
             $visitorPassGroup = VisitorPassGroup::query()->where('visitor_pass_id', $visitorPass->id)->first();
@@ -378,18 +379,18 @@ class VisitorPassAPIController extends AppBaseController
                     file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication response: @ ' .date("Y-m-d H:i:s") .' '. print_r("This Pass code is already in use.", true) . "\n\n", FILE_APPEND);
                     return $this->sendError("This Pass code is already in use.");
                 }
-//
-                if (!($now >= $entry_date_formatted) && ($exit_date > $now)) {
+
+                if (($now >= $entry_date_formatted) && ($exit_date <= $now) == true) {
                     file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication response: @ ' .date("Y-m-d H:i:s") .' '. print_r("This Pass code is not scheduled for today.", true) . "\n\n", FILE_APPEND);
                     return $this->sendError("This Pass code is not scheduled for today.");
                 }
                 if ($visitorPass->pass_type == "group")
                 {
                     if ($visitorPassGroup->expected_number_of_guests == $visitorPassGroup->number_of_guests_in)
-                        {
-                            file_put_contents('pass_authentication' . date('Y-m-d') . '.txt', 'Pass Authentication response: @ ' . date("Y-m-d H:i:s") . ' ' . print_r("This group pass has reached its limit", true) . "\n\n", FILE_APPEND);
-                            return $this->sendError("This group pass has reached its limit");
-                        }
+                    {
+                        file_put_contents('pass_authentication' . date('Y-m-d') . '.txt', 'Pass Authentication response: @ ' . date("Y-m-d H:i:s") . ' ' . print_r("This group pass has reached its limit", true) . "\n\n", FILE_APPEND);
+                        return $this->sendError("This group pass has reached its limit");
+                    }
                     $visitorPassGroup->number_of_guests_in  += 1;
                     $visitorPassGroup->save();
                     $message = "Your guest has arrived";
@@ -398,7 +399,7 @@ class VisitorPassAPIController extends AppBaseController
                     file_put_contents('pass_authentication' . date('Y-m-d') . '.txt', 'Pass Authentication response: @ ' . date("Y-m-d H:i:s") . ' ' . print_r("The visitor pass is already in use", true) . "\n\n", FILE_APPEND);
                     return $this->sendError("The visitor pass is already in use");
                 }
-                $visitorPass->checked_in_time = date('Y-m-d h:i:s');
+                $visitorPass->checked_in_time = date('Y-m-d H:i:s');
                 break;
             case "cancelled":
                 if ($visitorPass->status != "inactive") {
@@ -407,6 +408,10 @@ class VisitorPassAPIController extends AppBaseController
                 }
                 break;
             case "closed":
+                if (($now >= $entry_date_formatted) && ($exit_date <= $now) == true) {
+                    file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication response: @ ' .date("Y-m-d H:i:s") .' '. print_r("This Pass code is not scheduled for today.", true) . "\n\n", FILE_APPEND);
+                    return $this->sendError("This Pass code is not scheduled for today.");
+                }
                 if ($now > $exit_date) { return $this->sendError("The pass has expired, you overstayed."); }
                 if ($visitorPass->status == "closed" && $visitorPass->pass_type == "individual") return $this->sendError("This pass code is used.");
                 $message = "Your guest ". $visitorPass->guestname ." has departed";
@@ -422,7 +427,7 @@ class VisitorPassAPIController extends AppBaseController
                     if ($visitorPassGroup->expected_number_of_guests != $visitorPassGroup->number_of_guests_out)
                         $active = "active";
                 }
-                $visitorPass->checked_out_time = date('Y-m-d h:i:s');
+                $visitorPass->checked_out_time = date('Y-m-d H:i:s');
                 $message = "Your guest has departed.";
                 break;
             default:

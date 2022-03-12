@@ -60,7 +60,7 @@ class AuthenticationController extends BaseController
             'user' => $this->getUserData($user)
         ];
         $message = "User Logged In";
-        event(new PushNotificationEvent($message));
+        // event(new PushNotificationEvent($message));
         return $this->sendSuccess($data,'User Logged In', Response::HTTP_OK);
     }
 
@@ -124,7 +124,7 @@ class AuthenticationController extends BaseController
                 'estate_code' => $user->estate->estateCode,
             ],
             'resident' => $user->resident()->exists() ? $user->resident : null,
-            ];
+        ];
 
         if ($user->hasRole('resident'))
         {
