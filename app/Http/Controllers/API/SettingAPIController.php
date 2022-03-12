@@ -88,7 +88,6 @@ class SettingAPIController extends AppBaseController
             if (in_array($key, $validSettings)) {
 
                 if (!is_null($val)) {
-                    \Log::debug($key." ! ". $val ."!".Setting::getDataType($key));
                     Setting::set($key, $val, Setting::getDataType($key));
                 }
             }

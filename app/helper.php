@@ -22,7 +22,7 @@ if (!function_exists('setting')) {
 
         $value = \App\Models\Setting::where('name', $key)->first();
 
-        return is_null($value) ? value($default) : $value;
+        return is_null($value) ? value($default) : $value->val;
     }
 }
 
