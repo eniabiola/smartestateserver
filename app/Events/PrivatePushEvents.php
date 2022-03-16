@@ -2,19 +2,20 @@
 
 namespace App\Events;
 
+use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class PushNotificationEvent implements ShouldBroadcast
+class PrivatePushEvents implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $user;
     public $message;
 
     /**
@@ -22,9 +23,10 @@ class PushNotificationEvent implements ShouldBroadcast
      *
      * @return void
      */
-    public function __construct($message)
+    public function __construct(User $user, $message)
     {
         $this->message = $message;
+        $this->user = $user;
     }
 
     /**
@@ -34,11 +36,13 @@ class PushNotificationEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('my-channel');
+        return new PrivateChannel('push-channel'.$this->user->id);
     }
 
     public function broadcastAs()
     {
-        return "form-submitted";
+        return 'notify-event';
     }
+
+
 }

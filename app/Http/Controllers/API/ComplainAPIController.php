@@ -12,6 +12,8 @@ use App\Models\Complain;
 use App\Models\ComplainCategory;
 use App\Models\Estate;
 use App\Models\Setting;
+use App\Models\User;
+use App\Notifications\residentSendComplain;
 use App\Repositories\ComplainRepository;
 use App\Services\DatatableService;
 use App\Services\UploadService;
@@ -223,11 +225,22 @@ Action: <div class="datatable-actions"> <div class="text-center"> <div class="dr
         $user = \request()->user();
         $estate = Estate::query()
                     ->find($user->estate_id);
-        $settings = Setting::query()
+
+        $admins = User::query()
+            ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
+            ->where('model_has_roles.role_id', '=', 2) //assumes that admin id = 2
+            ->where('users.estate_id', '=', $estate->id)
+            ->get();
+        foreach ($admins as $admin)
+        {
+            $admin->notify(new residentSendComplain($user, $request->subject));
+        }
+        /*
+          $settings = Setting::query()
                     ->where('estate_id', $user->estate_id)
                     ->where('name', 'front_end_url')
                     ->first();
-        if (!empty($complain_category->email) and !is_null($complain_category->email))
+         if (!empty($complain_category->email) and !is_null($complain_category->email))
         {
             $details = [
                 "subject" => "Raised complaint",
@@ -240,7 +253,7 @@ Action: <div class="datatable-actions"> <div class="text-center"> <div class="dr
             ];
             $email = new GeneralMail($details);
             Mail::to($details['email'])->queue($email);
-        }
+        }*/
         $complain = $this->complainRepository->create($input);
 
         return $this->sendResponse(new ComplainAPIResource($complain), 'Complain sent successfully');

@@ -10,6 +10,7 @@ use App\Models\Estate;
 use App\Models\Resident;
 use App\Models\Role;
 use App\Models\User;
+use App\Notifications\residentActivated;
 use App\Repositories\ResidentRepository;
 use App\Repositories\UserRepository;
 use App\Services\DatatableService;
@@ -316,6 +317,10 @@ class UserAPIController extends AppBaseController
             $this->validate($request, [
                 'id' => 'required|exists:users,id'
             ]);
+            if ($status == true)
+            {
+                $user->notify(new residentActivated());
+            }
             return $this->sendResponse(new UserResource($this->userRepository->toggleStatus($request->id)), "User has been successfully {$message_status}.");
         }
         return $this->sendError("You are unable to perform this operation", 401);

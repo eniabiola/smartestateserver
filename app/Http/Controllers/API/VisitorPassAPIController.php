@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Events\PrivatePushEvents;
 use App\Http\Requests\API\CreateVisitorPassAPIRequest;
 use App\Http\Requests\API\UpdateVisitorPassAPIRequest;
 use App\Http\Resources\VisitorPassResource;
@@ -13,6 +14,9 @@ use App\Models\User;
 use App\Models\VisitorGroup;
 use App\Models\VisitorPass;
 use App\Models\VisitorPassGroup;
+use App\Notifications\adminAuthorizeGroupCode;
+use App\Notifications\residentGenerateGroupCode;
+use App\Notifications\residentVisitorPassStatus;
 use App\Repositories\VisitorPassRepository;
 use App\Services\DatatableService;
 use App\Services\UtilityService;
@@ -226,15 +230,15 @@ class VisitorPassAPIController extends AppBaseController
             $visitorGroup->save();
             $message = "Your group pass request has been submitted to the Estate Administrator for Approval";
 
-            $details = [
-                "subject" => "New Group Pass Created",
-                "name" => "Estate Administrator",
-                "message" => "A new group pass has been created by {$user->surname} {$user->othernames}. This requires your authorization.",
-                "email" => $estate->email,
-                "from" => $estate->mail_slug
-            ];
-            $email = new GeneralMail($details);
-            Mail::to($details['email'])->queue($email);
+            $admins = User::query()
+                ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
+                ->where('model_has_roles.role_id', '=', 2) //assumes that admin id = 2
+                ->where('users.estate_id', '=', $estate->id)
+                ->get();
+            foreach ($admins as $admin)
+            {
+                $admin->notify(new residentGenerateGroupCode($user));
+            }
         }
         return $this->sendResponse(new VisitorPassResource($visitorPass), $message);
     }
@@ -449,13 +453,11 @@ class VisitorPassAPIController extends AppBaseController
 
         if (($active == "active" || $active == "inactive") && $visitorPass->pass_type == "individual")
         {
-            $user = $visitorPass->user->surname." ".$visitorPass->user->surname;
-            $maildata = [
-                "message" => $message,
-                "user" => $user,
-            ];
-            $email = new sendVisitorPassMail($maildata);
-            Mail::to($visitorPass->user->email)->queue($email);
+            $status = $active == "active" ? "checked-in" : "checked-out";
+            $message = "Guest Alert: Your Guest ".$visitorPass->guestName ." has been ".$status;
+            $user = User::find($visitorPass->user_id);
+            event( new PrivatePushEvents($user, $message) );
+            $user->notify(new residentVisitorPassStatus($message));
         }
 
         return $this->sendResponse($visitor_pass, "The pass code is valid");
@@ -482,16 +484,7 @@ class VisitorPassAPIController extends AppBaseController
         $visitorPassGroup->save();
 
         $user = User::query()->find($visitorPass->user_id);
-        $details = [
-            "subject" => "Group Pass Status",
-            "name" => $user->surname. " ".$user->othernames,
-            "message" => "Your pass has been {$request->authorization}. {$request->authorization_comment}.",
-            "email" => $user->email,
-            "from" => $estate->mail_slug,
-        ];
-        $email = new GeneralMail($details);
-        Mail::to($details['email'])->queue($email);
-        file_put_contents('pass_authentication' . date('Y-m-d') . '.txt', 'Pass Authentication response: @ ' . date("Y-m-d H:i:s") . ' ' . print_r($details, true) . "\n\n", FILE_APPEND);
+        $user->notify(new adminAuthorizeGroupCode($request->authorization, $visitorPass->generatedCode));
         return $this->sendResponse($visitorPass, "Pass successfully {$request->authorization}");
 
     }
