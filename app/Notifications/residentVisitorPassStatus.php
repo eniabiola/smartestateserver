@@ -33,7 +33,7 @@ class residentVisitorPassStatus extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['database', 'broadcast'];
+        return ['database'];
     }
 
     /**
@@ -66,20 +66,4 @@ class residentVisitorPassStatus extends Notification implements ShouldQueue
         ];
     }
 
-    public function toBroadcast($notifiable)
-    {
-        return [
-            'message' => $this->message
-        ];
-    }
-
-    /**
-     * The channels the user receives notification broadcasts on.
-     *
-     * @return string
-     */
-    public function receivesBroadcastNotificationsOn()
-    {
-        return "my-channel";
-    }
 }

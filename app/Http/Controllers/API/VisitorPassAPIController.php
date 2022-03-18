@@ -456,7 +456,7 @@ class VisitorPassAPIController extends AppBaseController
             $status = $active == "active" ? "checked-in" : "checked-out";
             $message = "Guest Alert: Your Guest ".$visitorPass->guestName ." has been ".$status;
             $user = User::find($visitorPass->user_id);
-            event( new PrivatePushEvents($user, $message) );
+//            event( new PrivatePushEvents($user, $message) );
             $user->notify(new residentVisitorPassStatus($message));
         }
 

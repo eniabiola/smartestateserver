@@ -86,6 +86,7 @@ Route::group(['middleware' => ['jwt.verify', 'api_user_verified']], function() {
     Route::resource('notification_groups', \NotificationGroupAPIController::class);
     Route::resource('wallets', \WalletAPIController::class)->only('index');
     Route::resource('settings', \SettingAPIController::class);
+    Route::get('/user/notifications', [\App\Http\Controllers\API\UserAPIController::class, 'notifications'])->middleware('MarkAsRead');
 });
 
 Route::resource('countries', \CountryAPIController::class);

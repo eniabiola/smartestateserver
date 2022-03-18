@@ -36,7 +36,7 @@ class AdminActivateResident extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['database', 'broadcast'];
+        return ['database'];
     }
 
     /**
@@ -48,8 +48,8 @@ class AdminActivateResident extends Notification implements ShouldQueue
     public function toDatabase($notifiable)
     {
         return [
-            'resident_id' => $this->user->id,
-            'resident_name' => $this->name,
+//            'resident_id' => $this->user->id,
+//            'resident_name' => $this->name,
             'message' => $this->message
         ];
     }
@@ -66,8 +66,8 @@ class AdminActivateResident extends Notification implements ShouldQueue
             'id' => $this->id,
             'read_at' => null,
             'data' => [
-                'resident_id' => $this->user->id,
-                'resident_name' => $this->name,
+//                'resident_id' => $this->user->id,
+//                'resident_name' => $this->name,
                 'message' => $this->message
             ],
         ];

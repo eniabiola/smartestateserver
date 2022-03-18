@@ -325,4 +325,11 @@ class UserAPIController extends AppBaseController
         }
         return $this->sendError("You are unable to perform this operation", 401);
     }
+
+
+    public function notifications(Request $request)
+    {
+//        return $request->user();
+        return auth()->user()->unreadNotifications()->limit(5)->get()->toArray();
+    }
 }
