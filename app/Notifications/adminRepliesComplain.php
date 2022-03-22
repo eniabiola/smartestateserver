@@ -33,7 +33,7 @@ class adminRepliesComplain extends Notification
      */
     public function via($notifiable)
     {
-        return ['database', 'broadcast'];
+        return ['database'];
     }
 
     /**
@@ -58,7 +58,11 @@ class adminRepliesComplain extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+            'id' => $this->id,
+            'read_at' => null,
+            'data' => [
+                'message' => $this->message,
+            ],
         ];
     }
 }
