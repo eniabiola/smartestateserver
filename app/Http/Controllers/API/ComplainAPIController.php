@@ -235,7 +235,7 @@ Action: <div class="datatable-actions"> <div class="text-center"> <div class="dr
         {
             $admin->notify(new residentSendComplain($user, $request->subject));
         }
-        /*
+
           $settings = Setting::query()
                     ->where('estate_id', $user->estate_id)
                     ->where('name', 'front_end_url')
@@ -253,7 +253,7 @@ Action: <div class="datatable-actions"> <div class="text-center"> <div class="dr
             ];
             $email = new GeneralMail($details);
             Mail::to($details['email'])->queue($email);
-        }*/
+        }
         $complain = $this->complainRepository->create($input);
 
         return $this->sendResponse(new ComplainAPIResource($complain), 'Complain sent successfully');
