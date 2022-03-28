@@ -80,7 +80,7 @@ class VisitorPassAPIController extends AppBaseController
                 'users.surname AS users__dot__surname',
                 'users.othernames AS users__dot__othernames',
                 'users.phone AS users__dot__phone',
-                'users.email AS users__dot__email',)
+                'users.email AS users__dot__email')
             ->when($search_request != null, function ($query) use($search_request, $search){
                 $query->where(function($query) use($search_request, $search){
                     foreach($search as $key => $value) {
