@@ -113,6 +113,9 @@ class VisitorPassAPIController extends AppBaseController
             'name' => function (VisitorPass $visitorPass) {
                 return $visitorPass->users__dot__surname ." ".$visitorPass->users__dot__othernames;
             },
+            "visitationDate" => function(VisitorPass $visitorPass) {
+                return date('Y-m-d H:i:s', strtotime($visitorPass->visitationDate));
+            },
             'status' => function (VisitorPass $visitorPass) {
                 if($visitorPass->status == null || $visitorPass->status == strtolower("inactive")) return "<span class='badge badge-pill badge-info'>Open</span> ";
                 if($visitorPass->status == strtolower("active")) return "<span class='badge badge-pill badge-success'>Checked In</span>";
