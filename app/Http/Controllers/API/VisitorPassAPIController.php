@@ -80,7 +80,7 @@ class VisitorPassAPIController extends AppBaseController
                 'users.surname AS users__dot__surname',
                 'users.othernames AS users__dot__othernames',
                 'users.phone AS users__dot__phone',
-                'users.email AS users__dot__email',)
+                'users.email AS users__dot__email')
             ->when($search_request != null, function ($query) use($search_request, $search){
                 $query->where(function($query) use($search_request, $search){
                     foreach($search as $key => $value) {
@@ -113,11 +113,16 @@ class VisitorPassAPIController extends AppBaseController
             'name' => function (VisitorPass $visitorPass) {
                 return $visitorPass->users__dot__surname ." ".$visitorPass->users__dot__othernames;
             },
+            "visitationDate" => function(VisitorPass $visitorPass) {
+                return date('Y-m-d H:i:s', strtotime($visitorPass->visitationDate));
+            },
+            // 'visitationDate' => "2021-20-12 21:11:11",
             'status' => function (VisitorPass $visitorPass) {
                 if($visitorPass->status == null || $visitorPass->status == strtolower("inactive")) return "<span class='badge badge-pill badge-info'>Open</span> ";
                 if($visitorPass->status == strtolower("active")) return "<span class='badge badge-pill badge-success'>Checked In</span>";
                 if($visitorPass->status == strtolower("approved")) return "<span class='badge badge-pill badge-success'>Approved</span>";
-                if($visitorPass->status == strtolower("close") || $visitorPass->status == "closed") return "<span class='badge badge-pill badge-dark'>Checkedout Out</span>";
+                if($visitorPass->status == strtolower("cancelled")) return "<span class='badge badge-pill badge-success'>Cancelled</span>";
+                if($visitorPass->status == strtolower("close") || $visitorPass->status == "closed") return "<span class='badge badge-pill badge-dark'>Checked Out</span>";
                 if($visitorPass->status == strtolower("rejected")) return "<span class='badge badge-pill badge-danger'>Rejected</span>";
                 if($visitorPass->status == strtolower("expired")) return "<span class='badge badge-pill badge-danger'>Expired</span>";
             },
