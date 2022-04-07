@@ -60,7 +60,6 @@ class AuthenticationController extends BaseController
             'user' => $this->getUserData($user)
         ];
         $message = "User Logged In";
-         event(new PushNotificationEvent($message));
         return $this->sendSuccess($data,'User Logged In', Response::HTTP_OK);
     }
 

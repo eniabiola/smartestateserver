@@ -46,7 +46,11 @@ class sendNotificationMessages implements ShouldQueue
         switch ($notification->recipient_type)
         {
             case "user":
-              $user = User::query()->find($notification->recipient_id);
+              $user = User::query()->find($notification->receiver_id);
+              
+                    $details["name"] = $user->surname. " ".$user->othernames;
+                    $details["email"] = $user->email;
+                    // $this->sendMail($details);
                 $this->sendNotification($user, $message);
                 break;
             case "street":
@@ -60,6 +64,7 @@ class sendNotificationMessages implements ShouldQueue
                     $details["name"] = $user->surname. " ".$user->othernames;
                     $details["email"] = $user->email;
                     $this->sendNotification($user, $message);
+                    // $this->sendMail($details);
                 }
                 break;
             case "group":
@@ -71,13 +76,19 @@ class sendNotificationMessages implements ShouldQueue
                 foreach ($users as $user)
                 {
                     $this->sendNotification($user, $message);
+                    $details["name"] = $user->surname. " ".$user->othernames;
+                    $details["email"] = $user->email;
+                    // $this->sendMail($details);
                 }
                 break;
             case "all":
-                $users= User::query();
+                $users= User::query()->get();
                 foreach ($users as $user)
                 {
                     $this->sendNotification($user, $message);
+                    $details["name"] = $user->surname. " ".$user->othernames;
+                    $details["email"] = $user->email;
+                    // $this->sendMail($details);
                 }
                 break;
             default:
@@ -90,5 +101,13 @@ class sendNotificationMessages implements ShouldQueue
     function sendNotification($user, $details)
     {
         $user->notify(new adminSendsMessage());
+    }
+    
+    
+
+    function sendMail($details)
+    {
+        $email = new GeneralMail($details);
+        Mail::to($details['email'])->queue($email);
     }
 }
