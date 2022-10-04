@@ -264,7 +264,7 @@ class NotificationAPIController extends AppBaseController
     public function sendNotificationMessages(Request $request)
     {
         $this->validate($request, [
-            'id' => 'required|integer|exists:notifications,id'
+            'id' => 'required|integer'
         ]);
 
         sendNotificationMessages::dispatch($request->id);

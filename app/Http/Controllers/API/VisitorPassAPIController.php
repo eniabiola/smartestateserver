@@ -345,6 +345,7 @@ class VisitorPassAPIController extends AppBaseController
             "sent_requests" => $request->all()
         ];
         file_put_contents('pass_authentication'.date('Y-m-d').'.txt', 'Pass Authentication request: @ ' .date("Y-m-d H:i:s") .' '. print_r($array, true) . "\n\n", FILE_APPEND);
+
         $invitation_code = $request->get('invitation_code');
         $active = $request->get('status');
         if ($invitation_code == null || $active == null) {
@@ -482,6 +483,8 @@ class VisitorPassAPIController extends AppBaseController
         $visitorPass->save();
 
         $visitorPassGroup = VisitorPassGroup::query()->where('visitor_pass_id', $id)->first();
+        $visitorPassGroup->authorized_date = date("Y-m-d H:i:s");
+        $visitorPassGroup->authorized_by = $user->id;
         $visitorPassGroup->isApproved = true;
         $visitorPassGroup->save();
 

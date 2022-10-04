@@ -45,6 +45,7 @@ class Billing extends Model
         'bill_target',
         'invoice_day',
         'invoice_month',
+        'invoice_year',
         'due_day',
         'due_month',
         'status',
@@ -79,13 +80,14 @@ class Billing extends Model
      * @var array
      */
     public static $rules = [
-        'name' => 'required|string|max:100',
+        'name' => 'required|string|max:100|unique:billings,name',
         'description' => 'required|string|max:255',
         'amount' => 'required|numeric',
         'bill_frequency' => 'required|string|max:50|in:yearly,monthly,daily,one-off',
         'bill_target' => 'required|string|max:50|in:current,new,both',
         'invoice_day' => 'required|integer',
         'invoice_month' => 'nullable|integer',
+        'invoice_year' => 'nullable|integer',
         'status' => 'required|string|max:10',
     ];
 

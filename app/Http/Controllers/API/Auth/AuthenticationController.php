@@ -38,8 +38,6 @@ class AuthenticationController extends BaseController
             'password' => 'required|string|min:6|max:50'
         ]);
 
-        //Request is validated
-        //Create token
         try {
             $myTTL = 1200; //minutes
 

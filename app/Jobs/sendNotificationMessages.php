@@ -39,14 +39,16 @@ class sendNotificationMessages implements ShouldQueue
      */
     public function handle()
     {
+        \Log::debug("it got here");
         $notification = Notification::query()
                         ->find($this->notification_id);
+        \Log::info(print_r($notification, true));
 
         $message = "New Message Alert: You have just receive a message from Estate Admin";
         switch ($notification->recipient_type)
         {
             case "user":
-              $user = User::query()->find($notification->recipient_id);
+              $user = User::query()->find($notification->receiver_id);
                 $this->sendNotification($user, $message);
                 break;
             case "street":
@@ -74,7 +76,7 @@ class sendNotificationMessages implements ShouldQueue
                 }
                 break;
             case "all":
-                $users= User::query();
+                $users= User::query()->get();
                 foreach ($users as $user)
                 {
                     $this->sendNotification($user, $message);

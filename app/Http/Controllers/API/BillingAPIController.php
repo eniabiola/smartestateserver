@@ -58,8 +58,8 @@ class BillingAPIController extends AppBaseController
         $user = \request()->user();
 
         $request->merge(['created_by' => $user->id, 'estate_id' => $user->estate_id,
-            'invoice_day' => !is_null($request->invoice_day) && !empty($request->invoice_day) ? intval($request->invoice_day) : null,
-            'invoice_month' => !is_null($request->invoice_month) && !empty($request->invoice_month) ? intval($request->invoice_month) : null,
+            'invoice_day' => !empty($request->invoice_day) ? intval($request->invoice_day) : null,
+            'invoice_month' => !empty($request->invoice_month) ? intval($request->invoice_month) : null,
             ]);
 
         $input = $request->all();
