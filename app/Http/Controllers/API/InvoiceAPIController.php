@@ -48,6 +48,50 @@ class InvoiceAPIController extends AppBaseController
         return $this->sendResponse(InvoiceResource::collection($invoices)->response()->getData(true), 'Invoices retrieved successfully');
     }
 
+
+
+    public function userOutstanding(Request $request)
+    {
+        $owing = Invoice::query()
+            ->where('user_id', Auth::id())
+            ->where('status', '=', "Not Paid")
+            ->get();
+        return $this->sendResponse($owing, "List of users outstandings");
+    }
+
+    public function allUsersOutstanding(Request $request)
+    {
+
+        $owing = Invoice::query()
+            ->where('status', '=', "Not Paid")
+            ->get();
+        return $this->sendResponse($owing, "Outstanding of all users");
+    }
+
+    public function sumUserOutstanding(Request $request)
+    {
+        $amount = Invoice::query()
+            ->where('status', '=', 'Not Paid')
+            ->where('user_id', '=', Auth::id())
+            ->sum('amount');
+        return $this->sendResponse($amount, "Amount user is owing");
+    }
+
+    public function allSumUsersOutstanding()
+    {
+
+        $amount = Invoice::query()
+            ->join('users', 'invoices.user_id', '=', 'users.id')
+            ->where('status', '=', 'Not Paid')
+            ->groupBy('user_id')
+            ->selectRaw('sum(amount) as amount, user_id, users.surname, users.othernames')
+            ->get();
+
+        return $this->sendResponse($amount, "Amount users are owing");
+    }
+
+
+
     /**
      * Display a listing of the Invoice based on a particular user.
      * GET|HEAD /invoices_per_user/{user_id}

@@ -67,6 +67,10 @@ Route::group(['middleware' => ['jwt.verify', 'api_user_verified']], function() {
     Route::resource('visitor_pass_categories', VisitorPassCategoryAPIController::class);
     Route::resource('billings', \BillingAPIController::class);
     Route::post('pay-invoice', [\App\Http\Controllers\API\InvoiceAPIController::class, 'payInvoice']);
+    Route::get('user-outstanding', [\App\Http\Controllers\API\InvoiceAPIController::class, 'userOutstanding']);
+    Route::get('all-user-outstanding', [\App\Http\Controllers\API\InvoiceAPIController::class, 'allUsersOutstanding']);
+    Route::get('sum-user-outstanding', [\App\Http\Controllers\API\InvoiceAPIController::class, 'sumUserOutstanding']);
+    Route::get('all-sum-users-outstanding', [\App\Http\Controllers\API\InvoiceAPIController::class, 'allSumUsersOutstanding']);
     Route::get('invoices_per_user/{user_id}', [\App\Http\Controllers\API\InvoiceAPIController::class, 'userIndex']);
     Route::resource('invoices', \InvoiceAPIController::class);
     Route::resource('transactions', \TransactionAPIController::class);

@@ -6,6 +6,7 @@ use App\Http\Requests\API\CreateBillingAPIRequest;
 use App\Http\Requests\API\UpdateBillingAPIRequest;
 use App\Http\Resources\BillingResource;
 use App\Models\Billing;
+use App\Models\Invoice;
 use App\Repositories\BillingRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -43,6 +44,11 @@ class BillingAPIController extends AppBaseController
         );
 
         return $this->sendResponse(BillingResource::collection($billings), 'Billings retrieved successfully');
+    }
+
+    public function UserIndex(Request $request)
+    {
+
     }
 
     /**
