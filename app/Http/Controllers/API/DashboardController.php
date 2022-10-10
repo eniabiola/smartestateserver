@@ -4,9 +4,11 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\AppBaseController;
 use App\Http\Controllers\Controller;
+use App\Models\Invoice;
 use App\Repositories\DashboardRepository;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends AppBaseController
 {
@@ -49,12 +51,18 @@ class DashboardController extends AppBaseController
             ->groupBy('month')
             ->get();
 
+        $owing = Invoice::query()
+            ->where('status', '=', 'Not Paid')
+            ->where('user_id', '=', Auth::id())
+            ->sum('amount');
+
 //         $graph->for
         $result_array = [
             'active_visits' => $active_visits,
             'total_visits' => $total_visits,
             'cancelled_visits' => $cancelled_visits,
-            'graph' => $graph
+            'graph' => $graph,
+            'owing' => $owing,
         ];
 
         return $this->sendResponse($result_array, "Dashboard Analytics");
