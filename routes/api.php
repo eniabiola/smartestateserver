@@ -23,6 +23,8 @@ Route::get('testing', function ()
 Route::get('/check', function () {
     Artisan::call('queue:work');
 });
+Route::post('estate_account/{estate_id}', [\App\Http\Controllers\API\EstateAccountAPIController::class, 'store']);
+Route::apiResource('estate_account', \App\Http\Controllers\API\EstateAccountAPIController::class);
 Route::post('resend-verification-email', [App\Http\Controllers\API\VerificationController::class, 'resend']);
 Route::post('login', [AuthenticationController::class, 'authenticate']);
 Route::post('register', [AuthenticationController::class, 'adminRegister']);
