@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateVisitorPassCountTable extends Migration
+class CreateNotificationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,13 @@ class CreateVisitorPassCountTable extends Migration
      */
     public function up()
     {
-        Schema::create('visitor_pass_count', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->integer('pass_count');
-            $table->date('date');
+        Schema::create('notifications', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('type');
+            $table->morphs('notifiable');
+            $table->text('data');
+            $table->timestamp('read_at')->nullable();
             $table->timestamps();
-
-//            $table->
         });
     }
 
@@ -31,6 +30,6 @@ class CreateVisitorPassCountTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('visitor_pass_count');
+        Schema::dropIfExists('notifications');
     }
 }

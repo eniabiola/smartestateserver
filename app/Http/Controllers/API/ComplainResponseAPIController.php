@@ -7,6 +7,8 @@ use App\Http\Requests\API\UpdateComplainResponseAPIRequest;
 use App\Http\Resources\ComplainResponseResource;
 use App\Models\Complain;
 use App\Models\ComplainResponse;
+use App\Models\User;
+use App\Notifications\adminRepliesComplain;
 use App\Repositories\ComplainResponseRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -66,7 +68,11 @@ class ComplainResponseAPIController extends AppBaseController
         $input = $request->all();
 
         $complainResponse = $this->complainResponseRepository->create($input);
-
+        if ($complain->user_id != Auth::id() && \request()->user()->hasRole('administrator'))
+        {
+            $user = User::query()->find($complain->user_id);
+            $user->notify(new adminRepliesComplain($complain->subject));
+        }
         return $this->sendResponse(new ComplainResponseResource($complainResponse), 'Complain Response saved successfully');
     }
 

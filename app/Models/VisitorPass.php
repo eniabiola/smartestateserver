@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $guestName
  * @property string $status
  * @property string $pass_type
+ * @property integer $additional_guests_number
  * @property integer $user_id
  * @property string|\Carbon\Carbon $visitationDate
  * @property string|\Carbon\Carbon $generatedDate
@@ -53,6 +54,7 @@ class VisitorPass extends Model
         'dateExpires',
         'duration',
         'pass_type',
+        'additional_guests_number',
         'isActive'
     ];
 
@@ -68,6 +70,7 @@ class VisitorPass extends Model
         'guestName' => 'string',
         'status' => 'string',
         'user_id' => 'integer',
+        'additional_guests_number' => 'integer',
         'expected_number_of_guests' => 'integer',
         'number_of_guests_in' => 'integer',
         'number_of_guests_out' => 'integer',
@@ -87,6 +90,7 @@ class VisitorPass extends Model
     public static $rules = [
         'visitationDate' => 'required',
         'guestName' => 'nullable|required_if:pass_type,==,individual|string',
+        'additional_guests_number' => 'nullable|required_if:pass_type,==,individual|integer',
         'event' => 'nullable|required_if:pass_type,==,group|string',
         'expected_number_of_guests' => 'nullable|required_if:pass_type,==,group|integer',
         'pass_type' => 'required|in:individual,group',

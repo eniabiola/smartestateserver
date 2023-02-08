@@ -7,6 +7,7 @@ use App\Models\Notification;
 use App\Models\NotificationGroup;
 use App\Models\Street;
 use App\Models\User;
+use App\Notifications\adminSendsMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -40,17 +41,17 @@ class sendNotificationMessages implements ShouldQueue
     {
         $notification = Notification::query()
                         ->find($this->notification_id);
-        $details['attachment'] = "";
-        $details['subject'] = $notification->title;
-        $details['message'] = $notification->message;
+
+        $message = "New Message Alert: You have just receive a message from Estate Admin";
         switch ($notification->recipient_type)
         {
             case "user":
-              $user = User::query()->find($notification->recipient_id);
-
-                $details["name"] = $user->surname. " ".$user->othernames;
-                $details["email"] = $user->email;
-                $this->sendMail($details);
+              $user = User::query()->find($notification->receiver_id);
+              
+                    $details["name"] = $user->surname. " ".$user->othernames;
+                    $details["email"] = $user->email;
+                    // $this->sendMail($details);
+                $this->sendNotification($user, $message);
                 break;
             case "street":
                 $users = Street::query()
@@ -62,7 +63,8 @@ class sendNotificationMessages implements ShouldQueue
                 {
                     $details["name"] = $user->surname. " ".$user->othernames;
                     $details["email"] = $user->email;
-                    $this->sendMail($details);
+                    $this->sendNotification($user, $message);
+                    // $this->sendMail($details);
                 }
                 break;
             case "group":
@@ -73,18 +75,20 @@ class sendNotificationMessages implements ShouldQueue
                     ->get();
                 foreach ($users as $user)
                 {
+                    $this->sendNotification($user, $message);
                     $details["name"] = $user->surname. " ".$user->othernames;
                     $details["email"] = $user->email;
-                    $this->sendMail($details);
+                    // $this->sendMail($details);
                 }
                 break;
             case "all":
-                $users= User::query();
+                $users= User::query()->get();
                 foreach ($users as $user)
                 {
+                    $this->sendNotification($user, $message);
                     $details["name"] = $user->surname. " ".$user->othernames;
                     $details["email"] = $user->email;
-                    $this->sendMail($details);
+                    // $this->sendMail($details);
                 }
                 break;
             default:
@@ -93,6 +97,13 @@ class sendNotificationMessages implements ShouldQueue
         }
 
     }
+
+    function sendNotification($user, $details)
+    {
+        $user->notify(new adminSendsMessage());
+    }
+    
+    
 
     function sendMail($details)
     {

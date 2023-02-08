@@ -8,6 +8,7 @@ use App\Http\Resources\ResidentResource;
 use App\Jobs\createNewResidentInvoice;
 use App\Jobs\sendResidentWelcomeMail;
 use App\Mail\GeneralMail;
+use App\Notifications\AdminActivateResident;
 use App\Services\DatatableService;
 use Carbon\Carbon;
 use Illuminate\Auth\Events\Registered;
@@ -170,6 +171,7 @@ class ResidentAPIController extends AppBaseController
      */
     public function store(CreateResidentAPIRequest $request, UserRepository $userRepository, UploadService $uploadService)
     {
+
         try {
             DB::beginTransaction();
             $userInput = $request->safe()->only(['surname', 'othernames', 'phone', 'gender', 'email', 'password']);
@@ -220,18 +222,28 @@ class ResidentAPIController extends AppBaseController
             $wallet->save();
             DB::commit();
 
+            $admins = User::query()
+                        ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
+                        ->where('model_has_roles.role_id', '=', 2) //assumes that admin id = 2
+                        ->where('users.estate_id', '=', $estate->id)
+                        ->get();
+            foreach ($admins as $admin)
+            {
+                $admin->notify(new AdminActivateResident($user));
+            }
             $user->sendEmailVerificationNotification();
             $email = new ResidentMail($details);
+
             Mail::to($details['email'])->queue($email);
-            $details = [
-                "subject" => "New User Alert",
-                "name" => $user->surname. " ".$user->othernames,
-                "message" => "Dear {$estate->name} administrator, there is a new resident waiting for activation.",
-                "email" => $estate->email,
-                "from" => $estate->mail_slug,
-            ];
-            $email = new GeneralMail($details);
-            Mail::to($details['email'])->queue($email);
+            /*            $details = [
+                            "subject" => "New User Alert",
+                            "name" => $user->surname. " ".$user->othernames,
+                            "message" => "Dear {$estate->name} administrator, there is a new resident waiting for activation.",
+                            "email" => $estate->email,
+                            "from" => $estate->mail_slug,
+                        ];
+                        $email = new GeneralMail($details);
+                        Mail::to($details['email'])->queue($email);*/
             createNewResidentInvoice::dispatch($user);
 
             return $this->sendResponse(new ResidentResource($resident), 'Your account has been successfully created and an email has been sent to verify your email.');

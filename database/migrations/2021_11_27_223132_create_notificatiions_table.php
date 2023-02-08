@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateNotihificationsTable extends Migration
+
+class CreateNotificatiionsTable extends Migrations
 {
     /**
      * Run the migrations.
@@ -13,7 +14,7 @@ class CreateNotihificationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('notihifications', function (Blueprint $table) {
+        Schema::create('notifiications', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('estate_id')->nullable();

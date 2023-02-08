@@ -17,6 +17,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::view('/counter', 'counter');
 
 Route::get('email/verify/{id}', [\App\Http\Controllers\API\VerificationController::class, 'verify'])->name('verification.verify');
 Route::get('email/resend', [\App\Http\Controllers\API\VerificationController::class, 'resend'])->name('verification.resend');

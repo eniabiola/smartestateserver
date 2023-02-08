@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\Auth;
 
+use App\Events\PushNotificationEvent;
 use App\Http\Controllers\API\BaseController;
 use App\Http\Requests\AuthenticationRegisterRequest;
 use App\Http\Resources\RoleResource;
@@ -73,6 +74,7 @@ class AuthenticationController extends BaseController
             'user_token' => $userToken,
             'user' => $this->getUserData($user)
         ];
+        $message = "User Logged In";
         return $this->sendSuccess($data,'User Logged In', Response::HTTP_OK);
     }
 

@@ -8,6 +8,7 @@
         "php": "^7.3|^8.0",
         "appointer/swaggervel": "dev-master",
         "coconutcraig/laravel-postmark": "^2.11",
+        "crystoline/laravel-rest-api": "^2.0",
         "doctrine/dbal": "~2.3",
         "fakerphp/faker": "^1.9.1",
         "fruitcake/laravel-cors": "^2.0",
@@ -20,6 +21,7 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "laravelcollective/html": "^6.2",
+        "pusher/pusher-php-server": "^7.0",
         "spatie/laravel-permission": "^5.3",
         "tymon/jwt-auth": "^1.0",
         "yajra/laravel-datatables-oracle": "^9.19"
@@ -36,7 +38,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "app/helper.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
