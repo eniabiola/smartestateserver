@@ -77,7 +77,7 @@ class UserAPIController extends AppBaseController
     {
         $date_from = $request->query('date_from') != "null" && $request->query('date_from') != "" ? $request->query('date_from') : null;
         $date_to = $request->query('date_to') != "null" && $request->query('date_to') != "" ? $request->query('date_to') : null;
-        $street = $request->query('guest_name') != "null" && $request->query('guest_name') != "" ? $request->query('date_from') : null;
+        $street = $request->query('street') != "null" && $request->query('street') != "" ? $request->query('street') : null;
 
         if (Auth::user()->hasrole('superadministrator'))
         {
@@ -115,7 +115,7 @@ class UserAPIController extends AppBaseController
                 $query->whereBetween("users.created_at", [$from, $to]);
             })
             ->when(!is_null($street), function ($query) use($street){
-                $query->whereBetween("residents.street_id", $street);
+                $query->where("residents.street_id", $street);
             });
 
         $columns = $this->userRepository->getTableColumns();

@@ -7,7 +7,7 @@ Your login email is {{$maildata['email']}}
 And Password is as set.
 
 To login to your dashbord please click the activate link below
-@component('mail::button', ['url' => 'http://vgcpora.baloshapps.com/auth/login'])
+@component('mail::button', ['url' => config("url_constants.front_end_url").'/auth/login'])
 Activate
 @endcomponent
 

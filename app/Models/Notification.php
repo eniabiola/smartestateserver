@@ -32,7 +32,7 @@ class Notification extends Model
     use SoftDeletes;
 
 
-    public $table = 'notifications';
+    public $table = 'notifiications';
 
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';

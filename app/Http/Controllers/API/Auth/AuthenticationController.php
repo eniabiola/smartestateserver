@@ -143,7 +143,7 @@ class AuthenticationController extends BaseController
             $resident = Resident::query()->where('user_id', $user->id)->first();
 
             $resident_info = [
-                'resident_id' => $resident->id,
+                // 'resident_id' => $resident->id,
                 'house_no' => $resident->houseNo,
                 'street' => $resident->street,
                 'meter_number' => $resident->meterNo,
@@ -203,7 +203,8 @@ class AuthenticationController extends BaseController
         //TODO: send message to user to reset email
 
         $message = "Dear {$user->surname} {$user->othernames}, click on the link below to reset your password" . PHP_EOL;
-        $url = $this->url."/auth/reset-password/{$token}";
+
+        $url = config("url_constants.front_end_url")."/auth/reset-password/{$token}";
 
         $maildata = [
             'name' => $user->surname. " ".$user->othernames,

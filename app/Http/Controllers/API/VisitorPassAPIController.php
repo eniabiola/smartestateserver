@@ -76,7 +76,7 @@ class VisitorPassAPIController extends AppBaseController
                 'users.surname AS users__dot__surname',
                 'users.othernames AS users__dot__othernames',
                 'users.phone AS users__dot__phone',
-                'users.email AS users__dot__email',)
+                'users.email AS users__dot__email')
             ->when($search_request != null, function ($query) use($search_request, $search){
                 $query->where(function($query) use($search_request, $search){
                     foreach($search as $key => $value) {
@@ -106,6 +106,9 @@ class VisitorPassAPIController extends AppBaseController
 
         return $datatableService->dataTable2($request, $builder, [
             '*',
+            "visitationDate" => function(VisitorPass $visitorPass) {
+                return date('Y-m-d H:i:s', strtotime($visitorPass->visitationDate));
+            },
             'name' => function (VisitorPass $visitorPass) {
                 return $visitorPass->users__dot__surname ." ".$visitorPass->users__dot__othernames;
             },
@@ -113,7 +116,7 @@ class VisitorPassAPIController extends AppBaseController
                 if($visitorPass->status == null || $visitorPass->status == strtolower("inactive")) return "<span class='badge badge-pill badge-info'>Open</span> ";
                     if($visitorPass->status == strtolower("active")) return "<span class='badge badge-pill badge-success'>Checked In</span>";
                     if($visitorPass->status == strtolower("approved")) return "<span class='badge badge-pill badge-success'>Approved</span>";
-                    if($visitorPass->status == strtolower("close") || $visitorPass->status == "closed") return "<span class='badge badge-pill badge-dark'>Close</span>";
+                    if($visitorPass->status == strtolower("close") || $visitorPass->status == "closed") return "<span class='badge badge-pill badge-dark'>Checkedout Out</span>";
                     if($visitorPass->status == strtolower("rejected")) return "<span class='badge badge-pill badge-danger'>Rejected</span>";
                     if($visitorPass->status == strtolower("expired")) return "<span class='badge badge-pill badge-danger'>Expired</span>";
             },
@@ -188,16 +191,18 @@ class VisitorPassAPIController extends AppBaseController
                 ->where('name', 'pass_count')
                 ->where('estate_id', Auth::user()->estate_id)
                 ->first();
-        if ($settings){
+        if ($settings && !\request()->user()->hasRole('administrator')){
             if ($visitor_pass_count >= intval($settings->value))
             {
                 return $this->sendError("You have reached your daily visitor pass quota limit");
             }
             $pass_remaining = intval($settings->value) - intval($visitor_pass_count);
+        } else {
+            $pass_remaining = "unlimited";
         }
 
 
-        $generatedCode = random_int(100000, 999999);
+        $generatedCode = $this->generateUniqueCode();
 //        $generatedCode = str_shuffle($code);
         $date = date('Y-m-d H:i:s');
         $user = \request()->user();
@@ -479,6 +484,30 @@ class VisitorPassAPIController extends AppBaseController
         file_put_contents('pass_authentication' . date('Y-m-d') . '.txt', 'Pass Authentication response: @ ' . date("Y-m-d H:i:s") . ' ' . print_r($details, true) . "\n\n", FILE_APPEND);
         return $this->sendResponse($visitorPass, "Pass successfully {$request->authorization}");
 
+    }
+
+    /**
+     * Write code on Method
+     *
+     * @return response()
+     */
+    public function generateUniqueCode()
+    {
+        do {
+            $code = random_int(100000, 999999);
+        } while (VisitorPass::where("generatedCode", "=", $code)->first());
+
+        return $code;
+    }
+
+    //deleted repeated code rows
+    public function deleteRepeatedFunctions()
+    {
+        $visitorPasses = VisitorPass::all();
+        $visitorPassesUnique = $visitorPasses->unique('id');
+        $visitorPassesDupes = $visitorPasses->diff($visitorPassesUnique);
+
+        dd($visitorPasses, $visitorPassesUnique, $visitorPassesDupes);
     }
 
 }
