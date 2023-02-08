@@ -25,7 +25,7 @@ class UpdateBillingAPIRequest extends APIRequest
     public function rules()
     {
         $rules = Billing::$rules;
-        
+        $rules['name'] = 'required|string|max:100|unique:billings,name,'.$this->route('billing');
         return $rules;
     }
 }

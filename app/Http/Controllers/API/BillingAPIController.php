@@ -138,8 +138,12 @@ class BillingAPIController extends AppBaseController
         if (empty($billing)) {
             return $this->sendError('Billing not found');
         }
-
-        $billing->delete();
+        try {
+            $billing->delete();
+        } catch (\Throwable $th)
+        {
+            return $this->sendError("Unable to delete billing item");
+        }
 
         return $this->sendSuccess('Billing deleted successfully');
     }

@@ -220,7 +220,6 @@ class ResidentAPIController extends AppBaseController
             $wallet->transaction_type = "opening";
             $wallet->user_id = $user->id;
             $wallet->save();
-            DB::commit();
 
             $admins = User::query()
                         ->join('model_has_roles', 'model_has_roles.model_id', '=', 'users.id')
@@ -245,6 +244,8 @@ class ResidentAPIController extends AppBaseController
                         $email = new GeneralMail($details);
                         Mail::to($details['email'])->queue($email);*/
             createNewResidentInvoice::dispatch($user);
+
+            DB::commit();
 
             return $this->sendResponse(new ResidentResource($resident), 'Your account has been successfully created and an email has been sent to verify your email.');
         } catch (\Exception $th)

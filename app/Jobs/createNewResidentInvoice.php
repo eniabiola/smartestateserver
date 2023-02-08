@@ -36,6 +36,7 @@ class createNewResidentInvoice implements ShouldQueue
     {
         $billings = Billing::query()
             ->where('bill_target', 'new')
+            ->orWhere('bill_target', 'current_new')
             ->get();
         $utilityService->CreateInvoice($billings, $this->user);
         //TODO Send mail that they have invoice to pay
