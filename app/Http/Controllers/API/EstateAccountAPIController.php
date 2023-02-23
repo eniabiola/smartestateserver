@@ -6,13 +6,16 @@ use App\Http\Controllers\AppBaseController;
 use App\Http\Controllers\Controller;
 use App\Models\Estate;
 use App\Models\EstateAccount;
+use App\Models\RandomInt;
 use Illuminate\Http\Request;
 use App\Traits\ResponseTrait;
 use App\Traits\ApiCallTrait;
+use phpDocumentor\Reflection\Types\Integer;
+use App\Traits\FlutterPaymentTrait;
 
 class EstateAccountAPIController extends AppBaseController
 {
-    use ResponseTrait, ApiCallTrait;
+    use ResponseTrait, ApiCallTrait, FlutterPaymentTrait;
 
     //TODO for admin list all accounts and their accounts
     //TODO create new sub-accounts from flutter
@@ -58,30 +61,12 @@ class EstateAccountAPIController extends AppBaseController
             "country" => "NG"
         ];
 
-        $secret_key = config('flutterwave.secretKey');
-
-        $headers = ["Authorization:" => "Bearer " . $secret_key];
-        $url = "https://api.flutterwave.com/v3/subaccounts";
-        $result = $this->curlPost1($url, $fields);
-        if ($result['status'] == "error")
+        $profile_estate = $this->profileAccount($fields, $estate_id);
+        if (!$profile_estate['status'])
         {
-            \Log::info($result['message']);
-            return $this->failedResponse("Unable to profile merchant account, please contact the administrator");
+            return $this->failedResponse($profile_estate['message']);
         }
-        if ($result['status'] == "success"){
-            EstateAccount::query()->create(
-                [
-                    "estate_id"         => $estate_id,
-                    "bank_code"         => $result['data']['account_bank'],
-                    "account_number"    => $result['data']['account_number'],
-                    "account_name"      => $result['data']['full_name'],
-                    "split_type"        => $result['data']['split_type'],
-                    "split_value"       => $result['data']['split_value'],
-                    "subaccount_id"     => $result['data']['subaccount_id']
-                ]
-            );
-            return $this->successResponse("Account has been successfully profiled.");
-        }
+        return $this->successResponse($profile_estate['message'], 201, $profile_estate['data']);
 
         //Todo if it was a success enter it into the db table
 
@@ -131,5 +116,29 @@ class EstateAccountAPIController extends AppBaseController
     public function destroy($id)
     {
         //
+    }
+
+    public function generateRandomNumbers()
+    {
+        $iterator = 10000;
+        for ($i = 0; $i < $iterator; $i++)
+        {
+            $randomNR = $this->generateRandomInt();
+            $random = new RandomInt();
+            $random->number = $randomNR;
+            $random->save();
+        }
+    }
+
+
+    public function generateRandomInt(){
+        do{
+            $randomNR = mt_rand(100000000000000,999999999999999);
+            $randomNR = 'g'.$randomNR;
+            $exist = RandomInt::query()
+                ->where('number', $randomNR)
+                ->first();
+        }while(!empty($exist));
+        return $randomNR;
     }
 }

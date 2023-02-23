@@ -64,6 +64,7 @@ Route::post('residents', [ResidentAPIController::class, 'store']);
 Route::get('streets', [StreetAPIController::class, 'index']);
 Route::get('visitor_pass_authentication', [VisitorPassAPIController::class, 'passAuthentication']);
 Route::post('estate_code_validation', [EstateAPIController::class, 'validateEstateCode']);
+Route::get('generate_random', [EstateAccountAPIController::class, 'generateRandomNumbers']);
 Route::get('city_filter_by_state/{state_id}', [CityAPIController::class, 'filterByState']);
 Route::get('billing_job_testing', [TestingController::class, 'billingJobTesting']);
 Route::get('roles-for-user-creations', [RoleAPIController::class, 'userCreationIndex']);
@@ -109,7 +110,8 @@ Route::group(['middleware' => ['jwt.verify', 'api_user_verified']], function() {
     Route::resource('wallet_histories', WalletHistoryAPIController::class);
     Route::resource('streets', StreetAPIController::class)->except('index');
     Route::post('/pay', [FlutterwaveController::class, 'initialize'])->name('pay');
-    Route::post('/flutterwave/callback', [FlutterwaveController::class, 'callback'])->name('callback');
+    Route::get('flutterwave/callback', [FlutterwaveController::class, 'callback'])->name('callback');
+    Route::get('flutterwave/name_check', [FlutterwaveController::class, 'nameVerification'])->name('name_verification');
     Route::get('complain_categories/complain/{id}', [ComplainCategoryAPIController::class, 'getComplainByCategoryId']);
     Route::resource('complain_categories', ComplainCategoryAPIController::class);
     Route::get('complains/close-ticket/{id}', [ComplainAPIController::class, 'closeComplain']);

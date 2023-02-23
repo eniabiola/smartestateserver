@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "620227d6c559c48ebd26b5da714b77aa",
+    "content-hash": "8081b12abb25441c5b9585ce56cacd8d",
     "packages": [
         {
             "name": "appointer/swaggervel",
@@ -1166,6 +1166,61 @@
                 "source": "https://github.com/FakerPHP/Faker/tree/v1.16.0"
             },
             "time": "2021-09-06T14:53:37+00:00"
+        },
+        {
+            "name": "flutterwavedev/flutterwave-v3",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Flutterwave/PHP.git",
+                "reference": "6662946b499b8998ca1b4f5e500c69ea63c65bca"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Flutterwave/PHP/zipball/6662946b499b8998ca1b4f5e500c69ea63c65bca",
+                "reference": "6662946b499b8998ca1b4f5e500c69ea63c65bca",
+                "shasum": ""
+            },
+            "require": {
+                "mashape/unirest-php": ">=3.0",
+                "monolog/monolog": ">=2.0",
+                "php": ">=5.4.0",
+                "vlucas/phpdotenv": ">=2.5"
+            },
+            "require-dev": {
+                "mockery/mockery": ">=1.2",
+                "phpunit/phpunit": ">=6.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Flutterwave\\": "library/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Flutterwave Developers",
+                    "email": "developers@flutterwavego.com"
+                }
+            ],
+            "description": "A simple SDK for integrating to Flutterwave's Rave payment",
+            "homepage": "https://github.com/Flutterwave/Flutterwave-PHP-v3",
+            "keywords": [
+                "africa",
+                "flutterwave",
+                "payment",
+                "rave",
+                "transfers"
+            ],
+            "support": {
+                "issues": "https://github.com/Flutterwave/PHP/issues",
+                "source": "https://github.com/Flutterwave/PHP/tree/1.0.3"
+            },
+            "time": "2022-06-30T18:46:31+00:00"
         },
         {
             "name": "fruitcake/laravel-cors",
@@ -2792,6 +2847,57 @@
                 }
             ],
             "time": "2021-11-21T11:48:40+00:00"
+        },
+        {
+            "name": "mashape/unirest-php",
+            "version": "v3.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Mashape/unirest-php.git",
+                "reference": "842c0f242dfaaf85f16b72e217bf7f7c19ab12cb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Mashape/unirest-php/zipball/842c0f242dfaaf85f16b72e217bf7f7c19ab12cb",
+                "reference": "842c0f242dfaaf85f16b72e217bf7f7c19ab12cb",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "codeclimate/php-test-reporter": "0.1.*",
+                "phpunit/phpunit": "~4.4"
+            },
+            "suggest": {
+                "ext-json": "Allows using JSON Bodies for sending and parsing requests"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Unirest\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Unirest PHP",
+            "homepage": "https://github.com/Mashape/unirest-php",
+            "keywords": [
+                "client",
+                "curl",
+                "http",
+                "https",
+                "rest"
+            ],
+            "support": {
+                "email": "opensource@mashape.com",
+                "issues": "https://github.com/Mashape/unirest-php/issues",
+                "source": "https://github.com/Mashape/unirest-php/tree/master"
+            },
+            "time": "2016-08-11T17:49:21+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -9847,5 +9953,5 @@
         "php": "^7.3|^8.0"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.3.0"
 }

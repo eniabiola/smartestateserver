@@ -13,6 +13,7 @@ use App\Repositories\EstateRepository;
 use App\Repositories\UserRepository;
 use App\Services\UploadService;
 use App\Services\UtilityService;
+use App\Traits\FlutterPaymentTrait;
 use http\Url;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
@@ -28,6 +29,7 @@ use Response;
 
 class EstateAPIController extends AppBaseController
 {
+    use FlutterPaymentTrait;
     /** @var  EstateRepository */
     private $estateRepository;
 
@@ -80,6 +82,7 @@ class EstateAPIController extends AppBaseController
      */
     public function store(CreateEstateAPIRequest $request, UploadService $uploadService, UtilityService $utilityService)
     {
+        // check for image and upload or give default name
         if ($request->has('imageName') && $request->imageName != null){
             $imageUploadAction = $uploadService->uploadImageBase64($request->imageName, "estateImages/");
             if($imageUploadAction['status'] === false){
@@ -91,6 +94,7 @@ class EstateAPIController extends AppBaseController
         } else {
             $filename = "default.jpg";
         }
+
         $request->merge(['imageName' => $filename, 'status' => 'active',
             'estateCode' => $utilityService->generateCode(6), 'country_id' => 156]);
         $input = $request->all();
@@ -98,6 +102,8 @@ class EstateAPIController extends AppBaseController
         DB::beginTransaction();
         $estate = $this->estateRepository->create($input);
         $password = $utilityService->generateCode(6);
+
+        // Generate estate admin
         $user = User::firstOrCreate([
             "surname" => $estate->contactPerson,
             "othernames" => "",
@@ -107,6 +113,9 @@ class EstateAPIController extends AppBaseController
             "estate_id" => $estate->id,
             "isActive" => true,
         ]);
+
+        //Set estate admin Role
+
         DB::commit();
         $details = [
           "name" => $request->contactPerson,
@@ -121,7 +130,27 @@ class EstateAPIController extends AppBaseController
         $email = new UserWelcomeMail($details);
         Mail::to($details['email'])->queue($email);
 
-        return $this->sendResponse( new EstateResource($estate), 'Estate saved successfully');
+        $fields = [
+            "account_bank" => $estate->bank->bank_code,
+            "account_number" => $estate->accountNumber,
+            "business_name" => $estate->accountName,
+            "business_email" => $estate->email,
+            "business_contact" => $estate->phone,
+            "business_contact_mobile" => $estate->phone,
+            "business_mobile" => $estate->phone,
+            "country" => "NG"
+        ];
+
+        $profile_estate_account = $this->profileAccount($fields, $estate->id);
+        logger(print_r($profile_estate_account, 1));
+        if ($profile_estate_account['status'])
+        {
+            $message = "Estate saved and account successfully created";
+        } else {
+            $message = "Estate saved and account creation failed";
+        }
+        //Job to create estate account
+        return $this->sendResponse( new EstateResource($estate), $message);
     }
 
     /**
