@@ -26,7 +26,7 @@ class FlutterwaveController extends AppBaseController
      * Initialize Rave payment process
      * @return void
      */
-    public function initialize(Request $request)
+    public function initialize1(Request $request)
     {
         $this->validate($request, [
            'amount' => 'required|numeric'
@@ -92,6 +92,67 @@ class FlutterwaveController extends AppBaseController
             ],
             "subaccounts" => [
                 $accounts
+            ],
+
+            "customizations" => [
+                "title" => 'Movie Ticket',
+                "description" => "20th October"
+            ]
+        ];
+
+        $payment = Flutterwave::initializePayment($data);
+
+
+        if ($payment['status'] !== 'success') {
+            dd($payment);
+            // notify something went wrong
+            return;
+        }
+
+        return $payment['data']['link'];
+    }
+
+
+    public function initialize(Request $request)
+    {
+        $accounts =  json_encode([
+            "id" => "RS_9E36EE8570C1E5BA42B118EB9CA44170"
+        ], true);
+
+//        return redirect()->to(url('/new'));
+
+        //This generates a payment reference
+        $reference = Flutterwave::generateReference();
+
+        $transaction = new Transaction();
+        $transaction->user_id = Auth::id();
+        $transaction->estate_id = Auth::user()->estate_id;
+        $transaction->description = "wallet Funding ".date("Y-m-d H:i:s");
+        $transaction->amount = $request->amount;
+        $transaction->gateway_commission = 0.00;
+        $transaction->total_amount = $request->amount;
+        $transaction->transaction_type = "debit";
+        $transaction->transaction_status = "initiated";
+        $transaction->transaction_reference = $reference;
+        $transaction->date_initiated = date("Y-m-d H:i:s");
+        $transaction->save();
+
+        // Enter the details of the payment
+
+        $data = [
+            'payment_options' => 'card,banktransfer',
+            'amount' => 500,
+            'email' => "engineerenny@gmail.com",
+            'tx_ref' => $reference,
+            'currency' => "NGN",
+            'redirect_url' => route('api.callback'),
+            'customer' => [
+                'email' => "engineerenny@gmail.com",
+                "phone_number" => "08163214587",
+                "name" => "Test User"
+            ],
+            "subaccounts" => [
+                        $accounts
             ],
 
             "customizations" => [
@@ -252,6 +313,7 @@ class FlutterwaveController extends AppBaseController
         ]);
         return $wallet;
     }
+
 
 
 }
