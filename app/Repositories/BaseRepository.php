@@ -220,6 +220,7 @@ abstract class BaseRepository
     public function all($search = [], $skip = null, $limit = null, $columns = ['*'])
     {
         $query = $this->allQuery($search, $skip, $limit);
+        $query = $query->orderByDesc('created_at');
 
         return $query->get($columns);
     }

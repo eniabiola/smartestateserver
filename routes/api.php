@@ -49,8 +49,15 @@ Route::get('testing', function ()
 {
     return "This endpoint is reachable and the URL is valid";
 });
+Route::get('do-files', [\App\Http\Controllers\API\ExternalFileUploadController::class, 'callFolderIteration']);
 Route::get('/check', function () {
     Artisan::call('queue:work');
+});
+Route::get('/create-invoice', function () {
+    \Artisan::call('create:invoice');
+});
+Route::get('/pay-bills', function () {
+    \Artisan::call('pay:bills');
 });
 Route::post('estate_account/{estate_id}', [EstateAccountAPIController::class, 'store']);
 Route::apiResource('estate_account', EstateAccountAPIController::class);
@@ -64,6 +71,7 @@ Route::post('residents', [ResidentAPIController::class, 'store']);
 Route::get('streets', [StreetAPIController::class, 'index']);
 Route::get('visitor_pass_authentication', [VisitorPassAPIController::class, 'passAuthentication']);
 Route::post('estate_code_validation', [EstateAPIController::class, 'validateEstateCode']);
+Route::get('generate_random', [EstateAccountAPIController::class, 'generateRandomNumbers']);
 Route::get('city_filter_by_state/{state_id}', [CityAPIController::class, 'filterByState']);
 Route::get('billing_job_testing', [TestingController::class, 'billingJobTesting']);
 Route::get('roles-for-user-creations', [RoleAPIController::class, 'userCreationIndex']);
@@ -96,6 +104,8 @@ Route::group(['middleware' => ['jwt.verify', 'api_user_verified']], function() {
     Route::get('visitor_passes_per_user/{user_id}', [VisitorPassAPIController::class, 'userIndex']);
     Route::resource('visitor_passes', VisitorPassAPIController::class);
     Route::resource('visitor_pass_categories', VisitorPassCategoryAPIController::class);
+    Route::get('paginated_billings', [BillingAPIController::class, 'paginatedIndex'])->name('paginated_index');
+    Route::get('billings/toggle_status/{billing_id}', [BillingAPIController::class, 'toggleStatus']);
     Route::resource('billings', BillingAPIController::class);
     Route::post('pay-invoice', [InvoiceAPIController::class, 'payInvoice']);
     Route::get('user-outstanding', [InvoiceAPIController::class, 'userOutstanding']);
@@ -109,7 +119,8 @@ Route::group(['middleware' => ['jwt.verify', 'api_user_verified']], function() {
     Route::resource('wallet_histories', WalletHistoryAPIController::class);
     Route::resource('streets', StreetAPIController::class)->except('index');
     Route::post('/pay', [FlutterwaveController::class, 'initialize'])->name('pay');
-    Route::post('/flutterwave/callback', [FlutterwaveController::class, 'callback'])->name('callback');
+    Route::post('flutterwave/callback', [FlutterwaveController::class, 'callback'])->name('callback');
+    Route::get('flutterwave/name_check', [FlutterwaveController::class, 'nameVerification'])->name('name_verification');
     Route::get('complain_categories/complain/{id}', [ComplainCategoryAPIController::class, 'getComplainByCategoryId']);
     Route::resource('complain_categories', ComplainCategoryAPIController::class);
     Route::get('complains/close-ticket/{id}', [ComplainAPIController::class, 'closeComplain']);

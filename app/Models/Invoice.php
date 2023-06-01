@@ -29,7 +29,7 @@ class Invoice extends Model
 
 
     public $table = 'invoices';
-    
+
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
@@ -45,6 +45,9 @@ class Invoice extends Model
         'name',
         'description',
         'invoiceNo',
+        'invoice_day',
+        'invoice_month',
+        'invoice_year',
         'amount',
         'status'
     ];

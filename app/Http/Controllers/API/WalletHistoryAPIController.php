@@ -36,24 +36,30 @@ class WalletHistoryAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $walletHistories = Transaction::query()
+        $walletHistories = WalletHistory::query()
             ->when(Auth::user()->hasrole('resident'), function ($query){
-                $query->where('user_id', request()->user()->id);
+                $query->where('user_id', request()->user()->id)
+                ->select('prev_balance', 'amount', 'current_balance', 'description', 'transaction_type', 'created_at');
             })
             ->when(Auth::user()->hasrole('administrator'), function ($query){
-                $query->whereHas('user', function($query){
-                    $query->where('estate_id',request()->user()->estate_id);
-                });
+                $query->join('users', 'users.id', '=', 'wallet_histories.user_id')
+                      ->where('users.estate_id', '=', request()->user()->estate_id)
+                       ->select('wallet_histories.prev_balance', 'wallet_histories.amount',
+                           'wallet_histories.current_balance', 'wallet_histories.description',
+                           'wallet_histories.transaction_type', 'wallet_histories.created_at', 'users.email');
             })
             ->when(Auth::user()->hasrole('superadministrator'), function ($query){
-                $query->whereHas('user', function($query){
-                    $query->where('estate_id',request()->user()->estate_id);
-                });
+                $query->join('users', 'users.id', '=', 'wallet_histories.user_id')
+                    ->where('users.estate_id', '=', request()->user()->estate_id)
+                    ->select('wallet_histories.prev_balance', 'wallet_histories.amount',
+                        'wallet_histories.current_balance', 'wallet_histories.description',
+                        'wallet_histories.transaction_type', 'wallet_histories.created_at', 'users.email');
             })
-            ->orderBy('created_at', 'DESC')
-            ->get();
+            ->orderBy('wallet_histories.created_at', 'DESC')
+            ->paginate(20);
 
-        return $this->sendResponse($walletHistories->toArray(), 'Wallet Histories retrieved successfully');
+        return $this->sendResponse($walletHistories, 'Wallet Histories retrieved successfully');
+
     }
 
     /**
@@ -70,11 +76,11 @@ class WalletHistoryAPIController extends AppBaseController
             abort(404);
             return $this->sendError("You have no right to view this page");
         }
-        $walletHistories = Transaction::query()
+        $walletHistories = WalletHistory::query()
             ->when(Auth::user()->hasrole('administrator'), function ($query){
                 $query->whereHas('user', function($query){
-                    $query->where('estate_id',request()->user()->estate_id)
-                    ->where('user_id', $user_id);
+                    $query->where('estate_id',request()->user()->estate_id);
+//                    ->where('user_id', $user_id);
                 });
             })
             ->when(Auth::user()->hasrole('superadministrator'), function ($query){
@@ -83,9 +89,10 @@ class WalletHistoryAPIController extends AppBaseController
                 });
             })
             ->orderBy('created_at', 'DESC')
-            ->get();
+            ->paginate(20);
 
-        return $this->sendResponse($walletHistories->toArray(), 'Wallet Histories retrieved successfully');
+        return $this->sendResponse($walletHistories, 'Wallet Histories retrieved successfully');
+
     }
 
     /**

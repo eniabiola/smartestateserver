@@ -23,7 +23,7 @@ class WalletHistory extends Model
 
 
     public $table = 'wallet_histories';
-    
+
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
@@ -34,6 +34,7 @@ class WalletHistory extends Model
 
     public $fillable = [
         'prev_balance',
+        'user_id',
         'amount',
         'current_balance',
         'transaction_type',
@@ -70,5 +71,5 @@ class WalletHistory extends Model
         'deleted_at' => 'nullable'
     ];
 
-    
+
 }

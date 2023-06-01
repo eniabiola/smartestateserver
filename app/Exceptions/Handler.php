@@ -61,6 +61,7 @@ class Handler extends ExceptionHandler
 
         if ($exception instanceof \PDOException)
         {
+            logger($exception);
             report($exception->getMessage());
             return $this->failedResponse("Error performing operation PD.", 400);
         }

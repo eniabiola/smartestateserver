@@ -329,6 +329,7 @@ class UserAPIController extends AppBaseController
 
     public function notifications(Request $request)
     {
+        return [];
 //        return $request->user();
         return auth()->user()->unreadNotifications()->limit(20)->get()->toArray();
     }

@@ -26,6 +26,7 @@ class BillingResource extends JsonResource
             "status" => $this->status,
             "estate_id" => $this->estate_id,
             "estate" => $this->estate->name,
+            "created_at" => $this->created_at,
             "created_by" => $this->created_by,
             "created_by_user" => $this->createdBy->surname
         ];

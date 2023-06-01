@@ -26,15 +26,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Billing extends Model
 {
-    use SoftDeletes;
 
 
     public $table = 'billings';
 
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
-
-    protected $dates = ['deleted_at'];
 
 
     public $fillable = [
@@ -45,8 +42,6 @@ class Billing extends Model
         'bill_target',
         'invoice_day',
         'invoice_month',
-        'due_day',
-        'due_month',
         'status',
         'estate_id',
         'created_by'
@@ -108,7 +103,6 @@ class Billing extends Model
 
     protected $hidden = [
         'created_at',
-        'updated_at',
-        'deleted_at'
+        'updated_at'
     ];
 }

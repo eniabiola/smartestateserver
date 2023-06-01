@@ -8,7 +8,9 @@ use App\Models\Transaction;
 use App\Repositories\TransactionRepository;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
+use Illuminate\Support\Facades\DB;
 use Response;
+use Auth;
 
 /**
  * Class TransactionController
@@ -34,11 +36,37 @@ class TransactionAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $transactions = $this->transactionRepository->all(
-            $request->except(['skip', 'limit']),
-            $request->get('skip'),
-            $request->get('limit')
-        );
+        $status = $request->status ?? null;
+        $date_from = $request->date_from ?? null;
+        $date_to = $request->date_to ?? null;
+        $transactions = Transaction::query()
+            ->when(!is_null($status), function ($query) use($status){
+                $query->when('wallet_histories', '=', $status);
+            })
+            ->when(!is_null($date_from), function ($query) use($date_to, $date_from){
+                
+            })
+            ->when(Auth::user()->hasrole('resident'), function ($query){
+                $query->where('user_id', request()->user()->id)
+                    ->select('transactions.amount', 'transactions.transaction_reference',
+                        'transactions.transaction_status', 'transactions.date_initiated');
+            })
+            ->when(Auth::user()->hasrole('administrator'), function ($query){
+                $query->join('users', 'users.id', '=', 'wallet_histories.user_id')
+                    ->where('users.estate_id', '=', request()->user()->estate_id)
+                    ->select('users.email', DB::raw("CONCAT(`users`.`surname`,`users`.`othernames`) as full_name"),
+                        'transactions.amount', 'transactions.transaction_reference',
+                        'transactions.transaction_status', 'transactions.date_initiated');
+            })
+            ->when(Auth::user()->hasrole('superadministrator'), function ($query){
+                $query->join('users', 'users.id', '=', 'wallet_histories.user_id')
+                    ->where('users.estate_id', '=', request()->user()->estate_id)
+                    ->select('users.email', DB::raw("CONCAT(`users`.`surname`,`users`.`othernames`) as full_name"),
+                        'transactions.amount', 'transactions.transaction_reference',
+                        'transactions.transaction_status', 'transactions.date_initiated');
+            })
+            ->orderBy('transactions.created_at', 'DESC')
+            ->paginate(20);;
 
         return $this->sendResponse($transactions->toArray(), 'Transactions retrieved successfully');
     }
@@ -127,5 +155,10 @@ class TransactionAPIController extends AppBaseController
         $transaction->delete();
 
         return $this->sendSuccess('Transaction deleted successfully');
+    }
+
+    public function transactionRequery(Request $request, $transaction_reference)
+    {
+
     }
 }

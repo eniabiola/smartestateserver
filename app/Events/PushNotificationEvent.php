@@ -39,6 +39,6 @@ class PushNotificationEvent implements ShouldBroadcast
 
     public function broadcastAs()
     {
-        return "form-submitted";
+//        return "form-submitted";
     }
 }

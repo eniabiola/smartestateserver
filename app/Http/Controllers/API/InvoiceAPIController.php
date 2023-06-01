@@ -6,6 +6,7 @@ use App\Http\Requests\API\CreateInvoiceAPIRequest;
 use App\Http\Requests\API\UpdateInvoiceAPIRequest;
 use App\Http\Resources\InvoiceResource;
 use App\Mail\GeneralMail;
+use App\Models\Estate;
 use App\Models\Invoice;
 use App\Models\Transaction;
 use App\Models\Wallet;
@@ -41,9 +42,27 @@ class InvoiceAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
-        $search = $request->get('search');
-        $estate_id = $request->get('estate_id');
-        $invoices = $this->invoiceRepository->paginateViewBasedOnRole('20', ['*'], $search, $estate_id);
+        $status = $request->get('status') ?? null;
+        $billing = $request->get('invoiceId') ?? null;
+        logger($billing);
+
+        logger($billing);
+        logger(\request()->user()->estate_id);
+        $invoices = Invoice::query()
+                    ->when(!Auth::user()->hasRole('superadministrator'), function($q){
+                        $q->where('estate_id', \request()->user()->estate_id)
+                          ->where('user_id', '=', Auth::id());
+//                          ->groupBy('user_id');
+                    })
+                    ->when(!is_null($billing) && $billing != "null", function($q) use($billing){
+                        logger($billing);
+                        $q->where('billing_id', '=', $billing);
+                    })
+                    ->when(!is_null($status) && $status != "null", function($q) use($status){
+                        logger($status);
+                        $q->where('status', '=', $status);
+                    })
+                    ->paginate(20);
 
         return $this->sendResponse(InvoiceResource::collection($invoices)->response()->getData(true), 'Invoices retrieved successfully');
     }

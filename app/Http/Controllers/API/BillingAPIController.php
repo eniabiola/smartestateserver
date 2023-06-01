@@ -37,6 +37,7 @@ class BillingAPIController extends AppBaseController
      */
     public function index(Request $request)
     {
+
         $billings = $this->billingRepository->all(
             $request->except(['skip', 'limit']),
             $request->get('skip'),
@@ -46,9 +47,17 @@ class BillingAPIController extends AppBaseController
         return $this->sendResponse(BillingResource::collection($billings), 'Billings retrieved successfully');
     }
 
-    public function UserIndex(Request $request)
+    public function paginatedIndex(Request $request)
     {
+        $status = $request->get('status') ?? null;
+        $billings = Billing::query()
+            ->when(!is_null($status) && $status != "null", function ($q) use ($status){
+                    $q->where('status', '=', strtolower($status));
+            })
+            ->orderByDesc('created_at')
+            ->paginate(20);
 
+        return $this->sendResponse(BillingResource::collection($billings)->response()->getData(true), 'Billings retrieved successfully');
     }
 
     /**
@@ -104,7 +113,7 @@ class BillingAPIController extends AppBaseController
      *
      * @return Response
      */
-    public function update($id, UpdateBillingAPIRequest $request)
+    public function update(int $id, UpdateBillingAPIRequest $request)
     {
         $input = $request->all();
 
@@ -142,9 +151,27 @@ class BillingAPIController extends AppBaseController
             $billing->delete();
         } catch (\Throwable $th)
         {
+            logger("Billing error occurring on ".date("Y-m-d h:i:s"));
+            report($th);
             return $this->sendError("Unable to delete billing item");
         }
 
         return $this->sendSuccess('Billing deleted successfully');
+    }
+
+    public function toggleStatus($billing_id)
+    {
+        $billing = Billing::find($billing_id);
+        if (!$billing) { return $this->sendError("No such billing found"); }
+        if ($billing->status  == "active")
+        {
+            $billing->status = "inactive";
+            $message = "Billing is now inactive";
+        } else {
+            $billing->status = "active";
+            $message = "Billing is now active";
+        }
+        $billing->save();
+        return $this->sendSuccess($message);
     }
 }

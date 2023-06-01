@@ -26,6 +26,7 @@ class InvoiceResource extends JsonResource
             "invoice_number" => $this->invoiceNo,
             "amount" => $this->amount,
             "status" => $this->status,
+            "created_at" => $this->created_at
         ];
         return parent::toArray($request);
     }

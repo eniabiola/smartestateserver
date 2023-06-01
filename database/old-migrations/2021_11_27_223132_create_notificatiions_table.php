@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 
-class CreateNotificatiionsTable extends Migrations
+class CreateNotificatiionsTable extends Migration
 {
     /**
      * Run the migrations.

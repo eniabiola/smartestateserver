@@ -29,6 +29,7 @@
     "require-dev": {
         "bennett-treptow/laravel-migration-generator": "^4.3",
         "facade/ignition": "^2.5",
+        "kitloong/laravel-migrations-generator": "^6.10",
         "laravel/sail": "^1.0.1",
         "mockery/mockery": "^1.4.4",
         "nunomaduro/collision": "^5.10",
