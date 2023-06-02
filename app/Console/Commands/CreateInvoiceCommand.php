@@ -51,7 +51,11 @@ class CreateInvoiceCommand extends Command
          * What is the Frequency
          * Get the date, check if the date is today, then create the invoices
          */
-        $users = User::all();
+        $users = User::query()
+            ->whereHas("roles", function($q){
+                $q->where("name", '=', 'resident');
+            })
+            ->get();
 
         $billings = Billing::query()
             ->where(function ($query){
