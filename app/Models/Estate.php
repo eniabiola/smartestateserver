@@ -104,7 +104,7 @@ class Estate extends Model
      */
     public static $rules = [
         'city_id' => 'required|integer|exists:cities,id',
-        'mail_slug' => 'required|string|max:5',
+        'mail_slug' => 'required|string|max:10',
         'state_id' => 'required|integer|exists:states,id',
         'bank_id' => 'required|integer|exists:banks,id',
         'email' => 'required|string|max:100',
@@ -114,10 +114,6 @@ class Estate extends Model
         'accountNumber' => 'required|max:12',
         'accountName' => 'required|string|max:100',
         'imageName' => 'nullable|sometimes',
-        'accountVerified' => 'nullable|boolean',
-        'alternativeContact' => 'nullable|string|max:100',
-        'alternateEmail' => 'nullable|string|max:100',
-        'alternatePhone' => 'nullable|string|max:17',
         'created_by' => 'required|integer|exists:users,id',
     ];
 

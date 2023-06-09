@@ -107,8 +107,8 @@ class EstateAPIController extends AppBaseController
         $user = User::firstOrCreate([
             "surname" => $estate->contactPerson,
             "othernames" => "",
-            "phone" =>$estate->phone,
-            "email" => $estate->email,
+            "phone" =>$request->contactphone,
+            "email" => $estate->contactemail,
             "password" =>  bcrypt($password),
             "estate_id" => $estate->id,
             "isActive" => true,
@@ -120,7 +120,7 @@ class EstateAPIController extends AppBaseController
         $details = [
           "name" => $request->contactPerson,
           "estate_name" => $request->name,
-          "email" => $request->email,
+          "email" => $request->contactemail,
           "message" => "An account has been created for you as the estate manager of $request->name estate",
           "password" => $password,
           "url"      => url('/')."/auth/login",
